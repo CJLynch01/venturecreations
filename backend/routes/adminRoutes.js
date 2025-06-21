@@ -3,13 +3,35 @@ import Product from "../models/Product.js";
 
 const router = express.Router();
 
+// Middleware to check admin access
+function ensureAdmin(req, res, next) {
+  if (req.user && req.user.email === process.env.ADMIN_EMAIL) {
+    return next();
+  }
+  res.redirect("/");
+}
+
+// Admin Dashboard
+router.get("/admin", ensureAdmin, async (req, res) => {
+  try {
+    const products = await Product.find();
+    res.render("admin", {
+      user: req.user,
+      products
+    });
+  } catch (error) {
+    console.error("Admin page error:", error);
+    res.status(500).send("Error loading admin dashboard.");
+  }
+});
+
 // Show Add Product Form
-router.get("/admin/products/new", (req, res) => {
+router.get("/admin/products/new", ensureAdmin, (req, res) => {
   res.render("admin/newProduct");
 });
 
 // Handle Add Product Form
-router.post("/admin/products/new", async (req, res) => {
+router.post("/admin/products/new", ensureAdmin, async (req, res) => {
   try {
     const { name, price, sizes, colors, category, imageUrl, stock } = req.body;
 
@@ -32,7 +54,7 @@ router.post("/admin/products/new", async (req, res) => {
 });
 
 // Show Edit Form
-router.get("/admin/products/edit/:id", async (req, res) => {
+router.get("/admin/products/edit/:id", ensureAdmin, async (req, res) => {
   try {
     const product = await Product.findById(req.params.id);
     res.render("admin/editProduct", { product });
@@ -42,8 +64,8 @@ router.get("/admin/products/edit/:id", async (req, res) => {
   }
 });
 
-// Handle Edit Form
-router.post("/admin/products/edit/:id", async (req, res) => {
+// Handle Edit Form Submission
+router.post("/admin/products/edit/:id", ensureAdmin, async (req, res) => {
   try {
     const { name, price, sizes, colors, category, imageUrl, stock } = req.body;
 
@@ -64,8 +86,8 @@ router.post("/admin/products/edit/:id", async (req, res) => {
   }
 });
 
-// Handle Delete
-router.post("/admin/products/delete/:id", async (req, res) => {
+// Handle Delete Request
+router.post("/admin/products/delete/:id", ensureAdmin, async (req, res) => {
   try {
     await Product.findByIdAndDelete(req.params.id);
     res.redirect("/admin");

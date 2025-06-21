@@ -32,22 +32,14 @@ const mockUser = {
 
 app.use((req, res, next) => {
   req.user = mockUser;
-  res.locals.user = mockUser; // makes user available in EJS partials
+  res.locals.user = mockUser;
   next();
 });
-
-// Admin access middleware
-function ensureAdmin(req, res, next) {
-  if (req.user && req.user.email === process.env.ADMIN_EMAIL) {
-    return next();
-  }
-  res.redirect("/");
-}
 
 // API Routes
 app.use("/api/products", productRoutes);
 
-// Admin EJS Routes
+// Admin Routes
 app.use("/", adminRoutes);
 
 // Public Pages
@@ -59,20 +51,6 @@ app.get("/", async (req, res) => {
 app.get("/shop", async (req, res) => {
   const products = await Product.find();
   res.render("shop", { products });
-});
-
-// Admin Dashboard
-app.get("/admin", ensureAdmin, async (req, res) => {
-  try {
-    const products = await Product.find();
-    res.render("admin", {
-      user: req.user,
-      products
-    });
-  } catch (error) {
-    console.error("Admin page error:", error);
-    res.status(500).send("Error loading admin dashboard.");
-  }
 });
 
 // MongoDB & Server
