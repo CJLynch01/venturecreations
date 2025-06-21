@@ -15,10 +15,10 @@
     <div class="product-grid">
       <% products.forEach(product => { %>
         <div class="product-card">
-          <img src="<%= product.imagePath %>" alt="<%= product.name %>">
-          <h2><%= product.name %></h2>
-          <p>$<%= product.price.toFixed(2) %></p>
-          <a href="/shop/<%= product._id %>" class="btn">View Shirt</a>
+            <img src="<%= product.images[0] %>" alt="<%= product.name %>">
+            <h2><%= product.name %></h2>
+            <p>$<%= product.price.toFixed(2) %></p>
+            <a href="/shop/<%= product._id %>" class="btn">View Shirt</a>
         </div>
       <% }) %>
     </div>
