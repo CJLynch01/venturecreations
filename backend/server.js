@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import path from "path";
 import { fileURLToPath } from "url";
 import productRoutes from "./routes/productRoutes.js";
+import adminRoutes from "./routes/adminRoutes.js";
 import Product from "./models/Product.js";
 
 dotenv.config();
@@ -45,6 +46,9 @@ function ensureAdmin(req, res, next) {
 
 // API Routes
 app.use("/api/products", productRoutes);
+
+// Admin EJS Routes
+app.use("/", adminRoutes);
 
 // Public Pages
 app.get("/", async (req, res) => {

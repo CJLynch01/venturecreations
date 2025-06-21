@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Add New Product | Admin</title>
+  <link rel="stylesheet" href="/css/styles.css" />
+</head>
+<body>
+  <%- include('../partials/header') %>
+
+  <main class="container">
+    <h1>Add New Product</h1>
+
+    <form action="/admin/products/new" method="POST">
+      <label>Product Name</label>
+      <input type="text" name="name" required>
+
+      <label>Price ($)</label>
+      <input type="number" step="0.01" name="price" required>
+
+      <label>Sizes (comma-separated)</label>
+      <input type="text" name="sizes" placeholder="S,M,L,XL" required>
+
+      <label>Colors (comma-separated)</label>
+      <input type="text" name="colors" placeholder="Black,White" required>
+
+      <label>Category</label>
+      <input type="text" name="category" required>
+
+      <label>Image URL</label>
+      <input type="text" name="imageUrl" required>
+
+      <label>Stock</label>
+      <input type="number" name="stock" required>
+
+      <button type="submit" class="btn">Add Product</button>
+    </form>
+  </main>
+
+  <%- include('../partials/footer') %>
+</body>
+</html>
