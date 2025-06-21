@@ -1,0 +1,19 @@
+<header class="site-header">
+  <div class="container">
+    <h1 class="logo"><a href="/">Venture Creations</a></h1>
+    <nav class="main-nav">
+      <ul>
+        <li><a href="/">Home</a></li>
+        <li><a href="/shop">Shop</a></li>
+        <li><a href="/contact">Contact</a></li>
+
+        <% if (user && user.email === process.env.ADMIN_EMAIL) { %>
+          <li><a href="/admin">Admin</a></li>
+          <li><a href="/logout">Logout</a></li>
+        <% } else { %>
+          <li><a href="/auth/google">Login</a></li>
+        <% } %>
+      </ul>
+    </nav>
+  </div>
+</header>

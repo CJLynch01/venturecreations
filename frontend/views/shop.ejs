@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Shop | Venture Creations</title>
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+  <%- include('partials/header') %>
+
+  <main class="container">
+    <h1 class="page-title">Our Collection</h1>
+
+    <div class="product-grid">
+      <% products.forEach(product => { %>
+        <div class="product-card">
+          <img src="<%= product.imagePath %>" alt="<%= product.name %>">
+          <h2><%= product.name %></h2>
+          <p>$<%= product.price.toFixed(2) %></p>
+          <a href="/shop/<%= product._id %>" class="btn">View Shirt</a>
+        </div>
+      <% }) %>
+    </div>
+  </main>
+
+  <%- include('partials/footer') %>
+</body>
+</html>

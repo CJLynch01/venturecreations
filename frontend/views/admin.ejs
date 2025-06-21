@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Dashboard | Venture Creations</title>
+  <link rel="stylesheet" href="/css/styles.css" />
+</head>
+<body>
+  <%- include('partials/header') %>
+
+  <main class="container">
+    <h1>Admin Dashboard</h1>
+    <p>Welcome, <%= user.displayName %>!</p>
+
+    <section class="dashboard-controls">
+      <h2>Manage Products</h2>
+      <a href="/admin/products/new" class="btn">Add New Product</a>
+    </section>
+
+    <div class="product-grid">
+      <% if (products.length === 0) { %>
+        <p>No products available. Start by adding one.</p>
+      <% } else { %>
+        <% products.forEach(product => { %>
+          <div class="product-card">
+            <img src="<%= product.imageUrl %>" alt="<%= product.name %>">
+            <h3><%= product.name %></h3>
+            <p>$<%= product.price.toFixed(2) %></p>
+            <div class="admin-actions">
+              <a href="/admin/products/edit/<%= product._id %>" class="btn">Edit</a>
+              <form action="/admin/products/delete/<%= product._id %>" method="POST" style="display:inline;">
+                <button type="submit" class="btn delete-btn">Delete</button>
+              </form>
+            </div>
+          </div>
+        <% }) %>
+      <% } %>
+    </div>
+  </main>
+
+  <%- include('partials/footer') %>
+</body>
+</html>

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Home | Venture Creations</title>
+  <link rel="stylesheet" href="/css/styles.css" />
+</head>
+<body>
+  <%- include('partials/header') %>
+
+  <main class="home-hero">
+    <div class="hero-content">
+      <h1>Creating Shirts to Support All of Life’s Ventures</h1>
+      <p>From missionary work to youth group events, we craft custom shirts that inspire confidence and unity.</p>
+      <a href="/shop" class="btn">Shop Now</a>
+    </div>
+  </main>
+
+  <section class="featured-section container">
+    <h2>Featured Designs</h2>
+    <div class="product-grid">
+      <% products.slice(0, 3).forEach(product => { %>
+        <div class="product-card">
+          <img src="<%= product.imagePath %>" alt="<%= product.name %>">
+          <h3><%= product.name %></h3>
+          <p>$<%= product.price.toFixed(2) %></p>
+          <a href="/shop/<%= product._id %>" class="btn">View Shirt</a>
+        </div>
+      <% }) %>
+    </div>
+  </section>
+
+  <%- include('partials/footer') %>
+</body>
+</html>
