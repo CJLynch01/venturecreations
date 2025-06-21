@@ -14,7 +14,7 @@ function ensureAdmin(req, res, next) {
 // Admin Dashboard
 router.get("/admin", ensureAdmin, async (req, res) => {
   try {
-    const products = await Product.find();
+    const products = await Product.find().sort({ _id: -1 }).limit(3); // Most recent
     res.render("admin/admin", {
       user: req.user,
       products
@@ -25,6 +25,18 @@ router.get("/admin", ensureAdmin, async (req, res) => {
   }
 });
 
+// Full Product List (Admin Only)
+router.get("/admin/products", ensureAdmin, async (req, res) => {
+  try {
+    const products = await Product.find().sort({ _id: -1 });
+    res.render("admin/allProducts", { products });
+  } catch (err) {
+    console.error("Error loading all products:", err);
+    res.status(500).send("Failed to load product list.");
+  }
+});
+
+
 // Show Add Product Form
 router.get("/admin/products/new", ensureAdmin, (req, res) => {
   res.render("admin/newProduct");
@@ -33,16 +45,24 @@ router.get("/admin/products/new", ensureAdmin, (req, res) => {
 // Handle Add Product Form
 router.post("/admin/products/new", ensureAdmin, async (req, res) => {
   try {
-    const { name, price, sizes, colors, category, imageUrl, stock } = req.body;
+    const { name, price, sizes, colors, category, stock } = req.body;
+    let { images } = req.body;
+
+    // Ensure 'images' is an array
+    if (!Array.isArray(images)) {
+      images = [images]; // make it an array if it's just one string
+    }
+
+    const cleanImages = images.filter(url => url.trim() !== "");
 
     const newProduct = new Product({
       name,
-      price,
-      sizes: sizes.split(',').map(s => s.trim()),
-      colors: colors.split(',').map(c => c.trim()),
+      price: parseFloat(price),
+      sizes: sizes.split(",").map(s => s.trim()),
+      colors: colors.split(",").map(c => c.trim()),
       category,
-      imageUrl,
-      stock
+      images: cleanImages,
+      stock: parseInt(stock, 10)
     });
 
     await newProduct.save();

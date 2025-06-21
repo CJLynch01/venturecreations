@@ -19,12 +19,13 @@ export const createProduct = async (req, res) => {
       sizes,
       colors,
       category,
-      stock
+      stock,
+      images = []
     } = req.body;
 
-    const images = Array.isArray(req.body.images)
-      ? req.body.images.filter(url => url.trim() !== "")
-      : [req.body.images].filter(url => url.trim() !== "");
+    const cleanImages = Array.isArray(images)
+      ? images.filter(url => url.trim() !== "")
+      : [images].filter(url => url.trim() !== "");
 
     const newProduct = new Product({
       name,
@@ -32,8 +33,8 @@ export const createProduct = async (req, res) => {
       sizes: sizes.split(",").map(s => s.trim()),
       colors: colors.split(",").map(c => c.trim()),
       category,
-      stock: parseInt(stock),
-      images
+      stock: parseInt(stock, 10),
+      images: cleanImages
     });
 
     await newProduct.save();
