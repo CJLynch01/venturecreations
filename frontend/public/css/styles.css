@@ -122,3 +122,37 @@
   text-decoration: none;
   border-radius: 4px;
 }
+
+/* Admin Product Form Styling */
+.product-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  background: #fff;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.product-form label {
+  font-weight: 600;
+  color: #333;
+}
+
+.product-form input {
+  padding: 0.75rem;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  transition: border-color 0.3s ease;
+}
+
+.product-form input:focus {
+  border-color: #555;
+  outline: none;
+}
+
+.product-form .btn {
+  margin-top: 1rem;
+  align-self: start;
+}

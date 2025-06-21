@@ -22,7 +22,7 @@
     <div class="product-grid">
       <% products.slice(0, 3).forEach(product => { %>
         <div class="product-card">
-          <img src="<%= product.imagePath %>" alt="<%= product.name %>">
+          <img src="<%= product.imageUrl %>" alt="<%= product.name %>">
           <h3><%= product.name %></h3>
           <p>$<%= product.price.toFixed(2) %></p>
           <a href="/shop/<%= product._id %>" class="btn">View Shirt</a>

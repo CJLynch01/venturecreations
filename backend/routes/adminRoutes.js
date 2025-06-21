@@ -15,7 +15,7 @@ function ensureAdmin(req, res, next) {
 router.get("/admin", ensureAdmin, async (req, res) => {
   try {
     const products = await Product.find();
-    res.render("admin", {
+    res.render("admin/admin", {
       user: req.user,
       products
     });

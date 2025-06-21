@@ -12,7 +12,7 @@
   <main class="container">
     <h1>Add New Product</h1>
 
-    <form action="/admin/products/new" method="POST">
+    <form action="/admin/products/new" method="POST" class="product-form">
       <label>Product Name</label>
       <input type="text" name="name" required>
 
@@ -28,8 +28,11 @@
       <label>Category</label>
       <input type="text" name="category" required>
 
-      <label>Image URL</label>
-      <input type="text" name="imageUrl" required>
+      <label>Image URLs (up to 4)</label>
+      <input type="text" name="images" placeholder="Image 1" required>
+      <input type="text" name="images" placeholder="Image 2">
+      <input type="text" name="images" placeholder="Image 3">
+      <input type="text" name="images" placeholder="Image 4">
 
       <label>Stock</label>
       <input type="number" name="stock" required>
