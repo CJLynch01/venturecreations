@@ -6,6 +6,8 @@ import { fileURLToPath } from "url";
 import productRoutes from "./routes/productRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
 import Product from "./models/Product.js";
+import session from "express-session";
+import cartRoutes from "./routes/cartRoutes.js";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -36,6 +38,12 @@ app.use((req, res, next) => {
   next();
 });
 
+app.use(session({
+  secret: "yourSecretKey",
+  resave: false,
+  saveUninitialized: true,
+}));
+
 // API Routes
 app.use("/api/products", productRoutes);
 
@@ -43,7 +51,10 @@ app.use("/api/products", productRoutes);
 app.use("/", adminRoutes);
 
 // Product Routes
-app.use("/", productRoutes);
+app.use("/shop", productRoutes);
+
+// Cart Routes
+app.use("/", cartRoutes);
 
 // Public Pages
 app.get("/", async (req, res) => {

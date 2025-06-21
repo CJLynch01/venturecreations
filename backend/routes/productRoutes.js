@@ -1,22 +1,28 @@
 import express from 'express';
-import { getProducts, createProduct } from '../controllers/productController.js';
 import Product from '../models/Product.js';
+import { getProducts, createProduct } from '../controllers/productController.js';
 
 const router = express.Router();
 
-router.get('/', getProducts);
+// GET /shop/
+router.get('/', async (req, res) => {
+  const products = await Product.find();
+  res.render('shop', { products });
+});
 
-router.get("/shop/:id", async (req, res) => {
+// GET /shop/:id — product view page
+router.get('/:id', async (req, res) => {
   try {
     const product = await Product.findById(req.params.id);
     if (!product) return res.status(404).send("Product not found");
-    res.render("shop/product", { product });
+    res.render('product', { product }); // ✅ make sure this file exists
   } catch (err) {
     console.error("Error loading product:", err);
     res.status(500).send("Failed to load product.");
   }
 });
 
+// POST /api/products
 router.post('/', createProduct);
 
 export default router;

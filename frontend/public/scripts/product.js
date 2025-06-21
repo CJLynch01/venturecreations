@@ -1,10 +1,19 @@
 document.addEventListener("DOMContentLoaded", () => {
-  const mainImage = document.getElementById("main-image");
-  const thumbnails = document.querySelectorAll(".thumbnail");
+  const images = JSON.parse(document.getElementById("mainImage").dataset.images);
+  const mainImage = document.getElementById("mainImage");
+  let currentIndex = 0;
 
-  thumbnails.forEach((thumb) => {
-    thumb.addEventListener("click", () => {
-      mainImage.src = thumb.src;
-    });
+  const showImage = (index) => {
+    mainImage.src = images[index];
+  };
+
+  document.getElementById("prevImage").addEventListener("click", () => {
+    currentIndex = (currentIndex - 1 + images.length) % images.length;
+    showImage(currentIndex);
+  });
+
+  document.getElementById("nextImage").addEventListener("click", () => {
+    currentIndex = (currentIndex + 1) % images.length;
+    showImage(currentIndex);
   });
 });

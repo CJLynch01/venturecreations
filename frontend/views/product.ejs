@@ -4,32 +4,39 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title><%= product.name %> | Venture Creations</title>
-  <link rel="stylesheet" href="/css/styles.css" />
-  <script src="/scripts/product.js" defer></script>
+  <link rel="stylesheet" href="/css/styles.css">
+  <script src="/scripts/product.js"></script>
 </head>
 <body>
-  <%- include('../partials/header') %>
+  <%- include('partials/header') %>
 
   <main class="container product-detail">
-    <div class="product-gallery">
-      <img id="main-image" src="<%= product.images[0] %>" alt="<%= product.name %>" />
-      <div class="thumbnail-row">
-        <% product.images.forEach(img => { %>
-          <img class="thumbnail" src="<%= img %>" alt="Thumbnail of <%= product.name %>">
-        <% }) %>
-      </div>
+    <div class="product-images">
+        <img id="mainImage" src="<%= product.images[0] %>" data-images='<%= JSON.stringify(product.images) %>' alt="<%= product.name %>">
+        <div class="image-controls">
+            <button id="prevImage" class="carousel-btn">❮</button>
+            <button id="nextImage" class="carousel-btn">❯</button>
+        </div>
     </div>
 
     <div class="product-info">
       <h1><%= product.name %></h1>
       <p class="price">$<%= product.price.toFixed(2) %></p>
-      <p><strong>Category:</strong> <%= product.category %></p>
-      <p><strong>Sizes:</strong> <%= product.sizes.join(", ") %></p>
-      <p><strong>Colors:</strong> <%= product.colors.join(", ") %></p>
-      <p><strong>In Stock:</strong> <%= product.stock %></p>
+      <p class="category"><%= product.category %></p>
+      <p>Available sizes: <%= product.sizes.join(', ') %></p>
+      <p>Colors: <%= product.colors.join(', ') %></p>
+      <p>In Stock: <%= product.stock %></p>
     </div>
+
+    <form action="/cart/add" method="POST">
+        <input type="hidden" name="productId" value="<%= product._id %>">
+        <button type="submit" class="btn">Add to Cart</button>
+    </form>
+
+
+
   </main>
 
-  <%- include('../partials/footer') %>
+  <%- include('partials/footer') %>
 </body>
 </html>
