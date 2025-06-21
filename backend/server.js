@@ -3,18 +3,24 @@ import mongoose from "mongoose";
 import dotenv from "dotenv";
 import path from "path";
 import { fileURLToPath } from "url";
+import session from "express-session";
+
+// Routes
 import productRoutes from "./routes/productRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
-import Product from "./models/Product.js";
-import session from "express-session";
 import cartRoutes from "./routes/cartRoutes.js";
+
+// Models
+import Product from "./models/Product.js";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Path resolution
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+// Load environment variables
 dotenv.config({ path: path.join(__dirname, ".env") });
 
 // Middleware
@@ -22,14 +28,22 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "../frontend/public")));
 
+app.use(
+  session({
+    secret: "yourSecretKey", // Change this to a secure value
+    resave: false,
+    saveUninitialized: true,
+  })
+);
+
 // View Engine
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "../frontend/views"));
 
-// Mock user middleware (temporary until OAuth is added)
+// Mock user (until OAuth is added)
 const mockUser = {
   displayName: process.env.ADMIN_NAME,
-  email: process.env.ADMIN_EMAIL
+  email: process.env.ADMIN_EMAIL,
 };
 
 app.use((req, res, next) => {
@@ -38,23 +52,10 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use(session({
-  secret: "yourSecretKey",
-  resave: false,
-  saveUninitialized: true,
-}));
-
-// API Routes
-app.use("/api/products", productRoutes);
-
-// Admin Routes
-app.use("/", adminRoutes);
-
-// Product Routes
-app.use("/shop", productRoutes);
-
-// Cart Routes
-app.use("/", cartRoutes);
+// Route mounts
+app.use("/api/products", productRoutes); // API endpoints
+app.use("/admin", adminRoutes);          // Admin routes
+app.use("/cart", cartRoutes);            // Cart routes
 
 // Public Pages
 app.get("/", async (req, res) => {
@@ -67,8 +68,21 @@ app.get("/shop", async (req, res) => {
   res.render("shop", { products });
 });
 
-// MongoDB & Server
-mongoose.connect(process.env.MONGO_URI)
+// Individual Product Page
+app.get("/shop/:id", async (req, res) => {
+  try {
+    const product = await Product.findById(req.params.id);
+    if (!product) return res.status(404).send("Product not found");
+    res.render("shop/product", { product });
+  } catch (err) {
+    console.error("Error loading product:", err);
+    res.status(500).send("Failed to load product.");
+  }
+});
+
+// Database & Server Start
+mongoose
+  .connect(process.env.MONGO_URI)
   .then(() => {
     console.log("MongoDB Connected");
     app.listen(PORT, () => {
