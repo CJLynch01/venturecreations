@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title><%= product.name %> | Venture Creations</title>
+  <link rel="stylesheet" href="/css/styles.css" />
+  <script src="/scripts/product.js" defer></script>
+</head>
+<body>
+  <%- include('../partials/header') %>
+
+  <main class="container product-detail">
+    <div class="product-gallery">
+      <img id="main-image" src="<%= product.images[0] %>" alt="<%= product.name %>" />
+      <div class="thumbnail-row">
+        <% product.images.forEach(img => { %>
+          <img class="thumbnail" src="<%= img %>" alt="Thumbnail of <%= product.name %>">
+        <% }) %>
+      </div>
+    </div>
+
+    <div class="product-info">
+      <h1><%= product.name %></h1>
+      <p class="price">$<%= product.price.toFixed(2) %></p>
+      <p><strong>Category:</strong> <%= product.category %></p>
+      <p><strong>Sizes:</strong> <%= product.sizes.join(", ") %></p>
+      <p><strong>Colors:</strong> <%= product.colors.join(", ") %></p>
+      <p><strong>In Stock:</strong> <%= product.stock %></p>
+    </div>
+  </main>
+
+  <%- include('../partials/footer') %>
+</body>
+</html>
