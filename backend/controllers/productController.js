@@ -10,7 +10,7 @@ export const getProducts = async (req, res) => {
   }
 };
 
-// POST /api/products
+// POST /admin/products/new
 export const createProduct = async (req, res) => {
   try {
     const {
@@ -19,32 +19,27 @@ export const createProduct = async (req, res) => {
       sizes,
       colors,
       category,
-      stock,
-      images
+      stock
     } = req.body;
 
-    // Handle sizes and colors as comma-separated strings
-    const sizeArray = Array.isArray(sizes) ? sizes : sizes.split(',').map(s => s.trim());
-    const colorArray = Array.isArray(colors) ? colors : colors.split(',').map(c => c.trim());
+    const images = Array.isArray(req.body.images)
+      ? req.body.images.filter(url => url.trim() !== "")
+      : [req.body.images].filter(url => url.trim() !== "");
 
-    // Filter out any empty image fields
-    const imageArray = Array.isArray(images)
-      ? images.filter(url => url.trim() !== '')
-      : [images]; // fallback in case it's a single string
-
-    const product = new Product({
+    const newProduct = new Product({
       name,
-      price,
-      sizes: sizeArray,
-      colors: colorArray,
+      price: parseFloat(price),
+      sizes: sizes.split(",").map(s => s.trim()),
+      colors: colors.split(",").map(c => c.trim()),
       category,
-      stock,
-      images: imageArray
+      stock: parseInt(stock),
+      images
     });
 
-    await product.save();
-    res.status(201).json(product);
+    await newProduct.save();
+    res.redirect("/admin");
   } catch (err) {
-    res.status(400).json({ message: 'Error creating product', error: err });
+    console.error("Error creating product:", err);
+    res.status(400).send("Error creating product");
   }
 };
