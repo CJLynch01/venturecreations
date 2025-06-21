@@ -42,6 +42,9 @@ app.use("/api/products", productRoutes);
 // Admin Routes
 app.use("/", adminRoutes);
 
+// Product Routes
+app.use("/", productRoutes);
+
 // Public Pages
 app.get("/", async (req, res) => {
   const products = await Product.find().sort({ createdAt: -1 }).limit(3);
