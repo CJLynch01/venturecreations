@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Home | Venture Creations</title>
   <link rel="stylesheet" href="/css/styles.css" />
+  <script src="../public/scripts/home.js"></script>
 </head>
 <body>
   <%- include('partials/header') %>
@@ -22,12 +23,11 @@
     <div class="product-grid">
       <% products.slice(0, 3).forEach(product => { %>
         <div class="product-card">
-            <img src="<%= product.images[0] %>" alt="<%= product.name %>">
+            <img class="product-img" src="<%= product.images[0] %>" data-images='<%= JSON.stringify(product.images) %>' alt="<%= product.name %>">
             <h3><%= product.name %></h3>
             <p>$<%= product.price.toFixed(2) %></p>
             <a href="/shop/<%= product._id %>" class="btn">View Shirt</a>
         </div>
-
       <% }) %>
     </div>
   </section>
