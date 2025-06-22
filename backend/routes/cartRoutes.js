@@ -50,7 +50,7 @@ router.post("/remove", (req, res) => {
 });
 
 // Update quantity
-router.post("/cart/update", (req, res) => {
+router.post("/update", (req, res) => {
   const { productId, action } = req.body;
   const cart = req.session.cart || [];
 
