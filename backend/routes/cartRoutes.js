@@ -6,7 +6,7 @@ const router = express.Router();
 // View Cart
 router.get("/", (req, res) => {
   const cart = req.session.cart || [];
-  res.render("cart", { cart });
+  res.render("shop/cart", { cart });
 });
 
 // Add to Cart
