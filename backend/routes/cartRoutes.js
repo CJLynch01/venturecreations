@@ -4,7 +4,7 @@ import Product from "../models/Product.js";
 const router = express.Router();
 
 // View Cart
-router.get("/cart", (req, res) => {
+router.get("/", (req, res) => {
   const cart = req.session.cart || [];
   res.render("cart", { cart });
 });
@@ -41,7 +41,7 @@ router.post("/add", async (req, res) => {
 });
 
 // Remove from Cart
-router.post("/cart/remove", (req, res) => {
+router.post("/remove", (req, res) => {
   const { productId } = req.body;
   if (!req.session.cart) req.session.cart = [];
 
