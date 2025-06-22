@@ -10,7 +10,7 @@ router.get("/cart", (req, res) => {
 });
 
 // Add to Cart
-router.post("/cart/add", async (req, res) => {
+router.post("/add", async (req, res) => {
   const { productId } = req.body;
 
   try {
