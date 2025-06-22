@@ -53,9 +53,9 @@ app.use((req, res, next) => {
 });
 
 // Route mounts
-app.use("/api/products", productRoutes); // API endpoints
-app.use("/admin", adminRoutes);          // Admin routes
-app.use("/cart", cartRoutes);            // Cart routes
+app.use("/api/products", productRoutes);
+app.use("/admin", adminRoutes);
+app.use("/cart", cartRoutes);
 
 // Public Pages
 app.get("/", async (req, res) => {

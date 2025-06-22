@@ -49,4 +49,21 @@ router.post("/remove", (req, res) => {
   res.redirect("/cart");
 });
 
+// Update quantity
+router.post("/cart/update", (req, res) => {
+  const { productId, action } = req.body;
+  const cart = req.session.cart || [];
+
+  const item = cart.find(i => i._id === productId);
+  if (item) {
+    if (action === "increase") {
+      item.quantity += 1;
+    } else if (action === "decrease" && item.quantity > 1) {
+      item.quantity -= 1;
+    }
+  }
+
+  res.redirect("/cart");
+});
+
 export default router;
