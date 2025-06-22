@@ -6,7 +6,6 @@
         <li><a href="/">Home</a></li>
         <li><a href="/shop">Shop</a></li>
         <li><a href="/contact">Contact</a></li>
-        <li><a href="/cart" class="cart-link">🛒 Cart</a></li>
 
         <% if (user && user.email === process.env.ADMIN_EMAIL) { %>
           <li><a href="/admin">Admin</a></li>
@@ -14,6 +13,13 @@
         <% } else { %>
           <li><a href="/auth/google">Login</a></li>
         <% } %>
+
+        <a href="/cart" class="cart-icon">
+            🛒
+            <% if (cart && cart.length > 0) { %>
+                <span class="cart-count"><%= cart.reduce((sum, item) => sum + item.quantity, 0) %></span>
+            <% } %>
+        </a>
       </ul>
     </nav>
   </div>

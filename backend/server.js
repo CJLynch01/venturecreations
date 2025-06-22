@@ -36,6 +36,11 @@ app.use(
   })
 );
 
+app.use((req, res, next) => {
+  res.locals.cart = req.session.cart || [];
+  next();
+});
+
 // View Engine
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "../frontend/views"));

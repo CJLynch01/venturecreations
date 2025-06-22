@@ -59,6 +59,23 @@
   text-decoration: underline;
 }
 
+.cart-icon {
+  position: relative;
+  text-decoration: none;
+  font-size: 1.5rem;
+}
+
+.cart-count {
+  position: absolute;
+  top: -8px;
+  right: -10px;
+  background-color: red;
+  color: white;
+  font-size: 0.7rem;
+  padding: 2px 6px;
+  border-radius: 50%;
+}
+
 .site-footer {
   background-color: #222;
   color: #ccc;
