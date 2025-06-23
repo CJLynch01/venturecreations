@@ -12,7 +12,7 @@ function ensureAdmin(req, res, next) {
 }
 
 // Admin Dashboard
-router.get("/admin", ensureAdmin, async (req, res) => {
+router.get("/", ensureAdmin, async (req, res) => {
   try {
     const products = await Product.find().sort({ _id: -1 }).limit(3); // Most recent
     res.render("admin/admin", {
@@ -26,7 +26,7 @@ router.get("/admin", ensureAdmin, async (req, res) => {
 });
 
 // Full Product List (Admin Only)
-router.get("/admin/products", ensureAdmin, async (req, res) => {
+router.get("/products", ensureAdmin, async (req, res) => {
   try {
     const products = await Product.find().sort({ _id: -1 });
     res.render("admin/allProducts", { products });

@@ -30,7 +30,7 @@ app.use(express.static(path.join(__dirname, "../frontend/public")));
 
 app.use(
   session({
-    secret: "yourSecretKey", // Change this to a secure value
+    secret: "yourSecretKey",
     resave: false,
     saveUninitialized: true,
   })
