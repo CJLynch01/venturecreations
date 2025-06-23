@@ -38,12 +38,12 @@ router.get("/products", ensureAdmin, async (req, res) => {
 
 
 // Show Add Product Form
-router.get("/admin/products/new", ensureAdmin, (req, res) => {
+router.get("/products/new", ensureAdmin, (req, res) => {
   res.render("admin/newProduct");
 });
 
 // Handle Add Product Form
-router.post("/admin/products/new", ensureAdmin, async (req, res) => {
+router.post("/products/new", ensureAdmin, async (req, res) => {
   try {
     const { name, price, sizes, colors, category, stock } = req.body;
     let { images } = req.body;
@@ -74,7 +74,7 @@ router.post("/admin/products/new", ensureAdmin, async (req, res) => {
 });
 
 // Show Edit Form
-router.get("/admin/products/edit/:id", ensureAdmin, async (req, res) => {
+router.get("/products/edit/:id", ensureAdmin, async (req, res) => {
   try {
     const product = await Product.findById(req.params.id);
     res.render("admin/editProduct", { product });
@@ -85,7 +85,7 @@ router.get("/admin/products/edit/:id", ensureAdmin, async (req, res) => {
 });
 
 // Handle Edit Form Submission
-router.post("/admin/products/edit/:id", ensureAdmin, async (req, res) => {
+router.post("/products/edit/:id", ensureAdmin, async (req, res) => {
   try {
     const { name, price, sizes, colors, category, imageUrl, stock } = req.body;
 
@@ -107,7 +107,7 @@ router.post("/admin/products/edit/:id", ensureAdmin, async (req, res) => {
 });
 
 // Handle Delete Request
-router.post("/admin/products/delete/:id", ensureAdmin, async (req, res) => {
+router.post("/products/delete/:id", ensureAdmin, async (req, res) => {
   try {
     await Product.findByIdAndDelete(req.params.id);
     res.redirect("/admin");
