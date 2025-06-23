@@ -13,14 +13,16 @@
     <h1 class="page-title">Our Collection</h1>
 
     <div class="product-grid">
-      <% products.forEach(product => { %>
-        <div class="product-card">
-            <img src="<%= product.images[0] %>" alt="<%= product.name %>">
-            <h2><%= product.name %></h2>
-            <p>$<%= product.price.toFixed(2) %></p>
-            <a href="/shop/<%= product._id %>" class="btn">View Shirt</a>
-        </div>
-      <% }) %>
+        <% products.forEach(product => { %>
+            <div class="product-card">
+                <img src="<%= product.images[0] %>" alt="<%= product.name %>">
+                <h2><%= product.name %></h2>
+                <div class="product-info">
+                    <p class="price">$<%= product.price.toFixed(2) %></p>
+                    <a href="/shop/<%= product._id %>" class="btn">View Shirt</a>
+                </div>
+            </div>
+        <% }) %>
     </div>
   </main>
 
