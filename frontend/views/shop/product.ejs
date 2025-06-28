@@ -10,7 +10,7 @@
 <body>
   <%- include('../partials/header') %>
 
-  <main class="container product-detail">
+  <main class="container product-details">
     <div class="product-images">
         <img id="mainImage" src="<%= product.images[0] %>" data-images='<%= JSON.stringify(product.images) %>' alt="<%= product.name %>">
         <div class="image-controls">
@@ -19,7 +19,7 @@
         </div>
     </div>
 
-    <div class="product-page">
+    <div class="product-info">
       <h1><%= product.name %></h1>
       <p class="price">$<%= product.price.toFixed(2) %></p>
       <p class="category"><%= product.category %></p>
