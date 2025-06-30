@@ -1,6 +1,15 @@
+// ✅ Load .env locally to ensure it's available here too
+import dotenv from "dotenv";
+import path from "path";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+dotenv.config({ path: path.join(__dirname, "../.env") });
+
 import passport from "passport";
 import GoogleStrategy from "passport-google-oauth20";
-import User from "../models/User.js"; // Assume you have or will create this
+import User from "../models/User.js";
 
 passport.use(
   new GoogleStrategy({
@@ -12,19 +21,18 @@ passport.use(
       let user = await User.findOne({ googleId: profile.id });
 
       if (!user) {
-        // Default to 'Customer' unless email is found in a known list
-        const isAdmin = process.env.ADMIN_EMAILS?.split(',').includes(profile.emails[0].value);
+        const isAdmin = process.env.ADMIN_EMAILS?.split(",").includes(profile.emails[0].value);
         user = await User.create({
           googleId: profile.id,
           name: profile.displayName,
           email: profile.emails[0].value,
-          role: isAdmin ? 'Admin' : 'Customer'
+          role: isAdmin ? "Admin" : "Customer"
         });
       }
 
-      done(null, user);
+      return done(null, user);
     } catch (err) {
-      done(err, null);
+      return done(err, null);
     }
   })
 );
