@@ -1,31 +1,30 @@
-import express from "express";
-import mongoose from "mongoose";
+// ✅ Load environment variables FIRST
 import dotenv from "dotenv";
 import path from "path";
 import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+dotenv.config({ path: path.join(__dirname, ".env") }); // MUST come before using env vars
+
+// ✅ Now import everything else
+import express from "express";
+import mongoose from "mongoose";
 import session from "express-session";
+import passport from "./config/passport.js";
 
 // Routes
 import productRoutes from "./routes/productRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
 import cartRoutes from "./routes/cartRoutes.js";
-import authRoutes from "./routes/authRoutes.js"
-
-//Config
-import passport from "./config/passport.js";
+import authRoutes from "./routes/authRoutes.js";
 
 // Models
 import Product from "./models/Product.js";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-
-// Path resolution
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-// Load environment variables
-dotenv.config({ path: path.join(__dirname, ".env") });
 
 // Middleware
 app.use(express.json());
@@ -34,14 +33,18 @@ app.use(express.static(path.join(__dirname, "../frontend/public")));
 
 app.use(
   session({
-    secret: "yourSecretKey",
+    secret: process.env.SESSION_SECRET || "defaultSecret",
     resave: false,
     saveUninitialized: true,
   })
 );
 
+app.use(passport.initialize());
+app.use(passport.session());
+
 app.use((req, res, next) => {
   res.locals.cart = req.session.cart || [];
+  res.locals.user = req.user;
   next();
 });
 
@@ -49,18 +52,8 @@ app.use((req, res, next) => {
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "../frontend/views"));
 
-// User (OAuth)
-app.use(passport.initialize());
-app.use(passport.session());
-
-app.use((req, res, next) => {
-  res.locals.user = req.user;
-  next();
-});
-
+// Routes
 app.use("/auth", authRoutes);
-
-// Route mounts
 app.use("/api/products", productRoutes);
 app.use("/admin", adminRoutes);
 app.use("/cart", cartRoutes);
@@ -76,7 +69,6 @@ app.get("/shop", async (req, res) => {
   res.render("shop", { products });
 });
 
-// Individual Product Page
 app.get("/shop/:id", async (req, res) => {
   try {
     const product = await Product.findById(req.params.id);
@@ -88,7 +80,7 @@ app.get("/shop/:id", async (req, res) => {
   }
 });
 
-// Database & Server Start
+// Start server after connecting to MongoDB
 mongoose
   .connect(process.env.MONGO_URI)
   .then(() => {
