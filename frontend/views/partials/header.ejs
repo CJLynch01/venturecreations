@@ -8,22 +8,24 @@
         <li><a href="/contact">Contact</a></li>
 
         <% if (user) { %>
-          <span>Welcome, <%= user.name %>!</span>
+          <li><span>Welcome, <%= user.name %>!</span></li>
           <% if (user.role === "Admin") { %>
-            <a href="/admin">Admin Panel</a>
+            <li><a href="/admin">Admin Panel</a></li>
           <% } %>
-          <a href="/auth/logout">Logout</a>
+          <li><a href="/auth/logout">Logout</a></li>
         <% } else { %>
-          <a href="/auth/google">Login</a>
+          <li><a href="/auth/register">Register</a></li>
+          <li><a href="/auth/google">Login</a></li>
         <% } %>
 
-
-        <a href="/cart" class="cart-icon">
+        <li>
+          <a href="/cart" class="cart-icon">
             🛒
             <% if (cart && cart.length > 0) { %>
-                <span class="cart-count"><%= cart.reduce((sum, item) => sum + item.quantity, 0) %></span>
+              <span class="cart-count"><%= cart.reduce((sum, item) => sum + item.quantity, 0) %></span>
             <% } %>
-        </a>
+          </a>
+        </li>
       </ul>
     </nav>
   </div>
