@@ -9,6 +9,10 @@ import session from "express-session";
 import productRoutes from "./routes/productRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
 import cartRoutes from "./routes/cartRoutes.js";
+import authRoutes from "./routes/authRoutes.js"
+
+//Config
+import passport from "./config/passport.js";
 
 // Models
 import Product from "./models/Product.js";
@@ -45,17 +49,16 @@ app.use((req, res, next) => {
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "../frontend/views"));
 
-// Mock user (until OAuth is added)
-const mockUser = {
-  displayName: process.env.ADMIN_NAME,
-  email: process.env.ADMIN_EMAIL,
-};
+// User (OAuth)
+app.use(passport.initialize());
+app.use(passport.session());
 
 app.use((req, res, next) => {
-  req.user = mockUser;
-  res.locals.user = mockUser;
+  res.locals.user = req.user;
   next();
 });
+
+app.use("/auth", authRoutes);
 
 // Route mounts
 app.use("/api/products", productRoutes);

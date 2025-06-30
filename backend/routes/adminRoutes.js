@@ -1,23 +1,16 @@
 import express from "express";
 import Product from "../models/Product.js";
+import { ensureAdmin } from "../middleware/auth.js";
 
 const router = express.Router();
 
-// Middleware to check admin access
-function ensureAdmin(req, res, next) {
-  if (req.user && req.user.email === process.env.ADMIN_EMAIL) {
-    return next();
-  }
-  res.redirect("/");
-}
-
-// Admin Dashboard
+// Admin Dashboard - View recent products
 router.get("/", ensureAdmin, async (req, res) => {
   try {
     const products = await Product.find().sort({ _id: -1 }).limit(3); // Most recent
     res.render("admin/admin", {
       user: req.user,
-      products
+      products,
     });
   } catch (error) {
     console.error("Admin page error:", error);
@@ -25,7 +18,7 @@ router.get("/", ensureAdmin, async (req, res) => {
   }
 });
 
-// Full Product List (Admin Only)
+// Full Product List
 router.get("/products", ensureAdmin, async (req, res) => {
   try {
     const products = await Product.find().sort({ _id: -1 });
@@ -35,7 +28,6 @@ router.get("/products", ensureAdmin, async (req, res) => {
     res.status(500).send("Failed to load product list.");
   }
 });
-
 
 // Show Add Product Form
 router.get("/products/new", ensureAdmin, (req, res) => {
@@ -50,19 +42,19 @@ router.post("/products/new", ensureAdmin, async (req, res) => {
 
     // Ensure 'images' is an array
     if (!Array.isArray(images)) {
-      images = [images]; // make it an array if it's just one string
+      images = [images]; // convert to array if it's just one
     }
 
-    const cleanImages = images.filter(url => url.trim() !== "");
+    const cleanImages = images.filter((url) => url.trim() !== "");
 
     const newProduct = new Product({
       name,
       price: parseFloat(price),
-      sizes: sizes.split(",").map(s => s.trim()),
-      colors: colors.split(",").map(c => c.trim()),
+      sizes: sizes.split(",").map((s) => s.trim()),
+      colors: colors.split(",").map((c) => c.trim()),
       category,
       images: cleanImages,
-      stock: parseInt(stock, 10)
+      stock: parseInt(stock, 10),
     });
 
     await newProduct.save();
@@ -73,10 +65,11 @@ router.post("/products/new", ensureAdmin, async (req, res) => {
   }
 });
 
-// Show Edit Form
+// Show Edit Product Form
 router.get("/products/edit/:id", ensureAdmin, async (req, res) => {
   try {
     const product = await Product.findById(req.params.id);
+    if (!product) return res.status(404).send("Product not found");
     res.render("admin/editProduct", { product });
   } catch (err) {
     console.error("Error loading edit form:", err);
@@ -84,19 +77,27 @@ router.get("/products/edit/:id", ensureAdmin, async (req, res) => {
   }
 });
 
-// Handle Edit Form Submission
+// Handle Edit Product Form Submission
 router.post("/products/edit/:id", ensureAdmin, async (req, res) => {
   try {
-    const { name, price, sizes, colors, category, imageUrl, stock } = req.body;
+    const { name, price, sizes, colors, category, stock } = req.body;
+    let { images } = req.body;
+
+    // Ensure 'images' is an array
+    if (!Array.isArray(images)) {
+      images = [images];
+    }
+
+    const cleanImages = images.filter((url) => url.trim() !== "");
 
     await Product.findByIdAndUpdate(req.params.id, {
       name,
-      price,
-      sizes: sizes.split(',').map(s => s.trim()),
-      colors: colors.split(',').map(c => c.trim()),
+      price: parseFloat(price),
+      sizes: sizes.split(",").map((s) => s.trim()),
+      colors: colors.split(",").map((c) => c.trim()),
       category,
-      imageUrl,
-      stock
+      images: cleanImages,
+      stock: parseInt(stock, 10),
     });
 
     res.redirect("/admin");
@@ -106,7 +107,7 @@ router.post("/products/edit/:id", ensureAdmin, async (req, res) => {
   }
 });
 
-// Handle Delete Request
+// Handle Delete Product
 router.post("/products/delete/:id", ensureAdmin, async (req, res) => {
   try {
     await Product.findByIdAndDelete(req.params.id);
