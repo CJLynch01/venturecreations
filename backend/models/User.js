@@ -5,6 +5,10 @@ const userSchema = new mongoose.Schema({
   name: String,
   email: { type: String, required: true, unique: true },
   role: { type: String, enum: ["Admin", "Customer"], default: "Customer" },
+  cart: [
+    {
+      productId: { type: mongoose.Schema.Types.ObjectId, ref: "Product" },
+      quantity: Number
+    }
+  ]
 });
-
-export default mongoose.model("User", userSchema);

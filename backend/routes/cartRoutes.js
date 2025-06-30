@@ -1,69 +1,99 @@
 import express from "express";
+import User from "../models/User.js";
 import Product from "../models/Product.js";
 
 const router = express.Router();
 
 // View Cart
-router.get("/", (req, res) => {
-  const cart = req.session.cart || [];
-  res.render("shop/cart", { cart });
+router.get("/", async (req, res) => {
+  if (!req.user) return res.redirect("/auth/google");
+
+  try {
+    const user = await User.findById(req.user._id).populate("cart.productId");
+
+    const cartItems = user.cart.map(item => ({
+      product: item.productId,
+      quantity: item.quantity,
+    }));
+
+    res.render("shop/cart", { cart: cartItems });
+  } catch (err) {
+    console.error("Error loading cart:", err);
+    res.status(500).send("Error loading cart.");
+  }
 });
 
 // Add to Cart
 router.post("/add", async (req, res) => {
   const { productId } = req.body;
 
+  if (!req.user) return res.redirect("/auth/google");
+
   try {
     const product = await Product.findById(productId);
     if (!product) return res.status(404).send("Product not found");
 
-    if (!req.session.cart) req.session.cart = [];
+    const user = await User.findById(req.user._id);
 
-    const existingItem = req.session.cart.find(item => item._id === productId);
-
+    const existingItem = user.cart.find(item => item.productId.equals(productId));
     if (existingItem) {
       existingItem.quantity += 1;
     } else {
-      req.session.cart.push({
-        _id: product._id,
-        name: product.name,
-        price: product.price,
-        image: product.images[0],
+      user.cart.push({
+        productId: product._id,
         quantity: 1,
       });
     }
 
+    await user.save();
     res.redirect("/cart");
   } catch (err) {
     console.error("Error adding to cart:", err);
-    res.status(500).send("Error adding to cart");
+    res.status(500).send("Error adding to cart.");
   }
 });
 
 // Remove from Cart
-router.post("/remove", (req, res) => {
+router.post("/remove", async (req, res) => {
   const { productId } = req.body;
-  if (!req.session.cart) req.session.cart = [];
 
-  req.session.cart = req.session.cart.filter(item => item._id !== productId);
-  res.redirect("/cart");
+  if (!req.user) return res.redirect("/auth/google");
+
+  try {
+    const user = await User.findById(req.user._id);
+    user.cart = user.cart.filter(item => !item.productId.equals(productId));
+    await user.save();
+    res.redirect("/cart");
+  } catch (err) {
+    console.error("Error removing from cart:", err);
+    res.status(500).send("Error removing item.");
+  }
 });
 
-// Update quantity
-router.post("/update", (req, res) => {
+// Update Quantity
+router.post("/update", async (req, res) => {
   const { productId, action } = req.body;
-  const cart = req.session.cart || [];
 
-  const item = cart.find(i => i._id === productId);
-  if (item) {
-    if (action === "increase") {
-      item.quantity += 1;
-    } else if (action === "decrease" && item.quantity > 1) {
-      item.quantity -= 1;
+  if (!req.user) return res.redirect("/auth/google");
+
+  try {
+    const user = await User.findById(req.user._id);
+
+    const item = user.cart.find(item => item.productId.equals(productId));
+    if (item) {
+      if (action === "increase") {
+        item.quantity += 1;
+      } else if (action === "decrease" && item.quantity > 1) {
+        item.quantity -= 1;
+      }
     }
-  }
 
-  res.redirect("/cart");
+    await user.save();
+    res.redirect("/cart");
+  } catch (err) {
+    console.error("Error updating cart:", err);
+    res.status(500).send("Error updating item.");
+  }
 });
 
 export default router;

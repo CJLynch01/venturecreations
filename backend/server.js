@@ -1,17 +1,20 @@
-// Environment variables
+// Environment setup
 import dotenv from "dotenv";
 import path from "path";
 import { fileURLToPath } from "url";
-
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-
 dotenv.config({ path: path.join(__dirname, ".env") });
 
+// Core modules
 import express from "express";
 import mongoose from "mongoose";
 import session from "express-session";
 import passport from "./config/passport.js";
+
+// Models
+import User from "./models/User.js";
+import Product from "./models/Product.js";
 
 // Routes
 import productRoutes from "./routes/productRoutes.js";
@@ -19,9 +22,6 @@ import adminRoutes from "./routes/adminRoutes.js";
 import cartRoutes from "./routes/cartRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
 import customerRoutes from "./routes/customerRoutes.js";
-
-// Models
-import Product from "./models/Product.js";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -42,9 +42,22 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
-app.use((req, res, next) => {
-  res.locals.cart = req.session.cart || [];
+// Load user and cart into views
+app.use(async (req, res, next) => {
   res.locals.user = req.user;
+
+  if (req.user && req.user.role === "Customer") {
+    try {
+      const user = await User.findById(req.user._id);
+      res.locals.cart = user.cart || [];
+    } catch (err) {
+      console.error("Error loading cart into res.locals:", err);
+      res.locals.cart = [];
+    }
+  } else {
+    res.locals.cart = [];
+  }
+
   next();
 });
 
@@ -81,7 +94,7 @@ app.get("/shop/:id", async (req, res) => {
   }
 });
 
-// Start server after connecting to MongoDB
+// Connect to DB and start server
 mongoose
   .connect(process.env.MONGO_URI)
   .then(() => {

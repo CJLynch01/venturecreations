@@ -1,6 +1,7 @@
 <header class="site-header">
   <div class="container">
     <h1 class="logo"><a href="/">Venture Creations</a></h1>
+
     <nav class="main-nav">
       <ul>
         <li><a href="/">Home</a></li>
@@ -8,10 +9,14 @@
         <li><a href="/contact">Contact</a></li>
 
         <% if (user) { %>
-          <li><span>Welcome, <%= user.name %>!</span></li>
+          <li class="nav-user">👤 Welcome, <%= user.name.split(" ")[0] %>!</li>
+
           <% if (user.role === "Admin") { %>
             <li><a href="/admin">Admin Panel</a></li>
+          <% } else if (user.role === "Customer") { %>
+            <li><a href="/customer/dashboard">My Dashboard</a></li>
           <% } %>
+
           <li><a href="/auth/logout">Logout</a></li>
         <% } else { %>
           <li><a href="/auth/register">Register</a></li>
@@ -22,7 +27,9 @@
           <a href="/cart" class="cart-icon">
             🛒
             <% if (cart && cart.length > 0) { %>
-              <span class="cart-count"><%= cart.reduce((sum, item) => sum + item.quantity, 0) %></span>
+              <span class="cart-count">
+                <%= Math.min(cart.reduce((sum, item) => sum + item.quantity, 0), 99) %>
+              </span>
             <% } %>
           </a>
         </li>
