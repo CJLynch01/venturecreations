@@ -15,7 +15,7 @@ router.get("/google/callback", passport.authenticate("google", {
   if (req.user.role === "Admin") {
     res.redirect("/admin");
   } else {
-    res.redirect("/shop");
+    res.redirect("/customer/dashboard");
   }
 });
 

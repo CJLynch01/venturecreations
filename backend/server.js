@@ -1,4 +1,4 @@
-// ✅ Load environment variables FIRST
+// Environment variables
 import dotenv from "dotenv";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -6,9 +6,8 @@ import { fileURLToPath } from "url";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-dotenv.config({ path: path.join(__dirname, ".env") }); // MUST come before using env vars
+dotenv.config({ path: path.join(__dirname, ".env") });
 
-// ✅ Now import everything else
 import express from "express";
 import mongoose from "mongoose";
 import session from "express-session";
@@ -19,6 +18,7 @@ import productRoutes from "./routes/productRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
 import cartRoutes from "./routes/cartRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
+import customerRoutes from "./routes/customerRoutes.js";
 
 // Models
 import Product from "./models/Product.js";
@@ -57,6 +57,7 @@ app.use("/auth", authRoutes);
 app.use("/api/products", productRoutes);
 app.use("/admin", adminRoutes);
 app.use("/cart", cartRoutes);
+app.use("/customer", customerRoutes);
 
 // Public Pages
 app.get("/", async (req, res) => {

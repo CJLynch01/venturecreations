@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Shop | Venture Creations</title>
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+    <%- include("../partials/header") %>
+
+    <section class="dashboard">
+        <div class="container">
+            <h2>Welcome, <%= user.name %>!</h2>
+            <p>This is your personal customer dashboard.</p>
+
+            <div class="info-box">
+                <p><strong>Email:</strong> <%= user.email %></p>
+                <p><strong>Account Type:</strong> <%= user.role %></p>
+            </div>
+
+            <a href="/shop" class="btn">Go to Shop</a>
+            <a href="/auth/logout" class="btn secondary">Logout</a>
+        </div>
+    </section>
+
+    <%- include("../partials/footer") %>
+
+</body>
+</html>
