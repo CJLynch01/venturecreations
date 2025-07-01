@@ -48,6 +48,20 @@
         </div>
     </section>
 
+    <section class="featured-section container">
+      <h2>Newly Added Designs</h2>
+      <div class="product-grid">
+        <% products.slice(0, 3).forEach(product => { %>
+          <div class="product-card">
+            <img class="product-img" src="<%= product.images[0] %>" data-images='<%= JSON.stringify(product.images) %>' alt="<%= product.name %>">
+            <h3><%= product.name %></h3>
+            <p>$<%= product.price.toFixed(2) %></p>
+            <a href="/shop/<%= product._id %>" class="btn">View Shirt</a>
+          </div>
+        <% }) %>
+      </div>
+    </section>
+
     <section class="features-icons">
       <div class="feature">
         <img src="/images/shipping.png" alt="Fast Shipping">
@@ -68,20 +82,6 @@
         <img src="/images/customizable.png" alt="Customizable Designs">
         <p>Customizable Designs</p>
         <p><em>Available On All Products</em></p>
-      </div>
-    </section>
-
-    <section class="featured-section container">
-      <h2>Newly Added Designs</h2>
-      <div class="product-grid">
-        <% products.slice(0, 3).forEach(product => { %>
-          <div class="product-card">
-            <img class="product-img" src="<%= product.images[0] %>" data-images='<%= JSON.stringify(product.images) %>' alt="<%= product.name %>">
-            <h3><%= product.name %></h3>
-            <p>$<%= product.price.toFixed(2) %></p>
-            <a href="/shop/<%= product._id %>" class="btn">View Shirt</a>
-          </div>
-        <% }) %>
       </div>
     </section>
   </main>
