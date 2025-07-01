@@ -22,6 +22,7 @@ import adminRoutes from "./routes/adminRoutes.js";
 import cartRoutes from "./routes/cartRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
 import customerRoutes from "./routes/customerRoutes.js";
+import checkoutRoutes from "./routes/checkout.js";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -71,6 +72,7 @@ app.use("/api/products", productRoutes);
 app.use("/admin", adminRoutes);
 app.use("/cart", cartRoutes);
 app.use("/customer", customerRoutes);
+app.use("/checkout", checkoutRoutes);
 
 // Public Pages
 app.get("/", async (req, res) => {

@@ -49,9 +49,7 @@
         <h4>Estimated Tax (6.85%): $<%= estimatedTax.toFixed(2) %></h4>
         <h2>Total: $<%= total.toFixed(2) %></h2>
 
-        <form action="/checkout/create-checkout-session" method="POST">
           <button type="submit" class="btn">Checkout with Stripe</button>
-        </form>
       </div>
 
     <% } %>
