@@ -107,8 +107,8 @@ body {
 /* Footer */
 
 .site-footer {
-  background-color: #222;
-  color: #ccc;
+  background-color: black;
+  color: white;
   padding: 2rem 1rem;
 }
 
@@ -156,13 +156,14 @@ body {
 }
 
 .footer-links a {
-  color: #ccc;
+  color: white;
   text-decoration: none;
   font-weight: 500;
 }
 
 .footer-links a:hover {
-  color: #fff;
+  text-decoration: underline;
+  color: #2676d8
 }
 
 .social-icons {
@@ -178,7 +179,7 @@ body {
 }
 
 .social-icons a:hover {
-  color: #fcd34d;
+  color: #2676d8;
 }
 
 /* Register Page */
