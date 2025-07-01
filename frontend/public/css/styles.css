@@ -104,6 +104,96 @@ body {
   border-radius: 50%;
 }
 
+/* Main Home Page */
+.banner-images {
+  padding: 2rem;
+  background-color: #f5f5f5;
+}
+
+.banners-home {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+  justify-content: center;
+  align-items: center;
+}
+
+.banners-home img {
+  width: 100%;
+  height: auto;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.banner-item {
+  position: relative;
+  overflow: hidden;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.banner-item img {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 10px;
+}
+
+.banner-text {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  padding: 0.25rem 1rem;
+  border-radius: 5px;
+  font-weight: bold;
+  font-size: 1rem;
+  line-height: 1.4;
+}
+
+.banner-text .line-top {
+  display: block;
+  font-size: 1.5rem;
+  font-weight: 800;
+  margin-bottom: 2px;
+}
+
+.r1c1, .r3c1 {
+  color: red;
+}
+
+.r1c2, .r3c2 {
+  color: green;
+}
+
+.r1c3, .r3c3 {
+  color: blue;
+}
+
+.banner-text .line-middle {
+  display: block;
+  font-size: 1rem;
+  font-style: italic;
+  margin-bottom: 7px;
+}
+
+.r2c1 {
+  color:rgb(65, 10, 10);
+}
+
+.r2c2 {
+  color: rgb(24, 57, 24);
+}
+
+.r2c3 {
+  color: rgb(19, 19, 62);
+}
+
+.banner-text .line-bottom {
+  display: block;
+  font-size: 1rem;
+  text-decoration: underline;
+}
+
 /* Footer */
 
 .site-footer {
