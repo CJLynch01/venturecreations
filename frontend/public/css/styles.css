@@ -1,6 +1,19 @@
+/* Reset default spacing */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Ensure body takes full width and height */
+body {
+  margin: 0;
+  padding: 0;
+}
+
 .home-hero {
-  background: url('/images/hero-bg.jpg') center/cover no-repeat;
-  color: white;
+  background: #2676d8;
+  color: black;
   text-align: center;
   padding: 5rem 2rem;
 }
@@ -57,7 +70,8 @@
 .main-nav ul {
   list-style: none;
   display: flex;
-  gap: 1.5rem;
+  justify-content: center;
+  gap: 2rem;
   margin: 0;
   padding: 0;
 }
@@ -70,6 +84,7 @@
 
 .main-nav a:hover {
   text-decoration: underline;
+  color: #2676d8
 }
 
 .cart-icon {
@@ -88,6 +103,8 @@
   padding: 2px 6px;
   border-radius: 50%;
 }
+
+/* Footer */
 
 .site-footer {
   background-color: #222;
