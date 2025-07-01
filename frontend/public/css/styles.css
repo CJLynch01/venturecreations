@@ -27,7 +27,22 @@
   margin-bottom: 2rem;
 }
 
+.logo-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 150px;
+  padding: 1rem;
+  background-color: #111;
+}
 
+.vc-logo {
+  margin-top: 150px;
+  max-height: 500px;
+  width: auto;
+  filter: brightness(0) saturate(100%) invert(36%) sepia(81%) saturate(748%) hue-rotate(180deg);
+  transition: transform 0.3s ease, filter 0.3s ease;
+}
 
 .site-header {
   background-color: #111;
@@ -35,10 +50,8 @@
   padding: 1rem 0;
 }
 
-.site-header .logo a {
-  font-size: 1.5rem;
-  color: #fcd34d;
-  text-decoration: none;
+.main-nav {
+  margin-top: 300px;
 }
 
 .main-nav ul {
