@@ -1,8 +1,3 @@
-// routes/checkout.js
-import express from 'express';
-import stripe from '../config/stripe.js';
-const router = express.Router();
-
 router.post('/create-checkout-session', async (req, res) => {
   try {
     const session = await stripe.checkout.sessions.create({
@@ -19,6 +14,9 @@ router.post('/create-checkout-session', async (req, res) => {
         tax_behavior: 'exclusive',
       })),
       automatic_tax: { enabled: true },
+      shipping_address_collection: {
+        allowed_countries: ['US'], // Add more countries if needed
+      },
       success_url: `${process.env.CLIENT_URL}/success`,
       cancel_url: `${process.env.CLIENT_URL}/cancel`,
     });
@@ -29,5 +27,3 @@ router.post('/create-checkout-session', async (req, res) => {
     res.status(500).send('Failed to create session');
   }
 });
-
-export default router;
