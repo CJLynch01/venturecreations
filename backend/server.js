@@ -96,6 +96,15 @@ app.get("/shop/:id", async (req, res) => {
   }
 });
 
+// Stripe success/cancel routes
+app.get('/success', (req, res) => {
+  res.render('shop/success', { message: 'Your payment was successful. Thank you!' });
+});
+
+app.get('/cancel', (req, res) => {
+  res.render('shop/cancel', { message: 'Your payment was cancelled.' });
+});
+
 // Connect to DB and start server
 mongoose
   .connect(process.env.MONGO_URI)
