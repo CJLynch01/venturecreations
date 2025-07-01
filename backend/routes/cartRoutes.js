@@ -1,3 +1,4 @@
+// routes/cartRoutes.js
 import express from "express";
 import User from "../models/User.js";
 import Product from "../models/Product.js";
@@ -16,7 +17,19 @@ router.get("/", async (req, res) => {
       quantity: item.quantity,
     }));
 
-    res.render("shop/cart", { cart: cartItems });
+    const subtotal = cartItems.reduce((sum, item) => {
+      return sum + item.product.price * item.quantity;
+    }, 0);
+
+    const estimatedTax = subtotal * 0.0685; // 6.85% Utah sales tax
+    const total = subtotal + estimatedTax;
+
+    res.render("shop/cart", {
+      cart: cartItems,
+      subtotal,
+      estimatedTax,
+      total
+    });
   } catch (err) {
     console.error("Error loading cart:", err);
     res.status(500).send("Error loading cart.");

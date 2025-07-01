@@ -1,3 +1,7 @@
+import express from 'express';
+import stripe from '../config/stripe.js';
+const router = express.Router();
+
 router.post('/create-checkout-session', async (req, res) => {
   try {
     const session = await stripe.checkout.sessions.create({
@@ -8,14 +12,14 @@ router.post('/create-checkout-session', async (req, res) => {
           product_data: {
             name: item.name,
           },
-          unit_amount: item.price * 100,
+          unit_amount: item.price * 100, // convert dollars to cents
         },
         quantity: item.quantity,
-        tax_behavior: 'exclusive',
+        tax_behavior: 'exclusive', // tax will be added separately
       })),
-      automatic_tax: { enabled: true },
+      automatic_tax: { enabled: true }, // this enables Stripe Tax
       shipping_address_collection: {
-        allowed_countries: ['US'], // Add more countries if needed
+        allowed_countries: ['US'], // let Stripe collect shipping info for tax
       },
       success_url: `${process.env.CLIENT_URL}/success`,
       cancel_url: `${process.env.CLIENT_URL}/cancel`,
@@ -27,3 +31,5 @@ router.post('/create-checkout-session', async (req, res) => {
     res.status(500).send('Failed to create session');
   }
 });
+
+export default router;
