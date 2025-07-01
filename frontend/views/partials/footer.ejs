@@ -1,29 +1,37 @@
 <footer class="site-footer">
-  <div class="container footer-content">
-    <p>&copy; <%= new Date().getFullYear() %> Venture Creations. All rights reserved.</p>
-    <p class="tagline">Creating shirts to support all of life’s ventures.</p>
+  <div class="container footer-row">
+    <!-- Left: Logo + tagline -->
+    <div class="footer-left">
+      <img src="/images/Venture Creations.webp" alt="Venture Creations Logo" class="footer-logo" />
+      <p class="tagline">Creating shirts to support all of life’s ventures.</p>
+    </div>
 
-    <ul class="footer-links">
-      <li><a href="/">Home</a></li>
-      <li><a href="/shop">Shop</a></li>
-      <li><a href="/contact">Contact</a></li>
-      <% if (user && user.role === 'Admin') { %>
-        <li><a href="/admin">Admin Panel</a></li>
-      <% } else if (user && user.role === 'Customer') { %>
-        <li><a href="/customer/dashboard">My Dashboard</a></li>
-      <% } %>
-    </ul>
+    <!-- Right: Links + Socials -->
+    <div class="footer-right">
+      <ul class="footer-links">
+        <li><a href="/">Home</a></li>
+        <li><a href="/shop">Shop</a></li>
+        <li><a href="/contact">Contact</a></li>
+        <% if (user && user.role === 'Admin') { %>
+          <li><a href="/admin">Admin Panel</a></li>
+        <% } else if (user && user.role === 'Customer') { %>
+          <li><a href="/customer/dashboard">My Dashboard</a></li>
+        <% } %>
+      </ul>
 
-    <div class="social-icons">
-      <a href="https://www.facebook.com" target="_blank" aria-label="Facebook">
-        <i class="fab fa-facebook-f"></i>
-      </a>
-      <a href="https://www.instagram.com" target="_blank" aria-label="Instagram">
-        <i class="fab fa-instagram"></i>
-      </a>
-      <a href="https://www.pinterest.com" target="_blank" aria-label="Pinterest">
-        <i class="fab fa-pinterest-p"></i>
-      </a>
+      <div class="social-icons">
+        <a href="https://www.facebook.com" target="_blank" aria-label="Facebook">
+          <i class="fab fa-facebook-f"></i>
+        </a>
+        <a href="https://www.instagram.com" target="_blank" aria-label="Instagram">
+          <i class="fab fa-instagram"></i>
+        </a>
+        <a href="https://www.pinterest.com" target="_blank" aria-label="Pinterest">
+          <i class="fab fa-pinterest-p"></i>
+        </a>
+      </div>
+
+      <p class="copyright">&copy; <%= new Date().getFullYear() %> Venture Creations. All rights reserved.</p>
     </div>
   </div>
 </footer>

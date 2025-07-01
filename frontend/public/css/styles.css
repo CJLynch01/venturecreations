@@ -107,61 +107,78 @@ body {
 /* Footer */
 
 .site-footer {
-  background-color: #111;
+  background-color: #222;
   color: #ccc;
-  text-align: center;
   padding: 2rem 1rem;
-  margin-top: 3rem;
 }
 
-.footer-content {
+.footer-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 2rem;
+}
+
+.footer-left {
+  flex: 1 1 200px;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 1rem;
+  align-items: flex-start;
+}
+
+.footer-logo {
+  max-height: 80px;
+  margin-bottom: 0.5rem;
+  filter: brightness(0) saturate(100%) invert(36%) sepia(81%) saturate(748%) hue-rotate(180deg);
+}
+
+.tagline {
+  color: #fcd34d;
+  font-style: italic;
+  margin-top: 0.25rem;
+}
+
+.footer-right {
+  flex: 2 1 400px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
 }
 
 .footer-links {
   list-style: none;
   display: flex;
+  flex-wrap: wrap;
   gap: 1.5rem;
   padding: 0;
-  margin: 0;
-  flex-wrap: wrap;
-  justify-content: center;
+  margin: 0 0 1rem 0;
 }
 
 .footer-links a {
-  color: #fcd34d;
+  color: #ccc;
   text-decoration: none;
-  font-weight: bold;
+  font-weight: 500;
 }
 
 .footer-links a:hover {
-  text-decoration: underline;
-}
-
-.site-footer .tagline {
-  color: #fcd34d;
-  font-style: italic;
-  font-size: 0.95rem;
+  color: #fff;
 }
 
 .social-icons {
-  margin-top: 1rem;
   display: flex;
   gap: 1rem;
-  justify-content: center;
+  margin-bottom: 1rem;
 }
 
 .social-icons a {
-  color: #fcd34d;
-  font-size: 1.25rem;
+  color: #ccc;
+  font-size: 1.2rem;
   transition: color 0.3s ease;
 }
 
 .social-icons a:hover {
-  color: #fff;
+  color: #fcd34d;
 }
 
 /* Register Page */
