@@ -1,0 +1,28 @@
+<%- include("../partials/adminHeader") %> <!-- Optional: your admin header -->
+
+<section class="admin-container">
+  <h1>Blog Management</h1>
+  <a href="/admin/blog/new" class="btn btn-primary">+ New Blog Post</a>
+
+  <% if (posts.length === 0) { %>
+    <p>No blog posts yet.</p>
+  <% } else { %>
+    <ul class="blog-list">
+      <% posts.forEach(post => { %>
+        <li class="blog-item">
+          <h3><%= post.title %></h3>
+          <p><small>Created: <%= post.createdAt.toLocaleDateString() %></small></p>
+
+          <div class="actions">
+            <a href="/admin/blog/edit/<%= post._id %>" class="btn btn-sm btn-secondary">Edit</a>
+            <form action="/admin/blog/delete/<%= post._id %>" method="POST" style="display:inline;">
+              <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this post?')">Delete</button>
+            </form>
+          </div>
+        </li>
+      <% }) %>
+    </ul>
+  <% } %>
+</section>
+
+<%- include("../partials/adminFooter") %> <!-- Optional: your admin footer -->
