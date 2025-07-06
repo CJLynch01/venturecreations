@@ -23,8 +23,9 @@ import cartRoutes from "./routes/cartRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
 import customerRoutes from "./routes/customerRoutes.js";
 import checkoutRoutes from "./routes/checkout.js";
-import blogRoutes from "./routes/blog.js"
+import blogRoutes from "./routes/blog.js";
 import BlogPost from "./models/BlogPost.js";
+import contactFormRoutes from "./routes/contactForm.js";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -76,6 +77,7 @@ app.use("/cart", cartRoutes);
 app.use("/customer", customerRoutes);
 app.use("/checkout", checkoutRoutes);
 app.use("/", blogRoutes)
+app.use("/contact", contactFormRoutes)
 
 // Public Pages
 app.get("/", async (req, res) => {
