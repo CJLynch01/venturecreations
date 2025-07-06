@@ -24,6 +24,7 @@ import authRoutes from "./routes/authRoutes.js";
 import customerRoutes from "./routes/customerRoutes.js";
 import checkoutRoutes from "./routes/checkout.js";
 import blogRoutes from "./routes/blog.js"
+import BlogPost from "./models/BlogPost.js";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -95,6 +96,29 @@ app.get("/shop/:id", async (req, res) => {
   } catch (err) {
     console.error("Error loading product:", err);
     res.status(500).send("Failed to load product.");
+  }
+});
+
+// Public blog listing
+app.get("/blog", async (req, res) => {
+  try {
+    const posts = await BlogPost.find().sort({ createdAt: -1 });
+    res.render("blog/index", { posts });
+  } catch (err) {
+    console.error("Error loading blog posts:", err);
+    res.status(500).send("Error loading posts");
+  }
+});
+
+// Public single blog post
+app.get("/blog/:slug", async (req, res) => {
+  try {
+    const post = await BlogPost.findOne({ slug: req.params.slug });
+    if (!post) return res.status(404).render("404");
+    res.render("blog/show", { post });
+  } catch (err) {
+    console.error("Error loading blog post:", err);
+    res.status(500).send("Error loading post");
   }
 });
 
