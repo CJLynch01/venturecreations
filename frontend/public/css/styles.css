@@ -488,6 +488,15 @@ body {
   align-self: flex-start;
 }
 
+.success-message {
+  background-color: #e6ffed;
+  color: #2e7d32;
+  padding: 1rem;
+  border-radius: 6px;
+  margin-bottom: 1rem;
+  border: 1px solid #a5d6a7;
+}
+
 /* Register Page */
 .register-section {
   display: flex;
