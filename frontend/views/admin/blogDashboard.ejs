@@ -1,31 +1,43 @@
-<%- include("../partials/header") %> <!-- Optional: your admin header -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Dashboard | Venture Creations</title>
+  <link rel="stylesheet" href="/css/styles.css" />
+</head>
+<body>        
+        <%- include("../partials/header") %>
 
-<section class="admin-section">
-  <div class="admin-header">
-    <h1>📝 Blog Management</h1>
-    <a href="/admin/blog/new" class="btn btn-primary">+ New Blog Post</a>
-  </div>
+        <section class="admin-section">
+        <div class="admin-header">
+            <h1>📝 Blog Management</h1>
+            <a href="/admin/blog/new" class="btn btn-primary">+ New Blog Post</a>
+        </div>
 
-  <% if (posts.length === 0) { %>
-    <p class="no-posts">No blog posts yet. Start by creating one.</p>
-  <% } else { %>
-    <ul class="blog-list">
-      <% posts.forEach(post => { %>
-        <li class="blog-card">
-          <div class="blog-details">
-            <h3><%= post.title %></h3>
-            <p><small>Published on: <%= post.createdAt.toLocaleDateString() %></small></p>
-          </div>
-          <div class="blog-actions">
-            <a href="/admin/blog/edit/<%= post._id %>" class="btn btn-sm btn-secondary">✏️ Edit</a>
-            <form action="/admin/blog/delete/<%= post._id %>" method="POST" onsubmit="return confirm('Delete this post?')" style="display:inline;">
-              <button type="submit" class="btn btn-sm btn-danger">🗑️ Delete</button>
-            </form>
-          </div>
-        </li>
-      <% }) %>
-    </ul>
-  <% } %>
-</section>
+        <% if (posts.length === 0) { %>
+            <p class="no-posts">No blog posts yet. Start by creating one.</p>
+        <% } else { %>
+            <ul class="blog-list">
+            <% posts.forEach(post => { %>
+                <li class="blog-card">
+                <div class="blog-details">
+                    <h3><%= post.title %></h3>
+                    <p><small>Published on: <%= post.createdAt.toLocaleDateString() %></small></p>
+                </div>
+                <div class="blog-actions">
+                    <a href="/admin/blog/edit/<%= post._id %>" class="btn btn-sm btn-secondary">✏️ Edit</a>
+                    <form action="/admin/blog/delete/<%= post._id %>" method="POST" onsubmit="return confirm('Delete this post?')" style="display:inline;">
+                    <button type="submit" class="btn btn-sm btn-danger">🗑️ Delete</button>
+                    </form>
+                </div>
+                </li>
+            <% }) %>
+            </ul>
+        <% } %>
+        </section>
 
-<%- include("../partials/footer") %> <!-- Optional: your admin footer -->
+        <%- include("../partials/footer") %>
+
+</body>
+</html>

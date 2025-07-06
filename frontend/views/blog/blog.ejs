@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Dashboard | Venture Creations</title>
+  <link rel="stylesheet" href="/css/styles.css" />
+</head>
+<body>                
+        
+        <%- include("../partials/header") %>
+
+        <section class="blog-page">
+        <h1>Our Blog</h1>
+
+        <% if (posts.length === 0) { %>
+            <p>No blog posts yet. Check back soon!</p>
+        <% } else { %>
+            <ul class="blog-list">
+            <% posts.forEach(post => { %>
+                <li class="blog-card">
+                <h2><a href="/blog/<%= post.slug %>"><%= post.title %></a></h2>
+                <p><%= post.content.slice(0, 150) %>...</p>
+                <a href="/blog/<%= post.slug %>" class="read-more">Read More →</a>
+                </li>
+            <% }) %>
+            </ul>
+        <% } %>
+        </section>
+
+        <%- include("../partials/footer") %>
+</body>
+</html>
