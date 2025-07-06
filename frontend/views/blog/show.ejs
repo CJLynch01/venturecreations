@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Dashboard | Venture Creations</title>
+  <link rel="stylesheet" href="/css/styles.css" />
+</head>
+<body>    
+
+    <%- include("../partials/header") %>
+
+    <main class="blog-single">
+        <article class="blog-post">
+            <h1 class="blog-title"><%= post.title %></h1>
+            <p class="blog-date"><%= post.createdAt.toLocaleDateString() %></p>
+            
+            <div class="blog-content">
+                <%= post.content %>
+            </div>
+            
+            <a href="/blog" class="btn btn-secondary">← Back to Blog</a>
+        </article>
+    </main>
+
+    <%- include("../partials/footer") %>
+
+</body>
+</html>
