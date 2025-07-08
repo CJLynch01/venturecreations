@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Add New Product | Admin</title>
   <link rel="stylesheet" href="/css/styles.css" />
+  <script src="/scripts/adminProductForm.js" defer></script>
 </head>
 <body>
   <%- include('../partials/header') %>
@@ -28,11 +29,12 @@
       <label>Category</label>
       <input type="text" name="category" required>
 
-      <label>Image URLs (up to 4)</label>
-      <input type="text" name="images[]" placeholder="Image 1" required>
-      <input type="text" name="images[]" placeholder="Image 2">
-      <input type="text" name="images[]" placeholder="Image 3">
-      <input type="text" name="images[]" placeholder="Image 4">
+      <label>Image URLs</label>
+      <div id="image-fields">
+        <input type="text" name="images[]" placeholder="Image 1 URL" required>
+      </div>
+      <button type="button" id="add-image-btn" class="btn-secondary">+ Add Another Image</button>
+
 
       <label>Stock</label>
       <input type="number" name="stock" required>
