@@ -11,6 +11,15 @@ body {
   padding: 0;
 }
 
+:root {
+  --pink: #eec9c5;
+  --blue: #3b56a7;
+  --tan: #efe1ce;
+  --grey: #e6e6e6;
+  --black: #2e2e2e;
+
+}
+
 /* Navigation/Header */
 .logo-container {
   display: flex;
@@ -18,25 +27,23 @@ body {
   align-items: center;
   height: 150px;
   padding: 1rem;
-  background-color: #111;
+  background-color: var(--pink);
 }
 
 .vc-logo {
-  margin-top: 50px;
+  margin-top: 120px;
   max-height: 500px;
   width: auto;
-  /* filter: brightness(0) saturate(100%) invert(36%) sepia(81%) saturate(748%) hue-rotate(180deg);
-  transition: transform 0.3s ease, filter 0.3s ease; */
 }
 
 .site-header {
-  background-color: #111;
+  background-color: var(--pink);
   color: #fff;
   padding: 1rem 0;
 }
 
 .main-nav {
-  margin-top: 100px;
+  margin-bottom: 100px;
 }
 
 .main-nav ul {

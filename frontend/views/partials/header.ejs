@@ -1,28 +1,25 @@
 <header class="site-header">
   <div class="container">
-    <div class="logo-container">
-      <img src="/images/VentureCreations.webp" alt="Venture Creations Logo" class="vc-logo">
-    </div>
 
     <nav class="main-nav">
       <ul>
-        <li><a href="/">Home</a></li>
-        <li><a href="/shop">Shop</a></li>
-        <li><a href="/contact">Contact</a></li>
-        <li><a href="/blog">Blog</a></li>
+        <li><a href="/">Home</a></li>|
+        <li><a href="/shop">Shop</a></li>|
+        <li><a href="/contact">Contact</a></li>|
+        <li><a href="/blog">Blog</a></li>|
 
         <% if (user) { %>
 
           <% if (user.role === "Admin") { %>
-            <li><a href="/admin">Admin Panel</a></li>
+            <li><a href="/admin">Admin Panel</a></li>|
           <% } else if (user.role === "Customer") { %>
-            <li><a href="/customer/dashboard">My Dashboard</a></li>
+            <li><a href="/customer/dashboard">My Dashboard</a></li>|
           <% } %>
 
-          <li><a href="/auth/logout">Logout</a></li>
+          <li><a href="/auth/logout">Logout</a></li>|
         <% } else { %>
-          <li><a href="/auth/register">Register</a></li>
-          <li><a href="/auth/google">Login</a></li>
+          <li><a href="/auth/register">Register</a></li>|
+          <li><a href="/auth/google">Login</a></li>|
         <% } %>
 
         <li>
@@ -36,6 +33,11 @@
           </a>
         </li>
       </ul>
+
+      <div class="logo-container">
+        <img src="/images/VentureCreations.webp" alt="Venture Creations Logo" class="vc-logo">
+      </div>
+
     </nav>
   </div>
 </header>
