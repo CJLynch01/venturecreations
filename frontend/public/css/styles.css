@@ -11,35 +11,7 @@ body {
   padding: 0;
 }
 
-.home-hero {
-  background: #2676d8;
-  color: black;
-  text-align: center;
-  padding: 5rem 2rem;
-}
-
-.hero-content h1 {
-  font-size: 2.5rem;
-  margin-bottom: 1rem;
-}
-
-.hero-content p {
-  font-size: 1.2rem;
-  margin-bottom: 2rem;
-  max-width: 600px;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-.featured-section {
-  margin-top: 3rem;
-}
-
-.featured-section h2 {
-  text-align: center;
-  margin-bottom: 2rem;
-}
-
+/* Navigation/Header */
 .logo-container {
   display: flex;
   justify-content: center;
@@ -53,8 +25,8 @@ body {
   margin-top: 50px;
   max-height: 500px;
   width: auto;
-  filter: brightness(0) saturate(100%) invert(36%) sepia(81%) saturate(748%) hue-rotate(180deg);
-  transition: transform 0.3s ease, filter 0.3s ease;
+  /* filter: brightness(0) saturate(100%) invert(36%) sepia(81%) saturate(748%) hue-rotate(180deg);
+  transition: transform 0.3s ease, filter 0.3s ease; */
 }
 
 .site-header {
@@ -105,6 +77,35 @@ body {
 }
 
 /* Main Home Page */
+.home-hero {
+  background: #2676d8;
+  color: black;
+  text-align: center;
+  padding: 5rem 2rem;
+}
+
+.hero-content h1 {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+}
+
+.hero-content p {
+  font-size: 1.2rem;
+  margin-bottom: 2rem;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.featured-section {
+  margin-top: 3rem;
+}
+
+.featured-section h2 {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
 .banner-images {
   padding: 2rem;
   background-color: #2676d8;

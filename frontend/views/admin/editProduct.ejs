@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Edit Product | Admin</title>
   <link rel="stylesheet" href="/css/styles.css" />
+  <script src="/scripts/adminProductForm.js" defer></script>
 </head>
 <body>
   <%- include('../partials/header') %>
@@ -12,7 +13,7 @@
   <main class="container">
     <h1>Edit Product</h1>
 
-    <form action="/admin/products/edit/<%= product._id %>" method="POST">
+    <form action="/admin/products/edit/<%= product._id %>" method="POST" class="product-form">
       <label>Product Name</label>
       <input type="text" name="name" value="<%= product.name %>" required>
 
@@ -28,13 +29,21 @@
       <label>Category</label>
       <input type="text" name="category" value="<%= product.category %>" required>
 
-      <label>Image URL</label>
-      <input type="text" name="imageUrl" value="<%= product.imageUrl %>" required>
+      <label>Image URLs</label>
+      <div id="image-fields">
+        <% product.images.forEach((url, index) => { %>
+          <input type="text" name="images[]" value="<%= url %>" placeholder="Image <%= index + 1 %> URL" required />
+        <% }) %>
+      </div>
+      <button type="button" id="add-image-btn" class="btn-secondary">+ Add Another Image</button>
 
       <label>Stock</label>
       <input type="number" name="stock" value="<%= product.stock %>" required>
 
-      <button type="submit" class="btn">Update Product</button>
+      <div class="form-actions">
+        <button type="submit" class="btn">Update Product</button>
+        <a href="/admin/products" class="btn btn-secondary">Cancel</a>
+      </div>
     </form>
   </main>
 
