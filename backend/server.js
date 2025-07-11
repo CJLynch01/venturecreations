@@ -102,10 +102,23 @@ app.get("/shop/:id", async (req, res) => {
 });
 
 // Search Bar
-app.get("/search", (req, res) => {
+app.get("/search", async (req, res) => {
   const query = req.query.q;
-  // Search your products or blog database...
-  res.render("searchResults", { query });
+
+  try {
+    const results = await Product.find({
+      name: { $regex: query, $options: "i" }
+    });
+
+    res.render("searchResults", {
+      query: query,
+      results: results
+    });
+
+  } catch (err) {
+    console.error("Search error:", err);
+    res.status(500).send("Something went wrong during the search.");
+  }
 });
 
 // Public blog listing
