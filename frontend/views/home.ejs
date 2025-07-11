@@ -14,9 +14,18 @@
 
   <main>
 
-    <section class="home-hero">
+    <section class="home-hero shop">
       <div>
         <a href="/shop" class="btn">SHOP NOW</a>
+      </div>
+    </section>
+
+    <section class="search-bar">
+      <div>
+        <form action="/search" method="GET" class="search-form">
+          <input type="text" name="q" placeholder="Search..." />
+          <button type="submit"><i class="fas fa-search"></i></button>
+        </form>
       </div>
     </section>
     
@@ -53,19 +62,22 @@
             <span class="line-bottom r3c3">Shop Now</span>
           </div>
         </div>
+      </div>
     </section>
 
-    <section class="featured-section container">
-      <h2>Newly Added Designs</h2>
-      <div class="product-grid">
-        <% products.slice(0, 3).forEach(product => { %>
-          <div class="product-card">
-            <img class="product-img" src="<%= product.images[0] %>" data-images='<%= JSON.stringify(product.images) %>' alt="<%= product.name %>">
-            <h3><%= product.name %></h3>
-            <p>$<%= product.price.toFixed(2) %></p>
-            <a href="/shop/<%= product._id %>" class="btn">View Shirt</a>
-          </div>
-        <% }) %>
+    <section class="featured-section">
+      <div class="container">
+        <h2>Newly Added Designs</h2>
+        <div class="product-grid">
+          <% products.slice(0, 3).forEach(product => { %>
+            <div class="product-card">
+              <img class="product-img" src="<%= product.images[0] %>" data-images='<%= JSON.stringify(product.images) %>' alt="<%= product.name %>">
+              <h3><%= product.name %></h3>
+              <p>$<%= product.price.toFixed(2) %></p>
+              <a href="/shop/<%= product._id %>" class="btn">View Shirt</a>
+            </div>
+          <% }) %>
+        </div>
       </div>
     </section>
 
