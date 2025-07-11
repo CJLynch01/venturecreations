@@ -101,6 +101,13 @@ app.get("/shop/:id", async (req, res) => {
   }
 });
 
+// Search Bar
+app.get("/search", (req, res) => {
+  const query = req.query.q;
+  // Search your products or blog database...
+  res.render("searchResults", { query });
+});
+
 // Public blog listing
 app.get("/blog", async (req, res) => {
   try {
