@@ -2,7 +2,10 @@ import express from "express";
 const router = express.Router();
 
 router.get("/", (req, res) => {
-  res.render("contact", { success: req.query.success });
+  res.render("contact", { 
+    success: req.query.success,
+    page: "contact"
+  });
 });
 
 router.post("/", async (req, res) => {
