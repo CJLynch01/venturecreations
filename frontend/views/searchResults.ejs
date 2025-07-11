@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Shop | Venture Creations</title>
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+    <%- include("partials/header") %>
+
+    <main class="container">
+    <h1>Search Results for "<%= query %>"</h1>
+
+    <% if (results.length > 0) { %>
+        <div class="product-grid">
+        <% results.forEach(product => { %>
+            <div class="product-card">
+            <img src="<%= product.images[0] %>" alt="<%= product.name %>">
+            <h3><%= product.name %></h3>
+            <p>$<%= product.price.toFixed(2) %></p>
+            <a href="/shop/<%= product._id %>" class="btn">View Product</a>
+            </div>
+        <% }) %>
+        </div>
+    <% } else { %>
+        <p>No results found.</p>
+    <% } %>
+    </main>
+
+    <%- include("partials/footer") %>
+</body>
+</html>
