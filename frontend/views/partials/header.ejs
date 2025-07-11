@@ -1,43 +1,80 @@
-<header class="site-header">
-  <div class="container">
+<% if (page === 'home') { %>
+  <!-- Full Header for Home Page -->
+  <header class="site-header home-header">
+    <div class="container">
+      <nav class="main-nav">
+        <ul>
+          <li><a href="/">Home</a></li>|
+          <li><a href="/shop">Shop</a></li>|
+          <li><a href="/contact">Contact</a></li>|
+          <li><a href="/blog">Blog</a></li>|
 
-    <nav class="main-nav">
-      <ul>
-        <li><a href="/">Home</a></li>|
-        <li><a href="/shop">Shop</a></li>|
-        <li><a href="/contact">Contact</a></li>|
-        <li><a href="/blog">Blog</a></li>|
-
-        <% if (user) { %>
-
-          <% if (user.role === "Admin") { %>
-            <li><a href="/admin">Admin Panel</a></li>|
-          <% } else if (user.role === "Customer") { %>
-            <li><a href="/customer/dashboard">My Dashboard</a></li>|
+          <% if (user) { %>
+            <% if (user.role === "Admin") { %>
+              <li><a href="/admin">Admin Panel</a></li>|
+            <% } else if (user.role === "Customer") { %>
+              <li><a href="/customer/dashboard">My Dashboard</a></li>|
+            <% } %>
+            <li><a href="/auth/logout">Logout</a></li>|
+          <% } else { %>
+            <li><a href="/auth/register">Register</a></li>|
+            <li><a href="/auth/google">Login</a></li>|
           <% } %>
 
-          <li><a href="/auth/logout">Logout</a></li>|
-        <% } else { %>
-          <li><a href="/auth/register">Register</a></li>|
-          <li><a href="/auth/google">Login</a></li>|
-        <% } %>
+          <li>
+            <a href="/cart" class="cart-icon">
+              🛒
+              <% if (cart && cart.length > 0) { %>
+                <span class="cart-count">
+                  <%= Math.min(cart.reduce((sum, item) => sum + item.quantity, 0), 99) %>
+                </span>
+              <% } %>
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </div>
 
-        <li>
-          <a href="/cart" class="cart-icon">
-            🛒
-            <% if (cart && cart.length > 0) { %>
-              <span class="cart-count">
-                <%= Math.min(cart.reduce((sum, item) => sum + item.quantity, 0), 99) %>
-              </span>
+    <div class="logo-container">
+      <img src="/images/VentureCreations.webp" alt="Venture Creations Logo" class="vc-logo">
+    </div>
+  </header>
+
+<% } else { %>
+  <!-- Simplified Header for Other Pages -->
+  <header class="site-header simple-header">
+    <div class="container">
+      <nav class="main-nav">
+        <ul>
+          <li><a href="/">Home</a></li>
+          <li><a href="/shop">Shop</a></li>
+          <li><a href="/contact">Contact</a></li>
+          <li><a href="/blog">Blog</a></li>
+
+          <% if (user) { %>
+            <% if (user.role === "Admin") { %>
+              <li><a href="/admin">Admin Panel</a></li>
+            <% } else if (user.role === "Customer") { %>
+              <li><a href="/customer/dashboard">My Dashboard</a></li>
             <% } %>
-          </a>
-        </li>
-      </ul>
-    </nav>
-  </div>
+            <li><a href="/auth/logout">Logout</a></li>
+          <% } else { %>
+            <li><a href="/auth/register">Register</a></li>
+            <li><a href="/auth/google">Login</a></li>
+          <% } %>
 
-  <div class="logo-container">
-    <img src="/images/VentureCreations.webp" alt="Venture Creations Logo" class="vc-logo">
-  </div>
-
-</header>
+          <li>
+            <a href="/cart" class="cart-icon">
+              🛒
+              <% if (cart && cart.length > 0) { %>
+                <span class="cart-count">
+                  <%= Math.min(cart.reduce((sum, item) => sum + item.quantity, 0), 99) %>
+                </span>
+              <% } %>
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+<% } %>

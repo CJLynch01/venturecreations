@@ -82,12 +82,12 @@ app.use("/contact", contactFormRoutes)
 // Public Pages
 app.get("/", async (req, res) => {
   const products = await Product.find().sort({ createdAt: -1 }).limit(3);
-  res.render("home", { title: "Welcome to Venture Creations", products });
+  res.render("home", { title: "Welcome to Venture Creations", products, page: "home" });
 });
 
 app.get("/shop", async (req, res) => {
   const products = await Product.find();
-  res.render("shop", { products });
+  res.render("shop", { products, page: "shop"});
 });
 
 app.get("/shop/:id", async (req, res) => {
