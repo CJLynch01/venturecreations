@@ -11,6 +11,7 @@ router.get("/", ensureAdmin, async (req, res) => {
     res.render("admin/admin", {
       user: req.user,
       products,
+      page: "admin"
     });
   } catch (error) {
     console.error("Admin page error:", error);

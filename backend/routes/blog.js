@@ -10,7 +10,7 @@ const router = express.Router();
 router.get("/admin/blog", ensureAdmin, async (req, res) => {
   try {
     const posts = await BlogPost.find().sort({ createdAt: -1 });
-    res.render("admin/blogDashboard", { posts });
+    res.render("admin/blogDashboard", { posts, page: "blogDashboard" });
   } catch (err) {
     console.error("Error loading blog dashboard:", err);
     res.status(500).send("Server error");
