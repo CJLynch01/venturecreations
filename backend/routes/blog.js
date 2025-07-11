@@ -83,7 +83,7 @@ router.post("/admin/blog/delete/:id", ensureAdmin, async (req, res) => {
 router.get("/blog", async (req, res) => {
   try {
     const posts = await BlogPost.find().sort({ createdAt: -1 });
-    res.render("blog/blog", { posts });
+    res.render("blog/blog", { posts, page: "blog" });
   } catch (err) {
     console.error("Error loading blog posts:", err);
     res.status(500).send("Error loading posts");
