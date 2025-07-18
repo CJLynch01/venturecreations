@@ -24,15 +24,24 @@ router.get("/admin/blog/new", ensureAdmin, (req, res) => {
 
 // Admin: Create new blog post
 router.post("/admin/blog", ensureAdmin, async (req, res) => {
-  const { title, content } = req.body;
+  const { title, topic, description, content, coverImageUrl, hashtags } = req.body;
   const slug = title.toLowerCase().replace(/\s+/g, "-").replace(/[^\w\-]+/g, "");
   try {
-    await BlogPost.create({ title, slug, content });
+    await BlogPost.create({
+      title,
+      slug,
+      topic,
+      shortDescription: description,
+      content,
+      coverImageUrl,
+      hashtags: hashtags ? hashtags.split(",").map(tag => tag.trim()) : [],
+    });
     res.redirect("/admin/blog");
   } catch (err) {
     console.error("Error creating blog post:", err);
     res.status(500).send("Error creating blog post");
   }
+
 });
 
 // Admin: Edit blog post form
@@ -49,15 +58,20 @@ router.get("/admin/blog/edit/:id", ensureAdmin, async (req, res) => {
 
 // Admin: Handle update
 router.post("/admin/blog/edit/:id", ensureAdmin, async (req, res) => {
-  const { title, content } = req.body;
+  const { title, topic, description, content, coverImageUrl, hashtags } = req.body;
   const slug = title.toLowerCase().replace(/\s+/g, "-").replace(/[^\w\-]+/g, "");
   try {
     await BlogPost.findByIdAndUpdate(req.params.id, {
       title,
       slug,
+      topic,
+      shortDescription: description,
       content,
+      coverImageUrl,
+      hashtags: hashtags ? hashtags.split(",").map(tag => tag.trim()) : [],
       updatedAt: new Date(),
     });
+
     res.redirect("/admin/blog");
   } catch (err) {
     console.error("Error updating blog post:", err);
