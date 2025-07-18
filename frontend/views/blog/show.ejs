@@ -17,10 +17,32 @@
             <h1 class="blog-title"><%= post.title %></h1>
             <p class="blog-date"><%= post.createdAt.toLocaleDateString() %></p>
             
+            <div class="topic-content">
+                <% if (post.topic) { %>
+                        <p class="blog-topic">Topic: <%= post.topic %></p>
+                    <% } %>
+            </div>
+
+            <div class="description-content">
+                    <% if (post.shortDescription) { %>
+                        <p class="description">Description: <%= post.shortDescription %></p>
+                    <% } %>
+            </div>
+
             <div class="blog-content">
                 <%- post.content.replace(/\r?\n/g, "<br>") %>
             </div>
-            
+
+            <div class="hash-content">
+                <% if (post.hashtags && post.hashtags.length > 0) { %>
+                    <div class="hashtags">
+                    <% post.hashtags.forEach(tag => { %>
+                        <span class="tag">#<%= tag %></span>
+                    <% }) %>
+                    </div>
+                <% } %>
+            </div>
+
             <a href="/blog" class="btn btn-secondary">← Back to Blog</a>
         </article>
     </main>

@@ -29,15 +29,7 @@
                     <% } %>
 
                     <% if (post.shortDescription) { %>
-                        <p class="description"><%= post.shortDescription %></p>
-                    <% } %>
-
-                    <% if (post.hashtags && post.hashtags.length > 0) { %>
-                        <div class="hashtags">
-                        <% post.hashtags.forEach(tag => { %>
-                            <span class="tag">#<%= tag %></span>
-                        <% }) %>
-                        </div>
+                        <p class="description">Description: <%= post.shortDescription %></p>
                     <% } %>
 
                     <a href="/blog/<%= post.slug %>" class="read-more">Read More →</a>

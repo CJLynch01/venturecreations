@@ -881,6 +881,14 @@ body {
   gap: 2rem;
 }
 
+/* Single Page Blog */
+.description-content {
+  margin-bottom: 25px;
+}
+.hash-content {
+  margin: 25px 0 25px 0;
+}
+
 /* Optional for grid layout instead of column */
 .blog-grid {
   flex-direction: row;
