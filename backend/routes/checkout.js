@@ -4,7 +4,13 @@ import stripe from '../config/stripe.js';
 const router = express.Router();
 
 router.post('/create-checkout-session', async (req, res) => {
-  const { items, subtotal } = req.body; // subtotal should be passed from client in cents
+  const { items, subtotal } = req.body;
+
+  if (!Array.isArray(items)) {
+    console.error("Expected 'items' to be an array, but got:", items);
+    return res.status(400).json({ error: "Invalid items format" });
+  }
+
 
   try {
     const shippingOptions = [
