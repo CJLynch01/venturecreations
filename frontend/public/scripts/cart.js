@@ -7,13 +7,17 @@ document.getElementById('checkout-btn')?.addEventListener('click', async () => {
     };
   });
 
+  const subtotal = Math.round(
+    cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0) * 100
+  );
+
   try {
     const res = await fetch('/checkout/create-checkout-session', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ items: cartItems })
+      body: JSON.stringify({ items: cartItems, subtotal })
     });
 
     const data = await res.json();
