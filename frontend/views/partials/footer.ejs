@@ -11,14 +11,39 @@
     <!-- Right: Links + Socials -->
     <div class="footer-right">
       <ul class="footer-links">
-        <li><a href="/">Home</a></li>
-        <li><a href="/shop">Shop</a></li>
+        <li><a href="/">Home</a></li>|
+        <li><a href="/shop">Shop</a></li>|
         <li><a href="/contact">Contact</a></li>
-        <% if (user && user.role === 'Admin') { %>
+        <!-- <% if (user && user.role === 'Admin') { %>
           <li><a href="/admin">Admin Panel</a></li>
         <% } else if (user && user.role === 'Customer') { %>
           <li><a href="/customer/dashboard">My Dashboard</a></li>
-        <% } %>
+        <% } %> -->
+      </ul>
+
+      <ul class="footer-links">
+        <li><a href="/blog">Blog</a></li>|
+
+        <% if (user) { %>
+            <% if (user.role === "Admin") { %>
+              <li><a href="/admin">Admin Panel</a></li>|
+            <% } else if (user.role === "Customer") { %>
+              <li><a href="/customer/dashboard">My Dashboard</a></li>
+            <% } %>
+            <li><a href="/auth/logout">Logout</a></li>|
+          <% } else { %>
+            <li><a href="/auth/register">Register</a></li>|
+            <li><a href="/auth/google">Login</a></li>|
+          <% } %>
+        <li>
+            <a href="/cart">Cart
+              <% if (cart && cart.length > 0) { %>
+                <span class="cart-count">
+                  <%= Math.min(cart.reduce((sum, item) => sum + item.quantity, 0), 99) %>
+                </span>
+              <% } %>
+            </a>
+        </li>
       </ul>
 
       <div class="social-icons">
@@ -31,6 +56,7 @@
         <a href="https://www.pinterest.com" target="_blank" aria-label="Pinterest">
           <i class="fab fa-pinterest-p"></i>
         </a>
+        
       </div>
     </div>
   </div>
