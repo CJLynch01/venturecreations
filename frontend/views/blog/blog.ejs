@@ -12,22 +12,40 @@
         
         <%- include("../partials/header2") %>
 
+        
         <section class="blog-page">
-        <h1>Our Blog</h1>
+            <h1>Our Blog</h1>
 
-        <% if (posts.length === 0) { %>
+            <% if (posts.length === 0) { %>
             <p>No blog posts yet. Check back soon!</p>
-        <% } else { %>
-            <ul class="blog-list">
-            <% posts.forEach(post => { %>
-                <li class="blog-card">
-                <h2><a href="/blog/<%= post.slug %>"><%= post.title %></a></h2>
-                <p><%= post.content.slice(0, 150) %>...</p>
-                <a href="/blog/<%= post.slug %>" class="read-more">Read More →</a>
-                </li>
-            <% }) %>
-            </ul>
-        <% } %>
+            <% } else { %>
+            <div class="blog-grid">
+                <% posts.forEach(post => { %>
+                <div class="blog-card">
+                    <h2><a href="/blog/<%= post.slug %>"><%= post.title %></a></h2>
+
+                    <% if (post.topic) { %>
+                        <p class="blog-topic"><strong>Topic:</strong> <%= post.topic %></p>
+                    <% } %>
+
+                    <% if (post.description) { %>
+                        <p class="shortDescription"><%= post.description %></p>
+                    <% } %>
+
+                    <% if (post.hashtags && post.hashtags.length > 0) { %>
+                        <div class="hashtags">
+                        <% post.hashtags.forEach(tag => { %>
+                            <span class="tag">#<%= tag %></span>
+                        <% }) %>
+                        </div>
+                    <% } %>
+
+                    <a href="/blog/<%= post.slug %>" class="read-more">Read More →</a>
+                </div>
+
+                <% }) %>
+            </div>
+            <% } %>
         </section>
 
         <%- include("../partials/footer") %>
