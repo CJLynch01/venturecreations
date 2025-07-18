@@ -12,15 +12,23 @@ document.addEventListener("DOMContentLoaded", () => {
     }, 3000);
   });
 
-  // Hamburger toggle
+  // Hamburger toggle logic
   const toggle = document.getElementById("navToggle");
-  const nav = document.getElementById("mainNav");
+
+  // Try for mainNav first
+  let nav = document.getElementById("mainNav");
+
+  // Fallback to mainNav2 if it's not on this page
+  if (!nav) {
+    nav = document.getElementById("mainNav2");
+  }
+
   if (toggle && nav) {
     toggle.addEventListener("click", () => {
       nav.classList.toggle("open");
     });
 
-    // Close menu when a link is clicked (optional)
+    // Close menu when a link is clicked
     const navLinks = nav.querySelectorAll("a");
     navLinks.forEach(link => {
       link.addEventListener("click", () => {
