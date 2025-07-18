@@ -1075,7 +1075,30 @@ body {
     max-width: 350px;
   }
 
-/* Footer */
+  /* Every other page */
+
+  .main-nav2 {
+    display: none !important;
+    flex-direction: column;
+    background-color: var(--pink);
+    width: 100%;
+    padding: 1rem 0;
+  }
+
+  .main-nav2.open {
+    display: flex !important;
+  }
+
+  .main-nav2 ul {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .main-nav2 ul li {
+    text-align: left;
+  }
+
+  /* Footer */
   .footer-row {
     display: grid;
     grid-template-columns: 1fr;
