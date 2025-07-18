@@ -1,3 +1,10 @@
+import express from 'express';
+import stripe from '../config/stripe.js';
+const router = express.Router();
+
+const STANDARD_SHIPPING_RATE_ID = process.env.STRIPE_SHIPPING_STANDARD;
+const FREE_SHIPPING_RATE_ID = process.env.STRIPE_SHIPPING_FREE;
+
 router.post('/create-checkout-session', async (req, res) => {
   try {
     const items = JSON.parse(req.body.items); // from hidden input in EJS
@@ -37,3 +44,5 @@ router.post('/create-checkout-session', async (req, res) => {
     res.status(500).send('Failed to create session');
   }
 });
+
+export default router;
