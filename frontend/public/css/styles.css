@@ -24,7 +24,7 @@ body {
 
 }
 
-/* Navigation/Header */
+/* Navigation/Header Home Page*/
 .logo-container {
   display: flex;
   justify-content: center;
@@ -107,6 +107,71 @@ body {
 }
 
 .main-nav a:hover {
+  text-decoration: underline;
+  color: var(--black);
+}
+
+.cart-icon {
+  position: relative;
+  text-decoration: none;
+  font-size: 1.5rem;
+}
+
+.cart-count {
+  position: absolute;
+  top: -8px;
+  right: -10px;
+  background-color: red;
+  color: white;
+  font-size: 0.7rem;
+  padding: 2px 6px;
+  border-radius: 50%;
+}
+
+/* Navigation/Header Rest Of Pages*/
+.logo-container2 {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 150px;
+  padding: 1rem;
+  background-color: var(--pink);
+}
+
+.site-header2 {
+  background-color: var(--pink);
+  color: var(--black);
+  padding: 1rem 0;
+}
+
+.main-nav2 {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.main-nav2 {
+  font-family: var(--font-calgary);
+  margin: 30px 0 20px 0;
+}
+
+.main-nav2 ul {
+  list-style: none;
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  margin: 0;
+  padding: 0;
+}
+
+.main-nav2 a {
+  color: var(--blue);
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.main-nav2 a:hover {
   text-decoration: underline;
   color: var(--black);
 }
