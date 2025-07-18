@@ -21,7 +21,7 @@ router.get("/", async (req, res) => {
       return sum + item.product.price * item.quantity;
     }, 0);
 
-    const estimatedTax = subtotal * 0.0685; // 6.85% Utah sales tax
+    const estimatedTax = subtotal * 0.0725;
     const total = subtotal + estimatedTax;
 
     res.render("shop/cart", {

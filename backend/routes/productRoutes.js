@@ -15,7 +15,7 @@ router.get('/:id', async (req, res) => {
   try {
     const product = await Product.findById(req.params.id);
     if (!product) return res.status(404).send("Product not found");
-    res.render('product', { product }); // ✅ make sure this file exists
+    res.render('product', { product });
   } catch (err) {
     console.error("Error loading product:", err);
     res.status(500).send("Failed to load product.");
