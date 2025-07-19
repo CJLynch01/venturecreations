@@ -1,5 +1,8 @@
 import express from 'express';
 import stripe from '../config/stripe.js';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 const router = express.Router();
 
