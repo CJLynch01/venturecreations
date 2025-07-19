@@ -47,7 +47,9 @@
       <div class="cart-summary">
         <h3>Subtotal: $<%= subtotal.toFixed(2) %></h3>
         <h4>Estimated Tax (6.85%): $<%= estimatedTax.toFixed(2) %></h4>
+        <h4>Shipping: <%= shipping === 0 ? "Free" : `$${shipping.toFixed(2)}` %></h4>
         <h2>Total: $<%= total.toFixed(2) %></h2>
+
 
         <form action="/checkout/create-checkout-session" method="POST">
           <input type="hidden" name="subtotal" value="<%= subtotal.toFixed(2) %>">
