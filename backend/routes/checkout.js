@@ -14,10 +14,6 @@ router.post('/create-checkout-session', async (req, res) => {
     return res.status(400).json({ error: "Invalid items format" });
   }
 
-  console.log("Received checkout request:");
-  console.log("Items:", items);
-  console.log("Subtotal:", subtotal);
-
   try {
     const shippingOptions = [
       {
@@ -29,6 +25,7 @@ router.post('/create-checkout-session', async (req, res) => {
       shippingOptions.unshift({
         shipping_rate: process.env.STRIPE_SHIPPING_FREE,
       });
+      console.log(shippingOptions)
     }
 
     const session = await stripe.checkout.sessions.create({
