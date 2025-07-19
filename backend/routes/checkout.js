@@ -6,6 +6,15 @@ const router = express.Router();
 router.post('/create-checkout-session', async (req, res) => {
   let { items, subtotal } = req.body;
 
+  if (typeof items === 'string') {
+    try {
+      items = JSON.parse(items);
+    } catch (err) {
+      console.error('Error parsing items:', err);
+      return res.status(400).json({ error: 'Invalid items format' });
+    }
+  }
+
   // Debug logs for development
   console.log('Received checkout request:');
   console.log('Type of items:', typeof items);
