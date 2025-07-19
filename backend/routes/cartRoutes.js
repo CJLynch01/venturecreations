@@ -22,8 +22,8 @@ router.get("/", async (req, res) => {
     }, 0);
 
     const estimatedTax = subtotal * 0.0725;
-    const total = subtotal + estimatedTax + shipping;
     const shipping = subtotal >= 100 ? 0 : 4.99;
+    const total = subtotal + estimatedTax + shipping;
 
     res.render("shop/cart", {
       cart: cartItems,
