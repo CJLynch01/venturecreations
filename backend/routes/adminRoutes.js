@@ -83,11 +83,11 @@ router.get("/products/edit/:id", ensureAdmin, async (req, res) => {
 // Handle Edit Product Form Submission
 router.post("/products/edit/:id", ensureAdmin, async (req, res) => {
   try {
-    const { name, price, sizes, colors, category, stock, seasonalCategory, tags } = req.body;
+    const { name, price, sizes, colors, category, seasonalCategory, tags } = req.body;
     let { images } = req.body;
 
     // Ensure 'images' is an array
-    if (!Array.isArray(images)) {
+    if (!Array.isArray(images)) {Sa
       images = [images];
     }
 
@@ -100,7 +100,6 @@ router.post("/products/edit/:id", ensureAdmin, async (req, res) => {
       colors: colors.split(",").map((c) => c.trim()),
       category,
       images: cleanImages,
-      stock: parseInt(stock, 10),
       seasonalCategory: seasonalCategory || 'None',
       tags: tags ? tags.split(',').map((t) => t.trim().toLowerCase()) : []
     });
