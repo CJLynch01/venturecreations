@@ -1,3 +1,4 @@
+// routes/adminRoutes.js
 import express from "express";
 import Product from "../models/Product.js";
 import { ensureAdmin } from "../middleware/auth.js";
@@ -38,7 +39,7 @@ router.get("/products/new", ensureAdmin, (req, res) => {
 // Handle Add Product Form
 router.post("/products/new", ensureAdmin, async (req, res) => {
   try {
-    const { name, price, sizes, colors, category, stock } = req.body;
+    const { name, price, sizes, colors, category, seasonalCategory, tags } = req.body;
     let { images } = req.body;
 
     // Ensure 'images' is an array
@@ -55,7 +56,8 @@ router.post("/products/new", ensureAdmin, async (req, res) => {
       colors: colors.split(",").map((c) => c.trim()),
       category,
       images: cleanImages,
-      stock: parseInt(stock, 10),
+      seasonalCategory: seasonalCategory || 'None',
+      tags: tags ? tags.split(',').map(t => t.trim().toLowerCase()) : []
     });
 
     await newProduct.save();
@@ -81,7 +83,7 @@ router.get("/products/edit/:id", ensureAdmin, async (req, res) => {
 // Handle Edit Product Form Submission
 router.post("/products/edit/:id", ensureAdmin, async (req, res) => {
   try {
-    const { name, price, sizes, colors, category, stock } = req.body;
+    const { name, price, sizes, colors, category, stock, seasonalCategory, tags } = req.body;
     let { images } = req.body;
 
     // Ensure 'images' is an array
@@ -99,6 +101,8 @@ router.post("/products/edit/:id", ensureAdmin, async (req, res) => {
       category,
       images: cleanImages,
       stock: parseInt(stock, 10),
+      seasonalCategory: seasonalCategory || 'None',
+      tags: tags ? tags.split(',').map((t) => t.trim().toLowerCase()) : []
     });
 
     res.redirect("/admin");

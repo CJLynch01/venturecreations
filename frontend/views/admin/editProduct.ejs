@@ -31,16 +31,23 @@
       <label>Category</label>
       <input type="text" name="category" value="<%= product.category %>" required>
 
+      <select name="seasonalCategory" id="seasonalCategory">
+        <% ['None', 'Christmas', 'Easter', 'Fall', 'Summer', 'Back to School'].forEach(cat => { %>
+          <option value="<%= cat %>" <%= product.seasonalCategory === cat ? 'selected' : '' %>><%= cat %></option>
+        <% }) %>
+      </select>
+
       <label>Image URLs</label>
       <div id="image-fields">
         <% product.images.forEach((url, index) => { %>
           <input type="text" name="images[]" value="<%= url %>" placeholder="Image <%= index + 1 %> URL" required />
         <% }) %>
       </div>
+
+      <input type="text" name="tags" value="<%= product.tags.join(', ') %>" />
+
       <button type="button" id="add-image-btn" class="btn-secondary">+ Add Another Image</button>
 
-      <label>Stock</label>
-      <input type="number" name="stock" value="<%= product.stock %>" required>
 
       <div class="form-actions">
         <button type="submit" class="btn">Update Product</button>

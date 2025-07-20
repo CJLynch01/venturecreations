@@ -31,6 +31,16 @@
       <label>Category</label>
       <input type="text" name="category" required>
 
+      <label for="seasonalCategory">Seasonal Category (optional)</label>
+      <select name="seasonalCategory" id="seasonalCategory">
+        <option value="None">None</option>
+        <option value="Christmas">Christmas</option>
+        <option value="Easter">Easter</option>
+        <option value="Fall">Fall</option>
+        <option value="Summer">Summer</option>
+        <option value="Back to School">Back to School</option>
+      </select>
+
       <label>Image URLs</label>
       <div id="image-fields">
         <input type="text" name="images[]" placeholder="Image 1 URL" required>
@@ -38,8 +48,8 @@
       <button type="button" id="add-image-btn" class="btn-secondary">+ Add Another Image</button>
 
 
-      <label>Stock</label>
-      <input type="number" name="stock" required>
+      <label for="tags">Search Tags (comma-separated)</label>
+      <input type="text" name="tags" placeholder="funny, inspirational, depression" />
 
       <div class="form-actions">
         <button type="submit" class="btn">Add Product</button>
