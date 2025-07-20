@@ -1,7 +1,7 @@
-// backend/routes/checkout.js
+import dotenv from 'dotenv';
 import express from 'express';
 import stripe from '../config/stripe.js';
-import dotenv from 'dotenv';
+
 
 dotenv.config();
 
@@ -23,7 +23,7 @@ router.post('/create-checkout-session', async (req, res) => {
     // Set up shipping options
     const shippingOptions = [
       {
-        shipping_rate: "shr_1RmNZIKv6xEGO45y5095qQaR",
+        shipping_rate: process.env.STANDARD_SHIPPING_RATE,
       },
     ];
 
