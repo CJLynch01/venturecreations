@@ -23,7 +23,7 @@ router.post('/create-checkout-session', async (req, res) => {
     // Set up shipping options
     const shippingOptions = [
       {
-        shipping_rate: process.env.STRIPE_SHIPPING_STANDARD,
+        shipping_rate: "shr_1RmNZIKv6xEGO45y5095qQaR",
       },
     ];
 
