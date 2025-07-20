@@ -45,7 +45,7 @@ router.post('/create-checkout-session', async (req, res) => {
           product_data: {
             name: item.name,
           },
-          unit_amount: Math.round(item.price * 100), // convert dollars to cents
+          unit_amount: Math.round(item.price * 100),
         },
         quantity: item.quantity,
       })),
