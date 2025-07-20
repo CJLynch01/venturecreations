@@ -31,10 +31,14 @@
       <label>Category</label>
       <input type="text" name="category" value="<%= product.category %>" required>
 
+      <label for="seasonalCategory">Seasonal Category (optional)</label>
       <select name="seasonalCategory" id="seasonalCategory">
-        <% ['None', 'Christmas', 'Easter', 'Fall', 'Summer', 'Back to School'].forEach(cat => { %>
-          <option value="<%= cat %>" <%= product.seasonalCategory === cat ? 'selected' : '' %>><%= cat %></option>
-        <% }) %>
+        <option value="None" <%= product?.seasonalCategory === 'None' ? 'selected' : '' %>>None</option>
+        <option value="Christmas" <%= product?.seasonalCategory === 'Christmas' ? 'selected' : '' %>>Christmas</option>
+        <option value="Easter" <%= product?.seasonalCategory === 'Easter' ? 'selected' : '' %>>Easter</option>
+        <option value="Fall" <%= product?.seasonalCategory === 'Fall' ? 'selected' : '' %>>Fall</option>
+        <option value="Summer" <%= product?.seasonalCategory === 'Summer' ? 'selected' : '' %>>Summer</option>
+        <option value="Back to School" <%= product?.seasonalCategory === 'Back to School' ? 'selected' : '' %>>Back to School</option>
       </select>
 
       <label>Image URLs</label>
@@ -44,7 +48,9 @@
         <% }) %>
       </div>
 
-      <input type="text" name="tags" value="<%= product.tags.join(', ') %>" />
+      <!-- Tags -->
+      <label for="tags">Tags (comma-separated)</label>
+      <input type="text" name="tags" id="tags" placeholder="funny, mental health, inspirational" value="<%= product?.tags?.join(', ') || '' %>">
 
       <button type="button" id="add-image-btn" class="btn-secondary">+ Add Another Image</button>
 
