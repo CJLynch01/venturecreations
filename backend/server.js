@@ -14,7 +14,7 @@ import passport from "./config/passport.js";
 
 // Models
 import User from "./models/User.js";
-import Product from "./models/Product.js";
+import Product from "./models/product.js";
 
 // Routes
 import productRoutes from "./routes/productRoutes.js";
