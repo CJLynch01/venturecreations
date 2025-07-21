@@ -11,6 +11,7 @@ import express from "express";
 import mongoose from "mongoose";
 import session from "express-session";
 import passport from "./config/passport.js";
+import MongoStore from "connect-mongo";
 
 // Models
 import User from "./models/User.js";
@@ -39,7 +40,14 @@ app.use(
   session({
     secret: process.env.SESSION_SECRET || "defaultSecret",
     resave: false,
-    saveUninitialized: true,
+    saveUninitialized: false,
+    store: MongoStore.create({
+      mongoUrl: process.env.MONGO_URI,
+      collectionName: "sessions",
+    }),
+    cookie: {
+      maxAge: 1000 * 60 * 60 * 24,
+    },
   })
 );
 
