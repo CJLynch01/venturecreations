@@ -1,7 +1,7 @@
 // routes/cartRoutes.js
 import express from "express";
 import User from "../models/User.js";
-import Product from "../models/Product.js";
+import Product from "../models/product.js";
 
 const router = express.Router();
 
