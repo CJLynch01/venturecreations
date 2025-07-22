@@ -5,11 +5,8 @@
 
 Venture Creations is a full-featured e-commerce website for custom t-shirts and merchandise. Built with Node.js, Express, MongoDB, and EJS, it offers both admin and customer interfaces, product management, Stripe integration, Google OAuth, and a live blog system.
 
----
 
-## 🚀 Features
-
-### 🛍️ Customer
+### Customer
 - Browse products in a responsive shop layout
 - Add items to cart and checkout securely via Stripe
 - Register/Login using Google
@@ -17,7 +14,7 @@ Venture Creations is a full-featured e-commerce website for custom t-shirts and 
 - Read blog posts and announcements
 - Contact form to reach the business
 
-### 🧑‍💼 Admin
+### Admin
 - Login with Google (restricted by verified email)
 - Create, edit, and delete products
 - Manage customer-uploaded documents
@@ -26,7 +23,7 @@ Venture Creations is a full-featured e-commerce website for custom t-shirts and 
 
 ---
 
-## 🧱 Tech Stack
+## Tech Stack
 
 - **Backend:** Node.js, Express.js
 - **Database:** MongoDB (Mongoose)
