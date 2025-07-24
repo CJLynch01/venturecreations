@@ -167,7 +167,7 @@ mongoose
     useNewUrlParser: true,
     useUnifiedTopology: true,
     ssl: true,
-    serverSeelectionTimeoutMS: 10000,
+    serverSelectionTimeoutMS: 10000,
   })
   .then(() => {
     console.log("MongoDB Connected");
