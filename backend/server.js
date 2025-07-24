@@ -164,10 +164,10 @@ app.get('/cancel', (req, res) => {
 // Connect to DB and start server
 mongoose
   .connect(process.env.MONGO_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-    ssl: true,
-    serverSelectionTimeoutMS: 10000,
+    // useNewUrlParser: true,
+    // useUnifiedTopology: true,
+    // ssl: true,
+    // serverSelectionTimeoutMS: 10000,
   })
   .then(() => {
     console.log("MongoDB Connected");

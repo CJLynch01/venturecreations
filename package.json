@@ -9,9 +9,7 @@
     "start": "node backend/server.js",
     "dev": "nodemon backend/server.js"
   },
-  "engines": {
-    "node": "20.x"
-  },
+ 
   "keywords": [],
   "author": "",
   "license": "ISC",
