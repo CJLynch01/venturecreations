@@ -9,7 +9,6 @@
     "start": "node backend/server.js",
     "dev": "nodemon backend/server.js"
   },
- 
   "keywords": [],
   "author": "",
   "license": "ISC",
