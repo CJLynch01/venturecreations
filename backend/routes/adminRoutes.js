@@ -122,4 +122,23 @@ router.post("/products/delete/:id", ensureAdmin, async (req, res) => {
   }
 });
 
+// Delete a specific image from a product
+router.post("/products/:id/images/delete", ensureAdmin, async (req, res) => {
+  try {
+    const { imageUrl } = req.body;
+    const product = await Product.findById(req.params.id);
+
+    if (!product) return res.status(404).send("Product not found");
+
+    product.images = product.images.filter(img => img !== imageUrl);
+    await product.save();
+
+    res.redirect(`/admin/products/edit/${req.params.id}`);
+  } catch (err) {
+    console.error("Error deleting image:", err);
+    res.status(500).send("Failed to delete image.");
+  }
+});
+
+
 export default router;
