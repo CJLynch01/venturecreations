@@ -44,7 +44,7 @@ router.post("/products/new", ensureAdmin, async (req, res) => {
 
     // Ensure 'images' is an array
     if (!Array.isArray(images)) {
-      images = [images]; // convert to array if it's just one
+      images = [images];
     }
 
     const cleanImages = images.filter((url) => url.trim() !== "");
@@ -87,7 +87,7 @@ router.post("/products/edit/:id", ensureAdmin, async (req, res) => {
     let { images } = req.body;
 
     // Ensure 'images' is an array
-    if (!Array.isArray(images)) {Sa
+    if (!Array.isArray(images)) {
       images = [images];
     }
 
