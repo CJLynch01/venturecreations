@@ -83,16 +83,19 @@ router.get("/products/edit/:id", ensureAdmin, async (req, res) => {
 // Handle Edit Product Form Submission
 router.post("/products/edit/:id", ensureAdmin, async (req, res) => {
   try {
-    const { name, price, sizes, colors, category, seasonalCategory, tags } = req.body;
-    let { images } = req.body;
+    const { name, price, sizes, colors, category, seasonalCategory, tags, action } = req.body;
+    let { images, deleteImages } = req.body;
 
-    // Ensure 'images' is an array
-    if (!Array.isArray(images)) {
-      images = [images];
-    }
+    // Normalize input
+    if (!Array.isArray(images)) images = images ? [images] : [];
+    if (!Array.isArray(deleteImages)) deleteImages = deleteImages ? [deleteImages] : [];
 
-    const cleanImages = images.filter((url) => url.trim() !== "");
+    // Filter out any images marked for deletion
+    const cleanImages = images
+      .filter(url => url.trim() !== "")
+      .filter(url => !deleteImages.includes(url));
 
+    // Update the product
     await Product.findByIdAndUpdate(req.params.id, {
       name,
       price: parseFloat(price),
@@ -104,7 +107,13 @@ router.post("/products/edit/:id", ensureAdmin, async (req, res) => {
       tags: tags ? tags.split(',').map((t) => t.trim().toLowerCase()) : []
     });
 
-    res.redirect("/admin");
+    if (action === 'deleteImages') {
+      // Stay on the same edit page
+      return res.redirect(`/admin/products/edit/${req.params.id}`);
+    } else {
+      // Normal update flow
+      return res.redirect("/admin");
+    }
   } catch (err) {
     console.error("Error updating product:", err);
     res.status(500).send("Failed to update product.");

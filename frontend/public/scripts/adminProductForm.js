@@ -8,8 +8,11 @@ document.addEventListener("DOMContentLoaded", () => {
       newInput.type = "text";
       newInput.name = "images[]";
       newInput.placeholder = `Image ${imageFields.children.length + 1} URL`;
-      newInput.classList.add("form-control"); // Optional: add a class if you're styling with CSS
+      newInput.classList.add("form-control");
       imageFields.appendChild(newInput);
     });
   }
+
+
+  
 });
