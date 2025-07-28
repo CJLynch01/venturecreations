@@ -30,9 +30,34 @@
       <p>In Stock: <%= product.stock %></p>
     </div>
 
-    <form action="/cart/add" method="POST">
+    <!-- <form action="/cart/add" method="POST">
         <input type="hidden" name="productId" value="<%= product._id %>">
         <button type="submit" class="btn">Add to Cart</button>
+    </form> -->
+
+
+    <form action="/cart/add" method="POST" class="product-options">
+      <input type="hidden" name="productId" value="<%= product._id %>">
+
+      <!-- Size Dropdown -->
+      <label for="size">Select Size:</label>
+      <select name="size" id="size" required>
+        <option value="" disabled selected>Select size</option>
+        <% product.sizes.forEach(size => { %>
+          <option value="<%= size %>"><%= size %></option>
+        <% }) %>
+      </select>
+
+      <!-- Color Dropdown -->
+      <label for="color">Select Color:</label>
+      <select name="color" id="color" required>
+        <option value="" disabled selected>Select color</option>
+        <% product.colors.forEach(color => { %>
+          <option value="<%= color %>"><%= color %></option>
+        <% }) %>
+      </select>
+
+      <button type="submit" class="btn">Add to Cart</button>
     </form>
 
 

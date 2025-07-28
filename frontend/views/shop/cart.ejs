@@ -26,6 +26,14 @@
               <h2><%= item.product.name %></h2>
               <p>Price: $<%= item.product.price.toFixed(2) %></p>
 
+              <!-- Show Size and Color -->
+              <% if (item.size) { %>
+                <p>Size: <%= item.size %></p>
+              <% } %>
+              <% if (item.color) { %>
+                <p>Color: <%= item.color %></p>
+              <% } %>
+
               <form action="/cart/update" method="POST" class="quantity-form">
                 <input type="hidden" name="productId" value="<%= item.product._id %>">
                 <button type="submit" name="action" value="decrease" class="qty-btn">−</button>

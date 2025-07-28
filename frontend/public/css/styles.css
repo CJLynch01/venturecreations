@@ -843,6 +843,23 @@ body {
   margin-top: 0.5rem;
 }
 
+.product-options {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.product-options label {
+  font-weight: bold;
+}
+
+.product-options select {
+  padding: 0.5rem;
+  font-size: 1rem;
+}
+
+
 .btn {
   display: inline-block;
   margin-top: 0.5rem;

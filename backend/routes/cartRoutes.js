@@ -15,6 +15,8 @@ router.get("/", async (req, res) => {
     const cartItems = user.cart.map(item => ({
       product: item.productId,
       quantity: item.quantity,
+      size: item.size,
+      color: item.color
     }));
 
     const subtotal = cartItems.reduce((sum, item) => {
@@ -40,7 +42,7 @@ router.get("/", async (req, res) => {
 
 // Add to Cart
 router.post("/add", async (req, res) => {
-  const { productId } = req.body;
+  const { productId, size, color } = req.body;
 
   if (!req.user) return res.redirect("/auth/google");
 
@@ -50,13 +52,19 @@ router.post("/add", async (req, res) => {
 
     const user = await User.findById(req.user._id);
 
-    const existingItem = user.cart.find(item => item.productId.equals(productId));
+    const existingItem = user.cart.find(item => 
+      item.productId.equals(productId) &&
+      item.size === size &&
+      item.color === color
+    );
     if (existingItem) {
       existingItem.quantity += 1;
     } else {
       user.cart.push({
         productId: product._id,
         quantity: 1,
+        size,
+        color
       });
     }
 
