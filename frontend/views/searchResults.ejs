@@ -15,19 +15,29 @@
     <h1>Search Results for "<%= query %>"</h1>
 
     <% if (results.length > 0) { %>
-        <div class="product-grid">
+    <div class="product-grid">
         <% results.forEach(product => { %>
-            <div class="product-card">
+        <div class="product-card">
             <img src="<%= product.images[0] %>" alt="<%= product.name %>">
             <h3><%= product.name %></h3>
             <p>$<%= product.price.toFixed(2) %></p>
+
+            <% if (product.seasonalCategory && product.seasonalCategory !== 'None') { %>
+            <p><strong>Season:</strong> <%= product.seasonalCategory %></p>
+            <% } %>
+
+            <% if (product.tags && product.tags.length > 0) { %>
+            <p><strong>Tags:</strong> <%= product.tags.join(', ') %></p>
+            <% } %>
+
             <a href="/shop/<%= product._id %>" class="btn">View Product</a>
-            </div>
-        <% }) %>
         </div>
+        <% }) %>
+    </div>
     <% } else { %>
-        <p>No results found.</p>
+    <p>No results found.</p>
     <% } %>
+
     </main>
 
     <%- include("partials/footer") %>

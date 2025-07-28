@@ -115,7 +115,11 @@ app.get("/search", async (req, res) => {
 
   try {
     const results = await Product.find({
-      name: { $regex: query, $options: "i" }
+      $or: [
+        { name: { $regex: query, $options: "i" } },
+        { tags: { $regex: query, $options: "i" } },
+        { seasonalCategory: { $regex: query, $options: "i" } }
+      ]
     });
 
     res.render("searchResults", {
