@@ -89,7 +89,7 @@ app.use("/contact", contactFormRoutes)
 
 // Public Pages
 app.get("/", async (req, res) => {
-  const products = await Product.find().sort({ createdAt: -1 }).limit(3);
+  const products = await Product.find().sort({ createdAt: -1 }).limit(4);
   res.render("home", { title: "Welcome to Venture Creations", products, page: "home" });
 });
 
