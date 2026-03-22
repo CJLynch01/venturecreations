@@ -36,6 +36,8 @@
 
               <form action="/cart/update" method="POST" class="quantity-form">
                 <input type="hidden" name="productId" value="<%= item.product._id %>">
+                <input type="hidden" name="size" value="<%= item.size %>">
+                <input type="hidden" name="color" value="<%= item.color %>">
                 <button type="submit" name="action" value="decrease" class="qty-btn">−</button>
                 <span class="qty-display"><%= item.quantity %></span>
                 <button type="submit" name="action" value="increase" class="qty-btn">+</button>
@@ -45,6 +47,8 @@
 
               <form action="/cart/remove" method="POST">
                 <input type="hidden" name="productId" value="<%= item.product._id %>">
+                <input type="hidden" name="size" value="<%= item.size %>">
+                <input type="hidden" name="color" value="<%= item.color %>">
                 <button type="submit" class="btn remove-btn">Remove</button>
               </form>
             </div>

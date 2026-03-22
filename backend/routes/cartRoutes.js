@@ -78,13 +78,15 @@ router.post("/add", async (req, res) => {
 
 // Remove from Cart
 router.post("/remove", async (req, res) => {
-  const { productId } = req.body;
+  const { productId, size, color } = req.body;
 
   if (!req.user) return res.redirect("/auth/google");
 
   try {
     const user = await User.findById(req.user._id);
-    user.cart = user.cart.filter(item => !item.productId.equals(productId));
+    user.cart = user.cart.filter(item =>
+      !(item.productId.equals(productId) && item.size === size && item.color === color)
+    );
     await user.save();
     res.redirect("/cart");
   } catch (err) {
@@ -95,14 +97,16 @@ router.post("/remove", async (req, res) => {
 
 // Update Quantity
 router.post("/update", async (req, res) => {
-  const { productId, action } = req.body;
+  const { productId, size, color, action } = req.body;
 
   if (!req.user) return res.redirect("/auth/google");
 
   try {
     const user = await User.findById(req.user._id);
 
-    const item = user.cart.find(item => item.productId.equals(productId));
+    const item = user.cart.find(item =>
+      item.productId.equals(productId) && item.size === size && item.color === color
+    );
     if (item) {
       if (action === "increase") {
         item.quantity += 1;

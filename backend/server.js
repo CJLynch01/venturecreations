@@ -98,8 +98,18 @@ app.get("/", async (req, res) => {
 });
 
 app.get("/shop", async (req, res) => {
-  const products = await Product.find();
-  res.render("shop", { products, page: "shop"});
+  const currentPage = parseInt(req.query.page) || 1;
+  const perPage = 12;
+  const total = await Product.countDocuments();
+  const products = await Product.find()
+    .skip((currentPage - 1) * perPage)
+    .limit(perPage);
+  res.render("shop", {
+    products,
+    page: "shop",
+    currentPage,
+    totalPages: Math.ceil(total / perPage)
+  });
 });
 
 app.get("/shop/:id", async (req, res) => {
@@ -168,6 +178,11 @@ app.get('/success', (req, res) => {
 
 app.get('/cancel', (req, res) => {
   res.render('shop/cancel', { message: 'Your payment was cancelled.' });
+});
+
+// 404 handler
+app.use((req, res) => {
+  res.status(404).render("404");
 });
 
 // Connect to DB and start server

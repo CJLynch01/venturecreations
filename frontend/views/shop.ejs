@@ -28,6 +28,18 @@
     </div>
   </main>
 
+  <% if (totalPages > 1) { %>
+    <div class="pagination">
+      <% if (currentPage > 1) { %>
+        <a href="/shop?page=<%= currentPage - 1 %>" class="btn">← Prev</a>
+      <% } %>
+      <span>Page <%= currentPage %> of <%= totalPages %></span>
+      <% if (currentPage < totalPages) { %>
+        <a href="/shop?page=<%= currentPage + 1 %>" class="btn">Next →</a>
+      <% } %>
+    </div>
+  <% } %>
+
   <%- include('partials/footer') %>
 </body>
 </html>
