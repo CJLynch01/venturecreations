@@ -24,7 +24,8 @@ passport.use(
       let user = await User.findOne({ googleId: profile.id });
 
       if (!user) {
-        const isAdmin = process.env.ADMIN_EMAILS?.split(",").includes(profile.emails[0].value);
+        const adminEmails = process.env.ADMIN_EMAILS?.split(",").map(e => e.trim()) ?? [];
+        const isAdmin = adminEmails.includes(profile.emails[0].value);
         user = await User.create({
           googleId: profile.id,
           name: profile.displayName,

@@ -20,7 +20,7 @@
     <% } else { %>
       <div class="cart-items">
         <% cart.forEach(item => { %>
-          <div class="cart-item">
+          <div class="cart-item" data-product-id="<%= item.product._id %>">
             <img src="<%= item.product.images[0] %>" alt="<%= item.product.name %>" class="cart-img">
             <div class="cart-details">
               <h2><%= item.product.name %></h2>

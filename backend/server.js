@@ -28,9 +28,15 @@ import blogRoutes from "./routes/blog.js";
 import BlogPost from "./models/BlogPost.js";
 import contactFormRoutes from "./routes/contactForm.js";
 import webhookRoutes from "./routes/webhook.js";
+import rateLimit from "express-rate-limit";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+// Rate limiters
+const cartLimiter = rateLimit({ windowMs: 60 * 1000, limit: 30, standardHeaders: true, legacyHeaders: false });
+const checkoutLimiter = rateLimit({ windowMs: 60 * 1000, limit: 10, standardHeaders: true, legacyHeaders: false });
+const searchLimiter = rateLimit({ windowMs: 60 * 1000, limit: 30, standardHeaders: true, legacyHeaders: false });
 
 // Webhook must be registered before express.json() parses the body
 app.use("/webhook", webhookRoutes);
@@ -42,7 +48,7 @@ app.use(express.static(path.join(__dirname, "../frontend/public")));
 
 app.use(
   session({
-    secret: process.env.SESSION_SECRET || "defaultSecret",
+    secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
     store: MongoStore.create({
@@ -85,9 +91,9 @@ app.set("views", path.join(__dirname, "../frontend/views"));
 app.use("/auth", authRoutes);
 app.use("/api/products", productRoutes);
 app.use("/admin", adminRoutes);
-app.use("/cart", cartRoutes);
+app.use("/cart", cartLimiter, cartRoutes);
 app.use("/customer", customerRoutes);
-app.use("/checkout", checkoutRoutes);
+app.use("/checkout", checkoutLimiter, checkoutRoutes);
 app.use("/", blogRoutes)
 app.use("/contact", contactFormRoutes)
 
@@ -124,7 +130,7 @@ app.get("/shop/:id", async (req, res) => {
 });
 
 // Search Bar
-app.get("/search", async (req, res) => {
+app.get("/search", searchLimiter, async (req, res) => {
   const query = req.query.q;
   const escaped = query.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
