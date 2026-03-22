@@ -27,9 +27,13 @@ import checkoutRoutes from "./routes/checkout.js";
 import blogRoutes from "./routes/blog.js";
 import BlogPost from "./models/BlogPost.js";
 import contactFormRoutes from "./routes/contactForm.js";
+import webhookRoutes from "./routes/webhook.js";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+// Webhook must be registered before express.json() parses the body
+app.use("/webhook", webhookRoutes);
 
 // Middleware
 app.use(express.json());
@@ -112,13 +116,14 @@ app.get("/shop/:id", async (req, res) => {
 // Search Bar
 app.get("/search", async (req, res) => {
   const query = req.query.q;
+  const escaped = query.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
   try {
     const results = await Product.find({
       $or: [
-        { name: { $regex: query, $options: "i" } },
-        { tags: { $regex: query, $options: "i" } },
-        { seasonalCategory: { $regex: query, $options: "i" } }
+        { name: { $regex: escaped, $options: "i" } },
+        { tags: { $regex: escaped, $options: "i" } },
+        { seasonalCategory: { $regex: escaped, $options: "i" } }
       ]
     });
 
