@@ -23,6 +23,24 @@
 
             <a href="/shop" class="btn">Go to Shop</a>
             <a href="/auth/logout" class="btn secondary">Logout</a>
+
+            <h3>Order History</h3>
+            <% if (orders.length === 0) { %>
+              <p>You haven't placed any orders yet.</p>
+            <% } else { %>
+              <% orders.forEach(order => { %>
+                <div class="order-card">
+                  <p><strong>Date:</strong> <%= order.createdAt.toLocaleDateString() %></p>
+                  <p><strong>Total:</strong> $<%= order.total.toFixed(2) %></p>
+                  <p><strong>Status:</strong> <%= order.status %></p>
+                  <ul>
+                    <% order.items.forEach(item => { %>
+                      <li><%= item.quantity %> × <%= item.name %> — $<%= item.price.toFixed(2) %></li>
+                    <% }) %>
+                  </ul>
+                </div>
+              <% }) %>
+            <% } %>
         </div>
     </section>
 
