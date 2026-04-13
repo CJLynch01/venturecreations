@@ -4,21 +4,26 @@ import { getProducts, createProduct } from '../controllers/productController.js'
 
 const router = express.Router();
 
-// GET /shop/
+// GET /api/products
 router.get('/', async (req, res) => {
-  const products = await Product.find();
-  res.render('shop', { products });
+  try {
+    const products = await Product.find().sort({ createdAt: -1 });
+    res.json(products);
+  } catch (err) {
+    console.error("Error loading products:", err);
+    res.status(500).json({ error: "Failed to load products." });
+  }
 });
 
-// GET /shop/:id — product view page
+// GET /api/products/:id
 router.get('/:id', async (req, res) => {
   try {
     const product = await Product.findById(req.params.id);
-    if (!product) return res.status(404).send("Product not found");
-    res.render('product', { product });
+    if (!product) return res.status(404).json({ error: "Product not found" });
+    res.json(product);
   } catch (err) {
     console.error("Error loading product:", err);
-    res.status(500).send("Failed to load product.");
+    res.status(500).json({ error: "Failed to load product." });
   }
 });
 

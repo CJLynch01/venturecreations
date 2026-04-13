@@ -116,4 +116,29 @@ router.get("/blog/:slug", async (req, res) => {
   }
 });
 
+// ========== API ROUTES (for React) ========== //
+
+// API: List blog posts
+router.get("/api/blog", async (req, res) => {
+  try {
+    const posts = await BlogPost.find().sort({ createdAt: -1 });
+    res.json(posts);
+  } catch (err) {
+    console.error("Error loading blog posts:", err);
+    res.status(500).json({ error: "Error loading posts" });
+  }
+});
+
+// API: Single blog post
+router.get("/api/blog/:slug", async (req, res) => {
+  try {
+    const post = await BlogPost.findOne({ slug: req.params.slug });
+    if (!post) return res.status(404).json({ error: "Post not found" });
+    res.json(post);
+  } catch (err) {
+    console.error("Error loading post:", err);
+    res.status(500).json({ error: "Error loading post" });
+  }
+});
+
 export default router;
