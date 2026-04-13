@@ -27,9 +27,19 @@ import checkoutRoutes from "./routes/checkout.js";
 import blogRoutes from "./routes/blog.js";
 import BlogPost from "./models/BlogPost.js";
 import contactFormRoutes from "./routes/contactForm.js";
+import webhookRoutes from "./routes/webhook.js";
+import rateLimit from "express-rate-limit";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+// Rate limiters
+const cartLimiter = rateLimit({ windowMs: 60 * 1000, limit: 30, standardHeaders: true, legacyHeaders: false });
+const checkoutLimiter = rateLimit({ windowMs: 60 * 1000, limit: 10, standardHeaders: true, legacyHeaders: false });
+const searchLimiter = rateLimit({ windowMs: 60 * 1000, limit: 30, standardHeaders: true, legacyHeaders: false });
+
+// Webhook must be registered before express.json() parses the body
+app.use("/webhook", webhookRoutes);
 
 // Middleware
 app.use(express.json());
@@ -38,7 +48,7 @@ app.use(express.static(path.join(__dirname, "../frontend/public")));
 
 app.use(
   session({
-    secret: process.env.SESSION_SECRET || "defaultSecret",
+    secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
     store: MongoStore.create({
@@ -81,9 +91,9 @@ app.set("views", path.join(__dirname, "../frontend/views"));
 app.use("/auth", authRoutes);
 app.use("/api/products", productRoutes);
 app.use("/admin", adminRoutes);
-app.use("/cart", cartRoutes);
+app.use("/cart", cartLimiter, cartRoutes);
 app.use("/customer", customerRoutes);
-app.use("/checkout", checkoutRoutes);
+app.use("/checkout", checkoutLimiter, checkoutRoutes);
 app.use("/", blogRoutes)
 app.use("/contact", contactFormRoutes)
 
@@ -94,8 +104,18 @@ app.get("/", async (req, res) => {
 });
 
 app.get("/shop", async (req, res) => {
-  const products = await Product.find();
-  res.render("shop", { products, page: "shop"});
+  const currentPage = parseInt(req.query.page) || 1;
+  const perPage = 12;
+  const total = await Product.countDocuments();
+  const products = await Product.find()
+    .skip((currentPage - 1) * perPage)
+    .limit(perPage);
+  res.render("shop", {
+    products,
+    page: "shop",
+    currentPage,
+    totalPages: Math.ceil(total / perPage)
+  });
 });
 
 app.get("/shop/:id", async (req, res) => {
@@ -110,15 +130,16 @@ app.get("/shop/:id", async (req, res) => {
 });
 
 // Search Bar
-app.get("/search", async (req, res) => {
+app.get("/search", searchLimiter, async (req, res) => {
   const query = req.query.q;
+  const escaped = query.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
   try {
     const results = await Product.find({
       $or: [
-        { name: { $regex: query, $options: "i" } },
-        { tags: { $regex: query, $options: "i" } },
-        { seasonalCategory: { $regex: query, $options: "i" } }
+        { name: { $regex: escaped, $options: "i" } },
+        { tags: { $regex: escaped, $options: "i" } },
+        { seasonalCategory: { $regex: escaped, $options: "i" } }
       ]
     });
 
@@ -165,9 +186,17 @@ app.get('/cancel', (req, res) => {
   res.render('shop/cancel', { message: 'Your payment was cancelled.' });
 });
 
+// 404 handler
+app.use((req, res) => {
+  res.status(404).render("404");
+});
+
 // Connect to DB and start server
 mongoose
-  .connect(process.env.MONGO_URI, { tls: true, tlsAllowInvalidCertificates: true })
+  .connect(process.env.MONGO_URI, {
+    tls: true,
+    tlsAllowInvalidCertificates: false,
+  })
   .then(() => {
     console.log("MongoDB Connected");
     app.listen(PORT, () => {

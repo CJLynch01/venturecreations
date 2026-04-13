@@ -1,1 +1,4 @@
 .env
+CLAUDE.md
+node_modules/
+dev-frontend/node_modules/

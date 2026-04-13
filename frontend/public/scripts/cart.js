@@ -1,15 +1,10 @@
 document.getElementById('checkout-btn')?.addEventListener('click', async () => {
   const cartItems = Array.from(document.querySelectorAll('.cart-item')).map(item => {
     return {
-      name: item.querySelector('h2').textContent,
-      price: parseFloat(item.querySelector('p').textContent.replace('Price: $', '')),
+      productId: item.dataset.productId,
       quantity: parseInt(item.querySelector('.qty-display').textContent),
     };
   });
-
-  const subtotal = Math.round(
-    cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0) * 100
-  );
 
   try {
     const res = await fetch('/checkout/create-checkout-session', {
@@ -17,7 +12,7 @@ document.getElementById('checkout-btn')?.addEventListener('click', async () => {
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ items: cartItems, subtotal })
+      body: JSON.stringify({ items: cartItems })
     });
 
     const data = await res.json();
