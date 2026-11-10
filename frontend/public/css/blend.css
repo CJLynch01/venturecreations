@@ -393,7 +393,7 @@ footer.site .copy{grid-column:1/-1;border-top:1px solid var(--line);padding-top:
 .vc-spider{position:absolute;right:7vw;top:0;display:flex;flex-direction:column;align-items:center;animation:vc-spider 11s ease-in-out infinite}
 .vc-thread{display:block;width:1px;height:320px;background:#1c22335c}
 @keyframes vc-spider{0%,100%{transform:translateY(-345px)}35%,65%{transform:translateY(-130px)}}
-.vc-canvas{position:absolute;left:0;top:0;width:100%;height:60vh}
+.vc-canvas{position:absolute;inset:0;width:100%;height:100%}
 /* admin ideas list */
 .ideas-sum{display:flex;gap:8px;flex-wrap:wrap}
 .ist{display:inline-flex;gap:6px;align-items:center;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:4px 10px;background:#eef0f6;color:var(--muted);white-space:nowrap}

@@ -148,35 +148,56 @@ function makeFX(band, opts = {}) {
   const bat = `<svg width="46" height="22" viewBox="-23 -11 46 22"><g fill="${C.ink}" opacity=".78"><path class="vc-wing" d="M-3,0 C-8,-8 -16,-9 -22,-4 C-17,-3 -15,0 -14,3 C-11,1 -8,1 -6,4 Z"/><path class="vc-wing vc-wing-r" d="M3,0 C8,-8 16,-9 22,-4 C17,-3 15,0 14,3 C11,1 8,1 6,4 Z"/><ellipse rx="3.6" ry="4.4"/><path d="M-2.6,-3.4 L-3.6,-7 L-1,-4.4 Z M2.6,-3.4 L3.6,-7 L1,-4.4 Z"/></g></svg>`;
   const plane = `<svg width="54" height="30" viewBox="0 0 54 30"><path d="M2,15 L52,2 L30,28 L24,18 Z" fill="#fff" stroke="${C.blue}" stroke-width="1.4" stroke-linejoin="round"/><path d="M24,18 L52,2" stroke="${C.blue}" stroke-width="1.2"/></svg>`;
 
-  // Fireworks for the 4th of July: a canvas over the top of the page, small bursts in the site's colors
+  // Fireworks for the 4th of July: rockets rise from the bottom with a trail, then burst into
+  // streaking sparks with a soft glow, in red, blue and gold with a little white glitter
   function fireworks() {
     const cv = document.createElement('canvas');
     cv.className = 'vc-canvas';
     layer.appendChild(cv);
     const ctx = cv.getContext('2d');
-    const size = () => { cv.width = innerWidth * devicePixelRatio; cv.height = innerHeight * .6 * devicePixelRatio; };
+    const dpr = Math.min(2, devicePixelRatio || 1);
+    const size = () => { cv.width = innerWidth * dpr; cv.height = innerHeight * dpr; };
     size(); addEventListener('resize', size);
-    const sparks = [];
-    function burst() {
-      const x = rand(.1, .9) * cv.width, y = rand(.12, .5) * cv.height, col = pick([C.blue, C.mauve, C.gold, '#b3262e']);
-      for (let i = 0; i < 46; i++) { const a = i / 46 * Math.PI * 2, v = rand(1.4, 3.2) * devicePixelRatio; sparks.push({ x, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v, life: 1, col }); }
+    const COLS = ['#d33a3a', '#3a56c9', '#e0b030', '#c2185b', '#2f7fd8'];
+    const rockets = [], sparks = [];
+    function launch() {
+      const col = pick(COLS);
+      rockets.push({ x: rand(.12, .88) * cv.width, y: cv.height, vy: -rand(9, 12.5) * dpr, top: rand(.12, .45) * cv.height, col });
+      if (Math.random() < .35) later(launch, 260);   // sometimes a second one right after
     }
-    every(burst, ms(small ? 2200 : 1400));
-    burst();
+    function burst(x, y, col) {
+      const count = small ? 48 : 72;
+      for (let i = 0; i < count; i++) {
+        const a = i / count * Math.PI * 2 + rand(-.05, .05), v = rand(2.2, 5.2) * dpr;
+        sparks.push({ x, y, px: x, py: y, vx: Math.cos(a) * v, vy: Math.sin(a) * v, life: 1, fade: rand(.010, .016), col: Math.random() < .14 ? '#fff6d8' : col });
+      }
+    }
+    every(launch, ms(small ? 1700 : 1150));
+    launch();
     (function tick() {
       if (!cv.isConnected) return;
       ctx.clearRect(0, 0, cv.width, cv.height);
-      for (let i = sparks.length - 1; i >= 0; i--) {
-        const s = sparks[i];
-        s.x += s.vx; s.y += s.vy; s.vy += .035 * devicePixelRatio; s.vx *= .985; s.life -= .012;
-        if (s.life <= 0) { sparks.splice(i, 1); continue; }
-        ctx.globalAlpha = s.life; ctx.fillStyle = s.col;
-        ctx.beginPath(); ctx.arc(s.x, s.y, 1.8 * devicePixelRatio, 0, 7); ctx.fill();
+      ctx.lineCap = 'round';
+      for (let i = rockets.length - 1; i >= 0; i--) {
+        const r = rockets[i];
+        const oy = r.y; r.y += r.vy; r.vy += .09 * dpr;
+        ctx.globalAlpha = 1; ctx.strokeStyle = '#e0b030'; ctx.lineWidth = 2.2 * dpr; ctx.shadowBlur = 8 * dpr; ctx.shadowColor = '#ffcf6b';
+        ctx.beginPath(); ctx.moveTo(r.x, oy + 14 * dpr); ctx.lineTo(r.x, r.y); ctx.stroke();
+        if (r.y <= r.top || r.vy >= -1.5 * dpr) { burst(r.x, r.y, r.col); rockets.splice(i, 1); }
       }
+      for (let i = sparks.length - 1; i >= 0; i--) {
+        const p = sparks[i];
+        p.px = p.x; p.py = p.y;
+        p.x += p.vx; p.y += p.vy; p.vy += .05 * dpr; p.vx *= .982; p.vy *= .982; p.life -= p.fade;
+        if (p.life <= 0) { sparks.splice(i, 1); continue; }
+        ctx.globalAlpha = Math.min(1, p.life * 1.4);
+        ctx.strokeStyle = p.col; ctx.shadowColor = p.col; ctx.shadowBlur = 10 * dpr; ctx.lineWidth = 2.6 * dpr;
+        ctx.beginPath(); ctx.moveTo(p.px - p.vx * 2.2, p.py - p.vy * 2.2); ctx.lineTo(p.x, p.y); ctx.stroke();
+      }
+      ctx.shadowBlur = 0; ctx.globalAlpha = 1;
       requestAnimationFrame(tick);
     })();
   }
-
   function start() {
     layer = document.createElement('div');
     layer.className = 'vc-fx vc-fx-' + kind;
