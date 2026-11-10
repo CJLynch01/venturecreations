@@ -7,6 +7,7 @@ import Idea from "../models/Idea.js";
 import Setting from "../models/Setting.js";
 import { mailEnabled } from "./mailer.js";
 import { googleEnabled } from "../config/passport.js";
+import { uploadsEnabled } from "./uploads.js";
 
 export const ORDER_STEPS = ["paid", "printed", "shipped"];
 const TZ = "America/Denver";
@@ -73,6 +74,8 @@ export async function dashboardData() {
       how: "In the shop's Gmail: turn on 2-Step Verification, create an app password at myaccount.google.com/apppasswords, then add SMTP_USER (the Gmail address) and SMTP_PASS (the app password) in Render's Environment settings." },
     { key: "webhook", label: "Save paid orders automatically", ok: Boolean(process.env.STRIPE_WEBHOOK_SECRET),
       how: "In Render's Environment settings, add STRIPE_WEBHOOK_SECRET from Stripe (Developers, then Webhooks). Without it, paid orders don't show up here." },
+    { key: "photos", label: "Upload shirt photos from the site", ok: uploadsEnabled(),
+      how: "In Render's Environment settings, add AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_REGION (us-east-2) and S3_BUCKET_NAME (venturecreations-images), the same ones the site's .env file has. Until then, paste photo links on the Add a shirt page." },
     { key: "google", label: "Google sign-in", ok: googleEnabled, how: "Add GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET in Render." },
     { key: "searchConsole", label: "Tell Google about the site", ok: Boolean(done.searchConsole), manual: true,
       how: "In Google Search Console (signed in to the shop's Gmail), add venturecreations.net and submit venturecreations.net/sitemap.xml." },
