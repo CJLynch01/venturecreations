@@ -355,7 +355,9 @@ footer.site .copy{grid-column:1/-1;border-top:1px solid var(--line);padding-top:
 .season.animate .icon-turkey{animation:vc-waddle 1.1s ease-in-out infinite alternate;transform-origin:50% 90%}
 .season.animate .icon-pumpkin{animation:vc-flicker 2.2s steps(1) infinite}
 .season.animate .icon-heart{animation:vc-beat 1.2s ease-in-out infinite;transform-origin:50% 55%}
-.season.animate .icon-egg{animation:vc-swing 1.6s ease-in-out infinite alternate;transform-origin:50% 90%}
+.season.animate .icon-tulip{animation:vc-swing 2.6s ease-in-out infinite alternate;transform-origin:50% 95%}
+.vc-butterfly svg{animation:vc-bob 1.6s ease-in-out infinite alternate}
+.vc-butterfly .vc-wing{animation-duration:.18s}
 .season.animate .icon-star{animation:vc-spin 6s linear infinite;transform-origin:50% 50%}
 .season.animate .icon-apple{animation:vc-hop 1.4s ease-in-out infinite}
 @keyframes vc-swing{from{transform:rotate(-12deg)}to{transform:rotate(12deg)}}

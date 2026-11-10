@@ -72,7 +72,9 @@ function makeFX(band, opts = {}) {
   // Snow: six-point crystals in different sizes (small ones fall slower, like they're farther away)
   const flake = s => `<svg class="vc-crystal" width="${s}" height="${s}" viewBox="-6 -6 12 12"><g stroke="#ffffff" stroke-width="${s < 12 ? 1.6 : 1.2}" stroke-linecap="round"><path d="M0,-5 V5 M-4.3,-2.5 L4.3,2.5 M-4.3,2.5 L4.3,-2.5 M0,-5 l-1.4,-1.2 M0,-5 l1.4,-1.2 M0,5 l-1.4,1.2 M0,5 l1.4,1.2 M-4.3,-2.5 l-.2,-1.8 M-4.3,-2.5 l-1.7,.6 M4.3,2.5 l.2,1.8 M4.3,2.5 l1.7,-.6 M-4.3,2.5 l-1.7,-.6 M-4.3,2.5 l-.2,1.8 M4.3,-2.5 l1.7,.6 M4.3,-2.5 l.2,-1.8"/></g></svg>`;
   const heart = col => `<svg width="${rand(12, 20) | 0}" height="${rand(12, 20) | 0}" viewBox="3 4 22 21"><path d="M14,24 C4,17 3,11 6,8 C9,5 13,7 14,10 C15,7 19,5 22,8 C25,11 24,17 14,24 Z" fill="${col}"/></svg>`;
-  const petal = col => `<svg width="${rand(10, 15) | 0}" height="${rand(10, 15) | 0}" viewBox="-5 -6 10 12"><ellipse rx="3.6" ry="5.4" fill="${col}"/></svg>`;
+  // Easter: cherry blossom petals (notched at the tip) and the odd butterfly
+  const petal = col => { const s = rand(9, 16) | 0; return `<svg width="${s}" height="${s}" viewBox="-5 -6.5 10 13"><path d="M0,-4.3 C1,-6.2 3.7,-6 4.1,-3 C4.5,1 2.1,5 0,6.2 C-2.1,5 -4.5,1 -4.1,-3 C-3.7,-6 -1,-6.2 0,-4.3 Z" fill="${col}" stroke="#d99aab" stroke-opacity=".5" stroke-width=".5"/><path d="M0,5 V-1.5" stroke="#d99aab" stroke-opacity=".45" stroke-width=".5"/></svg>`; };
+  const butterfly = (a, b) => `<svg width="40" height="34" viewBox="-20 -17 40 34"><g class="vc-wing"><path d="M-1,-1 C-6,-15 -19,-14 -17,-4 C-16,1 -8,2 -1,0 Z" fill="${a}"/><path d="M-1,1 C-8,2 -15,6 -12,12 C-9,16 -3,10 -1,2 Z" fill="${b}"/></g><g class="vc-wing vc-wing-r"><path d="M1,-1 C6,-15 19,-14 17,-4 C16,1 8,2 1,0 Z" fill="${a}"/><path d="M1,1 C8,2 15,6 12,12 C9,16 3,10 1,2 Z" fill="${b}"/></g><ellipse rx="1.3" ry="7" fill="${C.ink}" opacity=".75"/><path d="M-.5,-7 q-2,-4 -4,-5 M.5,-7 q2,-4 4,-5" stroke="${C.ink}" stroke-width=".7" fill="none" opacity=".75"/></svg>`;
   const bat = `<svg width="46" height="22" viewBox="-23 -11 46 22"><g fill="${C.ink}" opacity=".78"><path class="vc-wing" d="M-3,0 C-8,-8 -16,-9 -22,-4 C-17,-3 -15,0 -14,3 C-11,1 -8,1 -6,4 Z"/><path class="vc-wing vc-wing-r" d="M3,0 C8,-8 16,-9 22,-4 C17,-3 15,0 14,3 C11,1 8,1 6,4 Z"/><ellipse rx="3.6" ry="4.4"/><path d="M-2.6,-3.4 L-3.6,-7 L-1,-4.4 Z M2.6,-3.4 L3.6,-7 L1,-4.4 Z"/></g></svg>`;
   const plane = `<svg width="54" height="30" viewBox="0 0 54 30"><path d="M2,15 L52,2 L30,28 L24,18 Z" fill="#fff" stroke="${C.blue}" stroke-width="1.4" stroke-linejoin="round"/><path d="M24,18 L52,2" stroke="${C.blue}" stroke-width="1.2"/></svg>`;
 
@@ -136,7 +138,9 @@ function makeFX(band, opts = {}) {
     } else if (kind === 'valentines') {
       for (let i = 0; i < n(small ? 10 : 18); i++) piece(heart(pick([C.mauve, C.pink, '#c96f86'])), { up: true, dur: [10, 16], delay: [0, 16] });
     } else if (kind === 'easter') {
-      for (let i = 0; i < n(small ? 12 : 22); i++) piece(petal(pick([C.pink, C.sky, C.mint, C.cream])), { dur: [10, 15], delay: [0, 15], cls: 'vc-tumble' });
+      for (let i = 0; i < n(small ? 14 : 26); i++) piece(petal(pick(['#f6d6de', '#f0c3cf', '#fbeaef', '#e8b4c2', '#ffffff'])), { dur: [10, 16], delay: [0, 16], cls: 'vc-tumble' });
+      const flutter = () => { const [a, b] = pick([[C.sky, C.mauve], [C.pink, C.gold], [C.mint, C.sky], [C.cream, C.pink]]); fly(butterfly(a, b), { y: [15, 60], dur: [9, 13], cls: 'vc-butterfly' }); };
+      later(flutter, 2500); every(flutter, ms(12000));
     } else if (kind === 'july4') {
       fireworks();
     } else if (kind === 'backtoschool') {

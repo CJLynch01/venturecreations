@@ -40,7 +40,7 @@ export const SEASONS = [
     range: y => [num(1, 25), num(2, 14)],
     greeting: "Valentine's Day is coming", link: "/shop", linkText: "Shirts for someone you love",
     match: words(/valentine|heart|love/i) },
-  { id: "easter", name: "Easter", icon: "egg",
+  { id: "easter", name: "Easter", icon: "tulip",
     range: y => { const e = easter(y), s = minusDays(y, e.m, e.d, 21); return [num(s.m, s.d), num(e.m, e.d)]; },
     greeting: "He is risen. Happy Easter", link: "/shop?c=faith", linkText: "Easter and faith shirts",
     match: words(/easter|risen|resurrection|jesus|christ|scripture/i) },
