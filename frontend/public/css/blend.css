@@ -425,3 +425,16 @@ footer.site .copy{grid-column:1/-1;border-top:1px solid var(--line);padding-top:
 .vc-walker .tk-leg-r{animation-delay:-.46s}
 @keyframes vc-step{from{transform:rotate(-20deg)}to{transform:rotate(20deg)}}
 @keyframes vc-stumble{0%,100%{transform:rotate(-4deg)}12%{transform:rotate(0) translateY(-1.5px)}25%{transform:rotate(4deg) scaleY(.97)}37%{transform:rotate(0) translateY(-1.5px)}50%{transform:rotate(-4deg)}58%{transform:rotate(22deg) translateX(3px) scaleY(.95)}64%{transform:rotate(30deg) translateX(5px) scaleY(.9)}70%{transform:rotate(-8deg) translateY(-7px) scaleY(1.05)}76%{transform:rotate(3deg) translateY(0) scaleY(.9)}82%{transform:rotate(-4deg) scaleY(1)}91%{transform:rotate(4deg) translateY(-1.5px)}}
+/* Halloween: witch on a broom, rising ghosts, a jack-o'-lantern that peeks up from the corner */
+.vc-witch svg{animation:vc-witch-bob 2.2s ease-in-out infinite alternate}
+@keyframes vc-witch-bob{from{transform:translateY(-10px) rotate(-4deg)}to{transform:translateY(12px) rotate(3deg)}}
+.vc-witch .cape{transform-box:fill-box;transform-origin:100% 30%;animation:vc-cape .35s ease-in-out infinite alternate}
+@keyframes vc-cape{from{transform:skewY(-8deg) scaleX(.9)}to{transform:skewY(6deg) scaleX(1.08)}}
+.vc-witch .cat-tail{transform-box:fill-box;transform-origin:100% 100%;animation:vc-swing 1s ease-in-out infinite alternate}
+.vc-ghostly{opacity:.9}
+.vc-ghost{animation:vc-wobble 2.4s ease-in-out infinite alternate}
+@keyframes vc-wobble{from{transform:rotate(-8deg) scaleX(.96)}to{transform:rotate(8deg) scaleX(1.04)}}
+.vc-jack{position:absolute;left:max(14px,3vw);bottom:-62px;animation:vc-peek 9s ease-in-out infinite}
+@keyframes vc-peek{0%,55%,100%{transform:translateY(0)}62%,88%{transform:translateY(-60px)}70%{transform:translateY(-54px) rotate(-6deg)}78%{transform:translateY(-60px) rotate(5deg)}}
+.vc-jack .jack-glow{animation:vc-candle 1.6s steps(1) infinite}
+@keyframes vc-candle{0%,100%{fill:#ffd27a;filter:drop-shadow(0 0 4px #ffb347)}30%{fill:#ffe9a8;filter:drop-shadow(0 0 7px #ffb347)}55%{fill:#f4c063;filter:drop-shadow(0 0 2px #ffb347)}80%{fill:#ffdc8c;filter:drop-shadow(0 0 6px #ffb347)}}

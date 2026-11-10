@@ -74,6 +74,26 @@ function makeFX(band, opts = {}) {
   const heart = col => `<svg width="${rand(12, 20) | 0}" height="${rand(12, 20) | 0}" viewBox="3 4 22 21"><path d="M14,24 C4,17 3,11 6,8 C9,5 13,7 14,10 C15,7 19,5 22,8 C25,11 24,17 14,24 Z" fill="${col}"/></svg>`;
   // Easter: cherry blossom petals (notched at the tip) and the odd butterfly
   const petal = col => { const s = rand(11, 20) | 0; return `<svg class="vc-bloom" width="${s}" height="${s}" viewBox="-6 -6 12 12">${[0, 72, 144, 216, 288].map(a => `<ellipse cy="-2.7" rx="1.9" ry="2.8" transform="rotate(${a})" fill="${col}" stroke="#d99aab" stroke-opacity=".6" stroke-width=".35"/>`).join('')}<circle r="1.3" fill="#c9a227"/></svg>`; };
+  // Halloween: a witch on her broom (with a cat riding along), little ghosts, a peeking jack-o'-lantern
+  const witch = `<svg width="${small ? 120 : 170}" height="${small ? 64 : 90}" viewBox="-8 -14 126 66"><g fill="#1c2233">
+    <path d="M8,42 L112,34" stroke="#6b4b33" stroke-width="2.4" stroke-linecap="round"/>
+    <path d="M11,41.6 L-5,31 M11,41.8 L-7,37 M11,42 L-7,43.5 M11,42.2 L-5,50 M11,42.4 L0,53" stroke="#c9a227" stroke-width="2.2" stroke-linecap="round"/>
+    <path d="M10,39 L13,45" stroke="#7a5a44" stroke-width="2.4"/>
+    <ellipse cx="24" cy="35" rx="6" ry="4.6"/><circle cx="29" cy="29.5" r="3.6"/><path d="M26.5,27 L27,22.5 L29,26 Z M30,26 L32,22.5 L32.3,27.5 Z"/>
+    <path class="cat-tail" d="M18.5,34 C13,32 13,24 17,22" stroke="#1c2233" stroke-width="2" fill="none" stroke-linecap="round"/>
+    <circle cx="30.4" cy="29" r=".7" fill="#e9c75a"/>
+    <path class="cape" d="M47,24 C37,22 29,27 21,19 C27,33 37,35 48,33 Z" fill="#3a2f4a"/>
+    <path d="M44,38 C45,24 52,17 60,17 C66,17 70,23 70,30 L72,38 Z"/>
+    <path d="M62,37 L73,45 L80,45.5" stroke="#1c2233" stroke-width="3.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M62,23 L78,35" stroke="#1c2233" stroke-width="3" stroke-linecap="round"/>
+    <circle cx="64" cy="13" r="5.2"/><path d="M68.5,12.5 L73,14.5 L68.5,15.2 Z"/>
+    <ellipse cx="65" cy="8.6" rx="11.5" ry="2.3"/><path d="M57,8 L73,8 L70,-6 C72,-9 75,-10 79,-9 C74,-8 72,-6 71,-2 Z"/>
+    <rect x="58.5" y="5.6" width="13" height="2.4" fill="#a97c86"/><path d="M75,-8.4 l1,-1.6 l1,1.6 l-1,1.6 Z" fill="#c9a227"/></g></svg>`;
+  const ghost = () => { const g = rand(26, 40) | 0; return `<svg class="vc-ghost" width="${g}" height="${g * 1.25 | 0}" viewBox="-14 -16 28 34"><path d="M0,-14 C9,-14 12,-6 12,2 L12,16 L8,12 L4,16 L0,12 L-4,16 L-8,12 L-12,16 L-12,2 C-12,-6 -9,-14 0,-14 Z" fill="#ffffff" fill-opacity=".92" stroke="#c9c3d8" stroke-width=".8"/><ellipse cx="-4" cy="-3" rx="2" ry="2.8" fill="#1c2233"/><ellipse cx="4" cy="-3" rx="2" ry="2.8" fill="#1c2233"/><ellipse cy="5" rx="2.4" ry="3" fill="#1c2233"/><ellipse cx="-7.5" cy="1.5" rx="1.8" ry="1" fill="#e3b3c0" opacity=".7"/><ellipse cx="7.5" cy="1.5" rx="1.8" ry="1" fill="#e3b3c0" opacity=".7"/></svg>`; };
+  const jack = `<svg width="64" height="58" viewBox="-32 -30 64 58"><ellipse cx="-11" cy="4" rx="13" ry="16" fill="#b5652c"/><ellipse cx="11" cy="4" rx="13" ry="16" fill="#b5652c"/><ellipse cy="4" rx="12" ry="17" fill="#c97a3c"/>
+    <path d="M0,-12 q1,-8 6,-11" stroke="#2f6a64" stroke-width="3.4" fill="none" stroke-linecap="round"/>
+    <g class="jack-glow" fill="#ffd27a"><path d="M-14,-3 L-6,-3 L-10,-10 Z"/><path d="M6,-3 L14,-3 L10,-10 Z"/><path d="M-2,1 L2,1 L0,-3 Z"/><path d="M-15,7 L-10,9 L-7,6 L-3,10 L0,7 L3,10 L7,6 L10,9 L15,7 C12,16 -12,16 -15,7 Z"/></g></svg>`;
+
   // Christmas: Santa's sleigh and two reindeer (the lead one with a red nose) flying across the sky
   const reindeer = (x, y, nose) => `<g transform="translate(${x},${y})">
     <path class="rd-legs" d="M-10,4 l-3,10 M-6,4 l2,10 M8,4 l-2,10 M12,4 l3,10" stroke="#5e4433" stroke-width="2" stroke-linecap="round" fill="none"/>
@@ -183,8 +203,15 @@ function makeFX(band, opts = {}) {
       // a gust of wind now and then pushes the leaves sideways
       every(() => { layer.classList.add('vc-gust'); setTimeout(() => layer.classList.remove('vc-gust'), 2600); }, ms(14000));
     } else if (kind === 'halloween') {
-      const bats = () => { const n = 1 + (Math.random() * 3 | 0), rtl = Math.random() < .5, y = rand(8, 40); for (let i = 0; i < n; i++) later(() => fly(bat, { y: [y - 4, y + 8], dur: [6, 9], cls: 'vc-bat', rtl }), i * 450); };
-      later(bats, 1200); every(bats, ms(11000));
+      const bats = () => { const n = 2 + (Math.random() * 4 | 0), rtl = Math.random() < .5, y = rand(10, 45); for (let i = 0; i < n; i++) later(() => fly(bat, { y: [y - 5, y + 10], dur: [5, 8], cls: 'vc-bat', rtl }), i * 380); };
+      later(bats, 800); every(bats, ms(7000));
+      const broom = () => fly(witch, { y: [16, 34], dur: [small ? 8 : 11, small ? 10 : 14], cls: 'vc-witch' });
+      later(broom, 3500); every(broom, ms(21000));
+      for (let i = 0; i < n(small ? 3 : 5); i++) piece(ghost(), { up: true, dur: [14, 22], delay: [0, 22], cls: 'vc-ghostly' });
+      const pumpkin = document.createElement('span');
+      pumpkin.className = 'vc-jack';
+      pumpkin.innerHTML = jack;
+      layer.appendChild(pumpkin);
       const spider = document.createElement('span');
       spider.className = 'vc-spider';
       spider.innerHTML = `<span class="vc-thread"></span><svg width="22" height="20" viewBox="-11 -10 22 20"><g stroke="${C.ink}" stroke-width="1.2" fill="none" stroke-linecap="round"><path d="M-3,-1 L-9,-6 M-3,1 L-10,0 M-3,2 L-9,6 M3,-1 L9,-6 M3,1 L10,0 M3,2 L9,6"/></g><ellipse cy="1" rx="4" ry="5" fill="${C.ink}"/><circle cy="-4" r="2.6" fill="${C.ink}"/></svg>`;
