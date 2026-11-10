@@ -1,40 +1,20 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>All Products | Admin</title>
-  <link rel="stylesheet" href="/css/styles.css" />
-  <script src="/scripts/home.js" defer></script>
-
-</head>
-<body>
-  <%- include('../partials/header2') %>
-
-  <main class="container">
-    <h1>All Products</h1>
-
-    <div class="product-grid">
-      <% if (products.length === 0) { %>
-        <p>No products available.</p>
-      <% } else { %>
-        <% products.forEach(product => { %>
-          <div class="product-card">
-            <img src="<%= product.images[0] %>" alt="<%= product.name %>">
-            <h3><%= product.name %></h3>
-            <p>$<%= product.price.toFixed(2) %></p>
-            <div class="admin-actions">
-              <a href="/admin/products/edit/<%= product._id %>" class="btn">Edit</a>
-              <form action="/admin/products/delete/<%= product._id %>" method="POST" style="display:inline;">
-                <button type="submit" class="btn delete-btn">Delete</button>
-              </form>
-            </div>
-          </div>
-        <% }) %>
-      <% } %>
-    </div>
-  </main>
-
-  <%- include('../partials/footer') %>
-</body>
-</html>
+<%- include('../partials/v2/head') %>
+<section class="page gut ad"><div class="in" style="display:grid;gap:20px">
+  <div class="ad-head" style="margin:0">
+    <div><a href="/admin" style="font-size:14px">← Dashboard</a><h1>Shirts <span class="muted tabnum" style="font-size:.5em"><%= products.length %></span></h1></div>
+    <div class="buyrow"><a class="btn" href="/admin/products/new">Add a shirt</a></div>
+  </div>
+  <% if (saved) { %><p class="pf-ok" role="status">Shirt <%= { added: 'added', updated: 'saved', removed: 'removed' }[saved] || 'saved' %>.</p><% } %>
+  <input type="search" class="pl-search" placeholder="Find a shirt" aria-label="Find a shirt" oninput="const q=this.value.toLowerCase();document.querySelectorAll('.pl-item').forEach(a=>a.hidden=!a.dataset.q.includes(q))">
+  <% if (!products.length) { %><p class="ad-empty card">No shirts yet. Add the first one.</p><% } %>
+  <div class="pl-grid">
+    <% products.forEach(p => { %>
+      <a class="pl-item" href="/admin/products/edit/<%= p._id %>" data-q="<%= [p.name, p.category, ...(p.tags || [])].join(' ').toLowerCase() %>">
+        <span class="pl-ph"><% if (p.images && p.images[0]) { %><img src="<%= p.images[0] %>" alt="" loading="lazy"><% } %></span>
+        <b><%= p.name %></b>
+        <span class="muted tabnum">$<%= Number(p.price || 0).toFixed(2) %> · <%= (p.images || []).length %> photo<%= (p.images || []).length === 1 ? '' : 's' %><%= p.seasonalCategory && p.seasonalCategory !== 'None' ? ' · ' + p.seasonalCategory : '' %></span>
+      </a>
+    <% }) %>
+  </div>
+</div></section>
+<%- include('../partials/v2/foot') %>

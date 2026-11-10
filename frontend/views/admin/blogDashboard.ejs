@@ -1,45 +1,19 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Admin Dashboard | Venture Creations</title>
-    <link rel="stylesheet" href="/css/styles.css" />
-    <script src="/scripts/home.js" defer></script>
-
-</head>
-<body>        
-        <%- include("../partials/header2") %>
-
-        <section class="admin-section">
-        <div class="admin-header">
-            <h1>📝 Blog Management</h1>
-            <a href="/admin/blog/new" class="btn btn-primary">+ New Blog Post</a>
-        </div>
-
-        <% if (posts.length === 0) { %>
-            <p class="no-posts">No blog posts yet. Start by creating one.</p>
-        <% } else { %>
-            <ul class="blog-list">
-            <% posts.forEach(post => { %>
-                <li class="blog-card">
-                <div class="blog-details">
-                    <h3><%= post.title %></h3>
-                    <p><small>Published on: <%= post.createdAt.toLocaleDateString() %></small></p>
-                </div>
-                <div class="blog-actions">
-                    <a href="/admin/blog/edit/<%= post._id %>" class="btn btn-sm btn-secondary">✏️ Edit</a>
-                    <form action="/admin/blog/delete/<%= post._id %>" method="POST" onsubmit="return confirm('Delete this post?')" style="display:inline;">
-                    <button type="submit" class="btn btn-sm btn-danger">🗑️ Delete</button>
-                    </form>
-                </div>
-                </li>
-            <% }) %>
-            </ul>
-        <% } %>
-        </section>
-
-        <%- include("../partials/footer") %>
-
-</body>
-</html>
+<%- include('../partials/v2/head') %>
+<section class="page gut ad"><div class="in" style="display:grid;gap:20px;max-width:1000px">
+  <div class="ad-head" style="margin:0">
+    <div><a href="/admin" style="font-size:14px">← Dashboard</a><h1>Blog <span class="muted tabnum" style="font-size:.5em"><%= posts.length %></span></h1></div>
+    <div class="buyrow"><a class="btn" href="/admin/blog/new">Write a post</a><a class="btn ghost" href="/blog">See the blog</a></div>
+  </div>
+  <% if (saved) { %><p class="pf-ok" role="status">Post <%= { added: 'published', updated: 'saved', removed: 'deleted' }[saved] || 'saved' %>.</p><% } %>
+  <% if (!posts.length) { %><p class="ad-empty card">No posts yet. Write the first one.</p><% } %>
+  <div class="bl-list">
+    <% posts.forEach(post => { %>
+      <a class="bl-item" href="/admin/blog/edit/<%= post._id %>">
+        <span class="bl-ph"><% if (post.coverImageUrl) { %><img src="<%= post.coverImageUrl %>" alt="" loading="lazy"><% } %></span>
+        <span><b><%= post.title %></b>
+          <span class="muted"><%= post.topic ? post.topic + ' · ' : '' %><%= post.createdAt.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) %></span></span>
+      </a>
+    <% }) %>
+  </div>
+</div></section>
+<%- include('../partials/v2/foot') %>

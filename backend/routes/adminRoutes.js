@@ -7,6 +7,7 @@ import Idea, { IDEA_STATUSES } from "../models/Idea.js";
 import Order from "../models/Order.js";
 import Setting from "../models/Setting.js";
 import { dashboardData, splitItem, ORDER_STEPS } from "../lib/dashboard.js";
+import { photoUpload, savePhotos, uploadsEnabled } from "../lib/uploads.js";
 
 const router = express.Router();
 
@@ -132,136 +133,123 @@ router.get("/messages", ensureAdmin, async (req, res) => {
   }
 });
 
-// Full Product List
+// Shirts: list, add, edit, remove
+const SEASONS = Product.schema.path("seasonalCategory").enumValues;
+const SIZE_OPTIONS = ["XS", "S", "M", "L", "XL", "2XL", "3XL", "4XL", "Youth S", "Youth M", "Youth L", "Youth XL"];
+const COLOR_OPTIONS = ["Black", "White", "Dark Heather Gray", "Light Heather Gray", "Heather Gray", "Navy", "Navy Blue Heather",
+  "Heather Mauve", "Charity Pink", "Red", "Maroon", "Autumn", "Sand", "Olive Green", "Forest Green", "Atlantic Green"];
+
+// Checkbox arrays or comma lists ("S, M, L") both work
+const list = v => (Array.isArray(v) ? v : String(v || "").split(","))
+  .map(x => String(x).trim()).filter(Boolean)
+  .filter((x, i, a) => a.findIndex(y => y.toLowerCase() === x.toLowerCase()) === i);
+
+function productFromForm(b) {
+  const price = Math.round(parseFloat(b.price) * 100) / 100;
+  return {
+    name: String(b.name || "").trim().slice(0, 140),
+    price: Number.isFinite(price) && price > 0 ? price : NaN,
+    sizes: list(b.sizes),
+    colors: [...list(b.colors), ...list(b.otherColors)].filter((x, i, a) => a.indexOf(x) === i),
+    category: list(b.category).join(", "),
+    images: list(b.images).filter(u => /^(https:\/\/|\/)/.test(u)),
+    seasonalCategory: SEASONS.includes(b.seasonalCategory) ? b.seasonalCategory : "None",
+    tags: list(b.tags).map(t => t.toLowerCase().replace(/^#/, "")),
+    description: String(b.description || "").trim().slice(0, 5000),
+  };
+}
+const formProblem = p => !p.name ? "Give the shirt a name."
+  : !Number.isFinite(p.price) ? "Add a price."
+  : !p.sizes.length ? "Pick at least one size."
+  : !p.colors.length ? "Pick at least one color."
+  : !p.images.length ? "Add at least one photo." : "";
+
+async function renderProductForm(res, product, error = "") {
+  const categories = (await Product.distinct("category")).flatMap(c => list(c)).filter((x, i, a) => a.indexOf(x) === i).sort();
+  res.status(error ? 400 : 200).render("admin/productForm", {
+    title: product._id ? `Edit ${product.name}` : "Add a shirt", product, error,
+    seasons: SEASONS, sizeOptions: SIZE_OPTIONS, colorOptions: COLOR_OPTIONS, categories, uploadsEnabled: uploadsEnabled(),
+  });
+}
+
 router.get("/products", ensureAdmin, async (req, res) => {
   try {
-    const products = await Product.find().sort({ _id: -1 });
-    res.render("admin/allProducts", { products });
+    const products = await Product.find().sort({ createdAt: -1, _id: -1 }).lean();
+    res.render("admin/allProducts", { title: "Shirts", products, saved: req.query.saved || "" });
   } catch (err) {
     console.error("Error loading all products:", err);
     res.status(500).send("Failed to load product list.");
   }
 });
 
-// Show Add Product Form
-router.get("/products/new", ensureAdmin, (req, res) => {
-  res.render("admin/newProduct");
+router.get("/products/new", ensureAdmin, async (req, res) => {
+  try {
+    await renderProductForm(res, { sizes: ["S", "M", "L", "XL", "2XL"], colors: [], images: [], tags: [], seasonalCategory: "None" });
+  } catch (err) {
+    console.error("Error loading add form:", err);
+    res.status(500).send("Failed to load the form.");
+  }
 });
 
-// Handle Add Product Form
 router.post("/products/new", ensureAdmin, async (req, res) => {
   try {
-    const { name, price, sizes, colors, category, seasonalCategory, tags, description } = req.body;
-    let { images } = req.body;
-
-    // Ensure 'images' is an array
-    if (!Array.isArray(images)) {
-      images = [images];
-    }
-
-    const cleanImages = images.filter((url) => url.trim() !== "");
-
-    const newProduct = new Product({
-      name,
-      price: parseFloat(price),
-      sizes: sizes.split(",").map((s) => s.trim()),
-      colors: colors.split(",").map((c) => c.trim()),
-      category,
-      images: cleanImages,
-      seasonalCategory: seasonalCategory || 'None',
-      tags: tags ? tags.split(',').map(t => t.trim().toLowerCase()) : [],
-      description: (description || '').trim().slice(0, 5000)
-    });
-
-    await newProduct.save();
-    res.redirect("/admin");
+    const p = productFromForm(req.body);
+    const problem = formProblem(p);
+    if (problem) return renderProductForm(res, { ...p, price: req.body.price }, problem);
+    await Product.create(p);
+    res.redirect("/admin/products?saved=added");
   } catch (err) {
     console.error("Error adding product:", err);
     res.status(500).send("Failed to add product.");
   }
 });
 
-// Show Edit Product Form
 router.get("/products/edit/:id", ensureAdmin, async (req, res) => {
   try {
-    const product = await Product.findById(req.params.id);
+    const product = await Product.findById(req.params.id).lean();
     if (!product) return res.status(404).send("Product not found");
-    res.render("admin/editProduct", { product });
+    await renderProductForm(res, product);
   } catch (err) {
     console.error("Error loading edit form:", err);
     res.status(500).send("Failed to load product.");
   }
 });
 
-// Handle Edit Product Form Submission
 router.post("/products/edit/:id", ensureAdmin, async (req, res) => {
   try {
-    const { name, price, sizes, colors, category, seasonalCategory, tags, action, description } = req.body;
-    let { images, deleteImages } = req.body;
-
-    // Normalize input
-    if (!Array.isArray(images)) images = images ? [images] : [];
-    if (!Array.isArray(deleteImages)) deleteImages = deleteImages ? [deleteImages] : [];
-
-    // Filter out any images marked for deletion
-    const cleanImages = images
-      .filter(url => url.trim() !== "")
-      .filter(url => !deleteImages.includes(url));
-
-    // Update the product
-    await Product.findByIdAndUpdate(req.params.id, {
-      name,
-      price: parseFloat(price),
-      sizes: sizes.split(",").map((s) => s.trim()),
-      colors: colors.split(",").map((c) => c.trim()),
-      category,
-      images: cleanImages,
-      seasonalCategory: seasonalCategory || 'None',
-      tags: tags ? tags.split(',').map((t) => t.trim().toLowerCase()) : [],
-      description: (description || '').trim().slice(0, 5000)
-    });
-
-    if (action === 'deleteImages') {
-      // Stay on the same edit page
-      return res.redirect(`/admin/products/edit/${req.params.id}`);
-    } else {
-      // Normal update flow
-      return res.redirect("/admin");
-    }
+    const p = productFromForm(req.body);
+    const problem = formProblem(p);
+    if (problem) return renderProductForm(res, { ...p, _id: req.params.id, price: req.body.price }, problem);
+    await Product.findByIdAndUpdate(req.params.id, p, { runValidators: true });
+    res.redirect("/admin/products?saved=updated");
   } catch (err) {
     console.error("Error updating product:", err);
     res.status(500).send("Failed to update product.");
   }
 });
 
-// Handle Delete Product
 router.post("/products/delete/:id", ensureAdmin, async (req, res) => {
   try {
     await Product.findByIdAndDelete(req.params.id);
-    res.redirect("/admin");
+    res.redirect("/admin/products?saved=removed");
   } catch (err) {
     console.error("Error deleting product:", err);
     res.status(500).send("Failed to delete product.");
   }
 });
 
-// Delete a specific image from a product
-router.post("/products/:id/images/delete", ensureAdmin, async (req, res) => {
-  try {
-    const { imageUrl } = req.body;
-    const product = await Product.findById(req.params.id);
-
-    if (!product) return res.status(404).send("Product not found");
-
-    product.images = product.images.filter(img => img !== imageUrl);
-    await product.save();
-
-    res.redirect(`/admin/products/edit/${req.params.id}`);
-  } catch (err) {
-    console.error("Error deleting image:", err);
-    res.status(500).send("Failed to delete image.");
-  }
+// Photo upload for the shirt and blog forms; answers with the new photo links
+router.post("/uploads", ensureAdmin, (req, res) => {
+  photoUpload(req, res, async (err) => {
+    try {
+      if (err) return res.status(400).json({ error: err.code === "LIMIT_FILE_SIZE" ? "Each photo has to be under 12 MB." : "Couldn't read those photos." });
+      if (!req.files?.length) return res.status(400).json({ error: "Pick JPG, PNG or WebP photos." });
+      res.json({ urls: await savePhotos(req.files, req.body.folder) });
+    } catch (e) {
+      console.error("Upload error:", e);
+      res.status(500).json({ error: uploadsEnabled() ? "The upload didn't go through. Try again." : "Uploading needs the AWS keys in Render. Paste a photo link for now." });
+    }
+  });
 });
-
 
 export default router;

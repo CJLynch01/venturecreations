@@ -1,0 +1,96 @@
+<%- include('../partials/v2/head') %>
+<%
+  const isEdit = Boolean(product._id);
+  const has = (arr, v) => (arr || []).some(x => String(x).toLowerCase() === v.toLowerCase());
+  const extraColors = (product.colors || []).filter(c => !colorOptions.some(o => o.toLowerCase() === String(c).toLowerCase()));
+  const extraSizes = (product.sizes || []).filter(z => !sizeOptions.includes(z));
+  const cats = String(product.category || '').split(',').map(c => c.trim()).filter(Boolean);
+%>
+<section class="page gut ad"><div class="in pf">
+  <div class="ad-head">
+    <div><a href="/admin/products" style="font-size:14px">← All shirts</a>
+      <h1><%= isEdit ? 'Edit' : 'Add' %> <em><%= isEdit ? product.name : 'a shirt' %></em></h1></div>
+    <% if (isEdit && product.name) { %><a class="btn ghost" href="<%= productPath(product) %>" target="_blank" rel="noopener">See it in the shop</a><% } %>
+  </div>
+
+  <% if (error) { %><p class="pf-error" role="alert"><%= error %></p><% } %>
+
+  <form action="<%= isEdit ? '/admin/products/edit/' + product._id : '/admin/products/new' %>" method="POST" class="pf-form" id="productForm">
+    <section class="ad-card">
+      <div class="ad-card-head"><h2>Photos</h2><span class="muted">The first photo is the one shoppers see first</span></div>
+      <div class="photos" data-photos data-field="images" data-folder="#pf-name" data-enabled="<%= uploadsEnabled %>">
+        <div class="ph-grid">
+          <% (product.images || []).forEach(url => { %>
+            <figure class="ph"><img src="<%= url %>" alt=""><input type="hidden" name="images" value="<%= url %>"></figure>
+          <% }) %>
+        </div>
+        <div class="ph-drop">
+          <label class="btn ghost">Upload photos<input type="file" accept="image/jpeg,image/png,image/webp" multiple hidden></label>
+          <span class="muted">or drag them here · JPG, PNG or WebP</span>
+        </div>
+        <details class="ph-link"><summary>Paste a photo link instead</summary>
+          <div class="sleeve"><input type="text" placeholder="https://…" aria-label="Photo link"><button class="btn ghost" type="button">Add</button></div></details>
+        <p class="msg" aria-live="polite"></p>
+      </div>
+    </section>
+
+    <section class="ad-card form">
+      <h2>The shirt</h2>
+      <div class="field"><label for="pf-name">Name</label>
+        <input type="text" id="pf-name" name="name" value="<%= product.name || '' %>" maxlength="140" required placeholder="Sugar Skull Bloom"></div>
+      <div class="field pf-price"><label for="pf-price">Price</label>
+        <div class="pf-money"><span>$</span><input type="text" inputmode="decimal" id="pf-price" name="price" value="<%= product.price != null && product.price !== '' ? (Number(product.price) ? Number(product.price).toFixed(2) : product.price) : '' %>" required placeholder="24.00"></div></div>
+      <div class="field"><label for="pf-desc">Description</label>
+        <textarea id="pf-desc" name="description" rows="5" maxlength="5000" placeholder="What the design is, who it's for, the shirt and how it fits. Shows on the shirt's page and in Google."><%= product.description || '' %></textarea></div>
+    </section>
+
+    <section class="ad-card form">
+      <h2>Sizes &amp; colors</h2>
+      <fieldset class="field"><legend class="lbl">Sizes</legend>
+        <div class="pf-checks">
+          <% sizeOptions.concat(extraSizes).forEach(z => { %>
+            <label class="pf-check"><input type="checkbox" name="sizes" value="<%= z %>" <%= has(product.sizes, z) ? 'checked' : '' %>><span><%= z %></span></label>
+          <% }) %>
+        </div></fieldset>
+      <fieldset class="field"><legend class="lbl">Colors</legend>
+        <div class="pf-checks">
+          <% colorOptions.concat(extraColors).forEach(c => { %>
+            <label class="pf-check pf-color"><input type="checkbox" name="colors" value="<%= c %>" <%= has(product.colors, c) ? 'checked' : '' %>><span><i style="background:<%= shop.colorHex(c) %>"></i><%= c %></span></label>
+          <% }) %>
+        </div></fieldset>
+      <div class="field"><label for="pf-other">Other colors (optional, separate with commas)</label>
+        <input type="text" id="pf-other" name="otherColors" placeholder="Mint, Lavender"></div>
+    </section>
+
+    <section class="ad-card form">
+      <h2>Where it shows up</h2>
+      <fieldset class="field"><legend class="lbl">Categories</legend>
+        <div class="pf-checks">
+          <% categories.concat(cats.filter(c => !categories.includes(c))).forEach(c => { %>
+            <label class="pf-check"><input type="checkbox" name="category" value="<%= c %>" <%= cats.includes(c) ? 'checked' : '' %>><span><%= c %></span></label>
+          <% }) %>
+        </div></fieldset>
+      <div class="field"><label for="pf-newcat">New category (optional)</label>
+        <input type="text" id="pf-newcat" name="category" placeholder="Fourth of July"></div>
+      <div class="field"><label for="pf-season">Holiday</label>
+        <select id="pf-season" name="seasonalCategory"><% seasons.forEach(s => { %><option value="<%= s %>" <%= product.seasonalCategory === s ? 'selected' : '' %>><%= s === 'None' ? 'Not a holiday shirt' : s %></option><% }) %></select>
+        <small class="muted">Holiday shirts move to the front of the shop when that holiday is coming up.</small></div>
+      <div class="field"><label for="pf-tags">Search words (separate with commas)</label>
+        <input type="text" id="pf-tags" name="tags" value="<%= (product.tags || []).join(', ') %>" placeholder="cats, halloween, gift for mom">
+        <small class="muted">Add <b>personalize</b> to give the shirt a box where shoppers type their own text.</small></div>
+    </section>
+
+    <div class="pf-bar">
+      <button class="btn" type="submit"><%= isEdit ? 'Save changes' : 'Add the shirt' %></button>
+      <a class="btn ghost" href="/admin/products">Cancel</a>
+    </div>
+  </form>
+
+  <% if (isEdit) { %>
+    <details class="pf-remove"><summary>Remove this shirt from the shop</summary>
+      <form action="/admin/products/delete/<%= product._id %>" method="POST"><p class="muted">It comes off the shop right away. Past orders keep their details.</p>
+        <button class="btn ghost" type="submit">Yes, remove <%= product.name %></button></form></details>
+  <% } %>
+</div></section>
+<script src="/scripts/admin-photos.js" defer></script>
+<%- include('../partials/v2/foot') %>

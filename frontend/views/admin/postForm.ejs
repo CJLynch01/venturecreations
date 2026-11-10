@@ -1,0 +1,59 @@
+<%- include('../partials/v2/head') %>
+<% const isEdit = Boolean(post._id); %>
+<section class="page gut ad"><div class="in pf">
+  <div class="ad-head">
+    <div><a href="/admin/blog" style="font-size:14px">← All posts</a>
+      <h1><%= isEdit ? 'Edit' : 'Write' %> <em><%= isEdit ? 'the post' : 'a post' %></em></h1></div>
+    <% if (isEdit && post.slug) { %><a class="btn ghost" href="/blog/<%= post.slug %>" target="_blank" rel="noopener">See the post</a><% } %>
+  </div>
+
+  <% if (error) { %><p class="pf-error" role="alert"><%= error %></p><% } %>
+
+  <form action="<%= isEdit ? '/admin/blog/edit/' + post._id : '/admin/blog' %>" method="POST" class="pf-form">
+    <section class="ad-card form">
+      <div class="field"><label for="bp-title">Title</label>
+        <input type="text" id="bp-title" name="title" value="<%= post.title || '' %>" maxlength="140" required placeholder="What to pack for the mission field"></div>
+      <div class="field"><label for="bp-topic">Topic (optional)</label>
+        <input type="text" id="bp-topic" name="topic" value="<%= post.topic || '' %>" maxlength="60" list="bp-topics" placeholder="Missionary moms">
+        <datalist id="bp-topics"><% topics.forEach(t => { %><option value="<%= t %>"><% }) %></datalist></div>
+      <div class="field"><label for="bp-desc">Short summary (optional)</label>
+        <input type="text" id="bp-desc" name="description" value="<%= post.shortDescription || '' %>" maxlength="160" placeholder="One sentence. Shows under the title and in Google.">
+        <small class="muted"><span data-count="bp-desc"><%= (post.shortDescription || '').length %></span>/160</small></div>
+      <div class="field"><label for="bp-content">The post</label>
+        <textarea id="bp-content" name="content" rows="16" required placeholder="Write it like you'd talk to a friend. A blank line starts a new paragraph."><%= post.content || '' %></textarea></div>
+    </section>
+
+    <section class="ad-card">
+      <div class="ad-card-head"><h2>Cover photo</h2><span class="muted">Optional · shows at the top and when the post is shared</span></div>
+      <div class="photos ph-one" data-photos data-single data-field="coverImageUrl" data-folder="#bp-title" data-enabled="<%= uploadsEnabled %>">
+        <div class="ph-grid"><% if (post.coverImageUrl) { %><figure class="ph"><img src="<%= post.coverImageUrl %>" alt=""><input type="hidden" name="coverImageUrl" value="<%= post.coverImageUrl %>"></figure><% } %></div>
+        <div class="ph-drop">
+          <label class="btn ghost">Upload a photo<input type="file" accept="image/jpeg,image/png,image/webp" hidden></label>
+          <span class="muted">or drag it here</span>
+        </div>
+        <details class="ph-link"><summary>Paste a photo link instead</summary>
+          <div class="sleeve"><input type="text" placeholder="https://…" aria-label="Photo link"><button class="btn ghost" type="button">Add</button></div></details>
+        <p class="msg" aria-live="polite"></p>
+      </div>
+    </section>
+
+    <section class="ad-card form">
+      <div class="field"><label for="bp-tags">Hashtags (separate with commas)</label>
+        <input type="text" id="bp-tags" name="hashtags" value="<%= (post.hashtags || []).join(', ') %>" placeholder="missionary, faith, gifts"></div>
+    </section>
+
+    <div class="pf-bar">
+      <button class="btn" type="submit"><%= isEdit ? 'Save changes' : 'Publish' %></button>
+      <a class="btn ghost" href="/admin/blog">Cancel</a>
+    </div>
+  </form>
+
+  <% if (isEdit) { %>
+    <details class="pf-remove"><summary>Delete this post</summary>
+      <form action="/admin/blog/delete/<%= post._id %>" method="POST"><p class="muted">It comes off the blog right away and can't be brought back.</p>
+        <button class="btn ghost" type="submit">Yes, delete it</button></form></details>
+  <% } %>
+</div></section>
+<script>document.querySelectorAll('[data-count]').forEach(s => { const i = document.getElementById(s.dataset.count); i.addEventListener('input', () => { s.textContent = i.value.length; }); });</script>
+<script src="/scripts/admin-photos.js" defer></script>
+<%- include('../partials/v2/foot') %>
