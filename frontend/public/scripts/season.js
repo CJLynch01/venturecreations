@@ -74,6 +74,28 @@ function makeFX(band, opts = {}) {
   const heart = col => `<svg width="${rand(12, 20) | 0}" height="${rand(12, 20) | 0}" viewBox="3 4 22 21"><path d="M14,24 C4,17 3,11 6,8 C9,5 13,7 14,10 C15,7 19,5 22,8 C25,11 24,17 14,24 Z" fill="${col}"/></svg>`;
   // Easter: cherry blossom petals (notched at the tip) and the odd butterfly
   const petal = col => { const s = rand(11, 20) | 0; return `<svg class="vc-bloom" width="${s}" height="${s}" viewBox="-6 -6 12 12">${[0, 72, 144, 216, 288].map(a => `<ellipse cy="-2.7" rx="1.9" ry="2.8" transform="rotate(${a})" fill="${col}" stroke="#d99aab" stroke-opacity=".6" stroke-width=".35"/>`).join('')}<circle r="1.3" fill="#c9a227"/></svg>`; };
+  // Easter bunny with a basket of eggs, hopping across the bottom of the page
+  const bunny = `<svg width="78" height="68" viewBox="0 0 64 56"><g stroke="#b9ab9f" stroke-width=".8">
+    <circle cx="9.5" cy="35.5" r="5" fill="#ffffff"/>
+    <ellipse cx="18" cy="48" rx="9" ry="4.2" fill="#ece5de"/>
+    <ellipse cx="24" cy="37.5" rx="14" ry="11" fill="#f1ebe5"/>
+    <ellipse cx="35.5" cy="12" rx="3.3" ry="10" transform="rotate(-14 35.5 12)" fill="#f1ebe5"/>
+    <ellipse cx="41.5" cy="12.5" rx="3.3" ry="10" transform="rotate(12 41.5 12.5)" fill="#f1ebe5"/>
+    <circle cx="38.5" cy="26" r="9" fill="#f1ebe5"/>
+    <ellipse cx="35" cy="48" rx="4.5" ry="3" fill="#ece5de"/></g>
+    <ellipse cx="35.5" cy="12.5" rx="1.5" ry="7" transform="rotate(-14 35.5 12.5)" fill="#e8b4c2"/>
+    <ellipse cx="41.5" cy="13" rx="1.5" ry="7" transform="rotate(12 41.5 13)" fill="#e8b4c2"/>
+    <circle cx="41.5" cy="24" r="1.4" fill="#1c2233"/><circle cx="41.9" cy="23.5" r=".4" fill="#fff"/>
+    <ellipse cx="47" cy="27.2" rx="1.3" ry="1" fill="#d98a9c"/>
+    <path d="M44.5,29.5 q2,1.2 4,0" stroke="#b9ab9f" stroke-width=".6" fill="none"/>
+    <ellipse cx="46.5" cy="35.5" rx="2.4" ry="3.2" fill="#f1ebe5" stroke="#b9ab9f" stroke-width=".8"/>
+    <path d="M43.5,38 Q53.5,26 61,38" stroke="#7a5a44" stroke-width="1.6" fill="none"/>
+    <ellipse cx="47.5" cy="36" rx="3" ry="4" fill="#9fb0e6"/><path d="M44.8,36 l1.3,-1 l1.3,1 l1.3,-1 l1.3,1" stroke="#fff" stroke-width=".7" fill="none"/>
+    <ellipse cx="52.5" cy="35" rx="3" ry="4" fill="#e3b3c0"/><path d="M50,35.5 h5" stroke="#fff" stroke-width=".8"/>
+    <ellipse cx="57.3" cy="36.2" rx="2.8" ry="3.8" fill="#ead9a6"/><circle cx="56.5" cy="35.5" r=".7" fill="#fff"/><circle cx="58.2" cy="37" r=".6" fill="#fff"/>
+    <path d="M42.5,37.5 H62 L59.5,48.5 H45 Z" fill="#b5865a" stroke="#7a5a44" stroke-width=".9" stroke-linejoin="round"/>
+    <path d="M43.6,41.2 H61.2 M44.4,44.8 H60.4 M48,37.5 L48.6,48.5 M52.2,37.5 V48.5 M56.4,37.5 L55.8,48.5" stroke="#7a5a44" stroke-opacity=".45" stroke-width=".6"/>
+  </svg>`;
   const butterfly = (a, b) => `<svg width="40" height="34" viewBox="-20 -17 40 34"><g class="vc-wing"><path d="M-1,-1 C-6,-15 -19,-14 -17,-4 C-16,1 -8,2 -1,0 Z" fill="${a}"/><path d="M-1,1 C-8,2 -15,6 -12,12 C-9,16 -3,10 -1,2 Z" fill="${b}"/></g><g class="vc-wing vc-wing-r"><path d="M1,-1 C6,-15 19,-14 17,-4 C16,1 8,2 1,0 Z" fill="${a}"/><path d="M1,1 C8,2 15,6 12,12 C9,16 3,10 1,2 Z" fill="${b}"/></g><ellipse rx="1.3" ry="7" fill="${C.ink}" opacity=".75"/><path d="M-.5,-7 q-2,-4 -4,-5 M.5,-7 q2,-4 4,-5" stroke="${C.ink}" stroke-width=".7" fill="none" opacity=".75"/></svg>`;
   const bat = `<svg width="46" height="22" viewBox="-23 -11 46 22"><g fill="${C.ink}" opacity=".78"><path class="vc-wing" d="M-3,0 C-8,-8 -16,-9 -22,-4 C-17,-3 -15,0 -14,3 C-11,1 -8,1 -6,4 Z"/><path class="vc-wing vc-wing-r" d="M3,0 C8,-8 16,-9 22,-4 C17,-3 15,0 14,3 C11,1 8,1 6,4 Z"/><ellipse rx="3.6" ry="4.4"/><path d="M-2.6,-3.4 L-3.6,-7 L-1,-4.4 Z M2.6,-3.4 L3.6,-7 L1,-4.4 Z"/></g></svg>`;
   const plane = `<svg width="54" height="30" viewBox="0 0 54 30"><path d="M2,15 L52,2 L30,28 L24,18 Z" fill="#fff" stroke="${C.blue}" stroke-width="1.4" stroke-linejoin="round"/><path d="M24,18 L52,2" stroke="${C.blue}" stroke-width="1.2"/></svg>`;
@@ -141,6 +163,8 @@ function makeFX(band, opts = {}) {
       for (let i = 0; i < n(small ? 14 : 26); i++) piece(petal(pick(['#f6d6de', '#f0c3cf', '#fbeaef', '#e8b4c2', '#ffffff'])), { dur: [10, 16], delay: [0, 16] });
       const flutter = () => { const [a, b] = pick([[C.sky, C.mauve], [C.pink, C.gold], [C.mint, C.sky], [C.cream, C.pink]]); fly(butterfly(a, b), { y: [15, 60], dur: [9, 13], cls: 'vc-butterfly' }); };
       later(flutter, 2500); every(flutter, ms(12000));
+      const hopAcross = () => fly(bunny, { y: [small ? 80 : 78, small ? 84 : 82], dur: [small ? 9 : 12, small ? 11 : 15], cls: 'vc-bunny', rtl: false });
+      later(hopAcross, 1000); every(hopAcross, ms(18000));
     } else if (kind === 'july4') {
       fireworks();
     } else if (kind === 'backtoschool') {

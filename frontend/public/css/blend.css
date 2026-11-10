@@ -411,3 +411,6 @@ footer.site .copy{grid-column:1/-1;border-top:1px solid var(--line);padding-top:
 /* pinned band stays compact on phones */
 @media (max-width:600px){.season-line{gap:4px 10px;padding-block:0 6px}.season-line span{font-size:15px}.season-icon{width:28px;height:28px}.season .garland{height:22px}}
 .vc-bloom{animation:vc-spin 7s linear infinite}
+/* Easter bunny: hops across the bottom of the page */
+.vc-bunny svg{transform-origin:50% 100%;animation:vc-hopping .72s ease-in-out infinite}
+@keyframes vc-hopping{0%{transform:translateY(0) scale(1.06,.9)}18%{transform:translateY(-6px) scale(.96,1.06)}50%{transform:translateY(-34px) rotate(-7deg) scale(1)}82%{transform:translateY(-4px) rotate(2deg) scale(1)}100%{transform:translateY(0) scale(1.06,.9)}}
