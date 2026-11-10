@@ -21,6 +21,9 @@ function bucket() {
 }
 const LOCAL_DIR = path.join(path.dirname(fileURLToPath(import.meta.url)), "../../frontend/public/new-images/uploads");
 
+// Which AWS setting names the server can't see (names only, never values), for the dashboard
+export const missingAwsKeys = () => ["AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY"].filter(k => !process.env[k]);
+
 export const uploadsEnabled = () => Boolean(bucket() || process.env.TEST_SITE);
 
 export const photoUpload = multer({
