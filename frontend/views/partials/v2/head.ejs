@@ -39,6 +39,7 @@
 </head>
 <body>
 <% if (typeof testSite !== 'undefined' && testSite) { %><div class="testbar gut">Test site. Checkout and sign-in are turned off, nothing here charges a card.</div><% } %>
+<div class="topbars">
 <header class="top gut"><div class="in">
   <a class="logo" href="/" aria-label="Venture Creations home">
     <svg class="mark" viewBox="0 0 48 48" aria-hidden="true"><circle class="m-bg" cx="24" cy="24" r="22"/><circle class="m-ring" cx="24" cy="24" r="18.5"/><text x="24" y="25" text-anchor="middle" dominant-baseline="central">VC</text></svg>
@@ -61,4 +62,5 @@
   </div>
 </div></header>
 <%- include('season') %>
+</div>
 <main id="main">

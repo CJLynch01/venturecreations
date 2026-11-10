@@ -41,7 +41,9 @@ section.blk{padding-block:56px}
 
 /* header */
 body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--card)}
-.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--card);border-bottom:1px solid var(--line);padding-block:10px}
+/* menu + holiday band stay pinned together while scrolling */
+.topbars{position:sticky;top:env(safe-area-inset-top,0px);z-index:20}
+.top{position:relative;background:var(--card);border-bottom:1px solid var(--line);padding-block:10px}
 .top .in{display:flex;align-items:center;gap:18px}
 .logo{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--ink)}
 .logo span{font-family:var(--display);font-size:19px;letter-spacing:.16em;text-transform:uppercase;white-space:nowrap}
@@ -235,7 +237,7 @@ th:first-child,td:first-child{text-align:left}
 .tiers div{padding:8px 10px;background:var(--deep);font-size:13px;color:#b9c0d6;border:1.5px solid transparent}
 .tiers div b{display:block;color:#fff;font-size:16px}
 .tiers div.on{border-color:var(--mauve);background:#3a2f3a}
-.sum{background:var(--deep);padding:24px;display:grid;gap:10px;position:sticky;top:90px}
+.sum{background:var(--deep);padding:24px;display:grid;gap:10px;position:sticky;top:170px}
 .sum .line{display:flex;justify-content:space-between;gap:12px}
 .sum .big{font-family:var(--display);font-size:42px;color:#fff}
 .sum .save{color:#9fd8c9;font-weight:600}
@@ -402,3 +404,5 @@ footer.site .copy{grid-column:1/-1;border-top:1px solid var(--line);padding-top:
 .idea-row .idea-sn{grid-column:2;font-size:14px}
 .vc-snow{display:block;border-radius:50%;background:radial-gradient(circle,#ffffff 0 42%,rgba(255,255,255,.75) 58%,rgba(255,255,255,0) 72%);filter:drop-shadow(0 0 1.5px rgba(74,92,163,.45))}
 .vc-crystal{filter:drop-shadow(0 0 1.2px rgba(74,92,163,.6))}
+/* pinned band stays compact on phones */
+@media (max-width:600px){.season-line{gap:4px 10px;padding-block:0 6px}.season-line span{font-size:15px}.season-icon{width:28px;height:28px}.season .garland{height:22px}}
