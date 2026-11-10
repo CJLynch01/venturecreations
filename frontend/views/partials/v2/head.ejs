@@ -3,9 +3,32 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <title><%= typeof title !== 'undefined' && title ? title + ' | ' : '' %>Venture Creations</title>
-  <meta name="description" content="Custom shirts for every venture: mission shirts, faith, mental health, cats, Día de los Muertos and seasonal tees, made to order. Group discounts.">
-  <% if (typeof testSite !== 'undefined' && testSite) { %><meta name="robots" content="noindex"><% } %>
+<%
+  // Search results and link previews (Google, Pinterest, Facebook, texts). Pages set res.locals.seo.
+  const S = (typeof seo !== 'undefined' && seo) || {};
+  const pageName = typeof title !== 'undefined' && title ? title : 'Custom shirts for every venture';
+  const desc = S.description || 'Custom shirts for every venture: custom missionary shirts, faith, mental health, cats, Día de los Muertos and seasonal tees, made to order. Group discounts.';
+  const site = typeof siteUrl !== 'undefined' ? siteUrl : '';
+  const img = S.image ? (typeof absolute === 'function' ? absolute(S.image) : S.image) : site + '/images/VentureCreations.webp';
+%>
+  <title><%= pageName %> | Venture Creations</title>
+  <meta name="description" content="<%= desc %>">
+  <% if (S.canonical) { %><link rel="canonical" href="<%= S.canonical %>"><% } %>
+  <% if (S.noindex || (typeof testSite !== 'undefined' && testSite)) { %><meta name="robots" content="noindex"><% } %>
+  <meta property="og:site_name" content="Venture Creations">
+  <meta property="og:type" content="<%= S.type === 'product' ? 'product' : 'website' %>">
+  <meta property="og:title" content="<%= pageName %>">
+  <meta property="og:description" content="<%= desc %>">
+  <meta property="og:url" content="<%= S.canonical || site %>">
+  <meta property="og:image" content="<%= img %>">
+  <% if (S.price) { %><meta property="product:price:amount" content="<%= Number(S.price).toFixed(2) %>">
+  <meta property="product:price:currency" content="USD">
+  <meta property="og:price:amount" content="<%= Number(S.price).toFixed(2) %>">
+  <meta property="og:price:currency" content="USD">
+  <meta property="product:availability" content="in stock"><% } %>
+  <meta name="twitter:card" content="summary_large_image">
+  <% (S.jsonld || []).forEach(j => { %><script type="application/ld+json"><%- JSON.stringify(j).replace(/</g, '\\u003c') %></script>
+  <% }) %>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,wght@0,400;0,600;1,400&family=Figtree:wght@400;500;600;700&family=Sacramento&display=swap">

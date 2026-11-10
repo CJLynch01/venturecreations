@@ -8,7 +8,7 @@
     <div class="row"><a class="btn" href="/shop">Shop the collection</a><a class="btn ghost" href="/mission">Make one custom</a></div>
   </div>
   <div class="collage">
-    <% hero.forEach(p => { %><a href="/shop/<%= p._id %>"><img src="<%= p.images[0] %>" alt="<%= p.name %>"></a><% }) %>
+    <% hero.forEach(p => { %><a href="<%= productPath(p) %>"><img src="<%= p.images[0] %>" alt="<%= p.name %> t-shirt"></a><% }) %>
   </div>
 </div></section>
 

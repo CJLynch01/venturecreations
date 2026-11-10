@@ -109,7 +109,13 @@ router.get("/blog/:slug", async (req, res) => {
   try {
     const post = await BlogPost.findOne({ slug: req.params.slug });
     if (!post) return res.status(404).render("404");
-    res.render("blog/show", { post });
+    // Search and link-preview details for the post
+    Object.assign(res.locals.seo || (res.locals.seo = {}), {
+      description: (post.shortDescription || post.content.replace(/<[^>]+>/g, " ")).replace(/\s+/g, " ").trim().slice(0, 155),
+      image: post.coverImageUrl || undefined,
+      type: "article",
+    });
+    res.render("blog/show", { post, title: post.title });
   } catch (err) {
     console.error("Error loading post:", err);
     res.status(500).send("Error loading blog post");

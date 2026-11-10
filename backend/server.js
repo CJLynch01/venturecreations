@@ -15,10 +15,12 @@ import MongoStore from "connect-mongo";
 
 // Models
 import Product from "./models/product.js";
+import BlogPost from "./models/BlogPost.js";
 
 // Shop settings and cart
 import * as SHOP from "./config/shop.js";
 import { cartCount, clearCart } from "./lib/cart.js";
+import { withSlugs, siteUrl, absolute, productPath, productSummary, productJsonLd, breadcrumbJsonLd, storeJsonLd } from "./lib/seo.js";
 
 // Routes
 import productRoutes from "./routes/productRoutes.js";
@@ -98,6 +100,11 @@ app.use(async (req, res, next) => {
   res.locals.path = req.path;
   try { res.locals.cartCount = await cartCount(req); } catch (err) { console.error("Cart count failed:", err); res.locals.cartCount = 0; }
   res.locals.cart = [];   // old admin templates read this
+  // Search and link-preview defaults; pages fill in res.locals.seo with their own title, description and photo
+  res.locals.siteUrl = siteUrl(req);
+  res.locals.absolute = src => absolute(req, src);
+  res.locals.productPath = productPath;
+  res.locals.seo = { canonical: siteUrl(req) + req.path, noindex: /^\/(cart|checkout|customer|auth|admin|search|success)/.test(req.path) };
   next();
 });
 
@@ -117,7 +124,7 @@ app.use("/contact", contactFormRoutes)
 
 // Products with their collections attached
 async function allProducts() {
-  const products = await Product.find().sort({ createdAt: -1 });
+  const products = withSlugs(await Product.find().sort({ createdAt: -1 }));
   return products.map(p => Object.assign(p, { collections: SHOP.collectionsFor(p) }));
 }
 const missionProduct = products => products.find(p => SHOP.MISSION_MATCH.test(`${p.category} ${p.name}`));
@@ -137,6 +144,11 @@ app.get("/", async (req, res) => {
   // Top photos: shirts she tags "featured" come first, then the newest
   const featured = p => (p.tags || []).some(t => /featured/i.test(t));
   const hero = [...products.filter(featured), ...products.filter(p => !featured(p))].filter(p => p !== mission && p.images?.length).slice(0, 4);
+  Object.assign(res.locals.seo, {
+    canonical: siteUrl(req) + "/",
+    description: "Custom shirts for every venture: custom missionary shirts, Christmas and faith tees, mental health, cats, Día de los Muertos and Halloween shirts, made to order with group discounts.",
+    image: hero[0]?.images?.[0], jsonld: [storeJsonLd(req)],
+  });
   res.render("home", { title: "Custom shirts for every venture", products: products.slice(0, 8), hero, collections, mission, page: "home" });
 });
 
@@ -145,17 +157,32 @@ app.get("/shop", async (req, res) => {
   const active = SHOP.COLLECTIONS.find(c => c.id === req.query.c) ? req.query.c : "all";
   const counts = Object.fromEntries(SHOP.COLLECTIONS.map(c => [c.id, products.filter(p => p.collections.includes(c.id)).length]));
   const list = active === "all" ? products : products.filter(p => p.collections.includes(active));
-  res.render("shop", { title: "Shop", products: list, total: products.length, active, counts, page: "shop" });
+  const coll = SHOP.COLLECTIONS.find(c => c.id === active);
+  Object.assign(res.locals.seo, {
+    canonical: siteUrl(req) + "/shop" + (coll ? `?c=${coll.id}` : ""),
+    description: coll ? coll.blurb : "Shop every Venture Creations shirt: custom missionary shirts, faith, Christmas, mental health, cats, Día de los Muertos, Halloween and funny tees.",
+    image: list[0]?.images?.[0],
+  });
+  res.render("shop", { title: coll ? `${coll.name} shirts` : "Shop all shirts", products: list, total: products.length, active, counts, page: "shop" });
 });
 
-app.get("/shop/:id", async (req, res) => {
+app.get("/shop/:key", async (req, res) => {
   try {
-    const product = await Product.findById(req.params.id);
+    // Shirts live at readable addresses (/shop/nativity); old /shop/<id> links forward there
+    const products = await allProducts();
+    const key = String(req.params.key);
+    const product = products.find(p => p.slug === key) || (/^[0-9a-f]{24}$/i.test(key) ? products.find(p => String(p._id) === key.toLowerCase()) : null);
     if (!product) return res.status(404).render("404");
-    // The custom mission shirt has its own builder page
+    // The custom mission shirts have their own page
     const style = SHOP.missionStyleOf(product);
-    if (style) return res.redirect(`/mission?style=${style.id}`);
-    const related = (await allProducts()).filter(p => String(p._id) !== String(product._id) && SHOP.collectionsFor(product).some(c => p.collections.includes(c))).slice(0, 4);
+    if (style) return res.redirect(301, style.id === "original" ? "/mission" : `/mission?style=${style.id}`);
+    if (key !== product.slug) return res.redirect(301, productPath(product));
+    const related = products.filter(p => String(p._id) !== String(product._id) && SHOP.collectionsFor(product).some(c => p.collections.includes(c))).slice(0, 4);
+    const coll = SHOP.COLLECTIONS.find(c => SHOP.collectionsFor(product).includes(c.id));
+    Object.assign(res.locals.seo, {
+      description: productSummary(product), image: product.images?.[0], type: "product", price: product.price,
+      jsonld: [productJsonLd(req, product), breadcrumbJsonLd(req, [{ name: "Shop", path: "/shop" }, ...(coll ? [{ name: coll.name, path: `/shop?c=${coll.id}` }] : []), { name: product.name, path: productPath(product) }])],
+    });
     res.render("shop/product", { title: product.name, product, related, page: "shop" });
   } catch (err) {
     if (err.name === "CastError") return res.status(404).render("404");
@@ -170,11 +197,22 @@ app.get("/mission", async (req, res) => {
   const styles = SHOP.MISSION_STYLES.map(s => ({ ...s, product: products.find(p => s.match.test(p.name)) })).filter(s => s.product);
   if (!styles.length) return res.status(404).render("404");
   const active = styles.find(s => s.id === req.query.style) || styles[0];
-  res.render("mission", { title: "Custom mission shirts", styles, active, page: "mission" });
+  const canonical = siteUrl(req) + "/mission" + (active.id === styles[0].id ? "" : `?style=${active.id}`);
+  const ld = productJsonLd(req, active.product);
+  ld.offers.url = canonical;
+  Object.assign(res.locals.seo, {
+    canonical,
+    description: active.things
+      ? "Custom missionary shirts: your mission's state or country in the middle, four things that describe the mission, and the mission name, hand-drawn and made to order."
+      : "Custom missionary flag shirts with the flag of the country where they serve and the mission name, made to order.",
+    image: active.product.images?.[0], type: "product", price: active.product.price, jsonld: [ld],
+  });
+  res.render("mission", { title: active.things ? "Custom missionary shirts" : "Custom missionary flag shirts", styles, active, page: "mission" });
 });
 
 app.get("/groups", async (req, res) => {
   const products = await allProducts();
+  Object.assign(res.locals.seo, { description: "Group shirts for youth conferences, treks, mission prep, reunions and homecomings. Prices drop at 12, 24 and 48 shirts." });
   res.render("groups", { title: "Group orders", products, mission: missionProduct(products), reqStyle: req.query.style || (req.query.mission === "1" ? "original" : ""), page: "groups" });
 });
 
@@ -209,8 +247,34 @@ app.get('/success', async (req, res) => {
 
 app.get('/cancel', (req, res) => res.redirect('/cart'));
 
+// For search engines: the list of every page and shirt, and which areas to skip
+app.get("/sitemap.xml", async (req, res) => {
+  const site = siteUrl(req);
+  const products = await allProducts();
+  const posts = await BlogPost.find({}, { slug: 1, updatedAt: 1, createdAt: 1 }).catch(() => []);
+  const day = d => new Date(d || Date.now()).toISOString().slice(0, 10);
+  const urls = [
+    { loc: "/", pri: "1.0" }, { loc: "/shop", pri: "0.9" }, { loc: "/mission", pri: "0.9" }, { loc: "/groups", pri: "0.7" },
+    { loc: "/blog", pri: "0.5" }, { loc: "/contact", pri: "0.4" },
+    ...SHOP.MISSION_STYLES.slice(1).filter(s => products.some(p => s.match.test(p.name))).map(s => ({ loc: `/mission?style=${s.id}`, pri: "0.8" })),
+    ...SHOP.COLLECTIONS.filter(c => products.some(p => p.collections.includes(c.id))).map(c => ({ loc: `/shop?c=${c.id}`, pri: "0.7" })),
+    ...products.filter(p => !SHOP.missionStyleOf(p)).map(p => ({ loc: productPath(p), pri: "0.8", mod: day(p.updatedAt || p.createdAt) })),
+    ...posts.filter(p => p.slug).map(p => ({ loc: `/blog/${p.slug}`, pri: "0.5", mod: day(p.updatedAt || p.createdAt) })),
+  ];
+  const esc = s => s.replace(/&/g, "&amp;");
+  res.type("application/xml").send(`<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n` +
+    urls.map(u => `  <url><loc>${esc(site + u.loc)}</loc>${u.mod ? `<lastmod>${u.mod}</lastmod>` : ""}<priority>${u.pri}</priority></url>`).join("\n") + "\n</urlset>\n");
+});
+
+app.get("/robots.txt", (req, res) => {
+  res.type("text/plain").send(TEST_SITE
+    ? "User-agent: *\nDisallow: /\n"
+    : `User-agent: *\nDisallow: /admin\nDisallow: /cart\nDisallow: /checkout\nDisallow: /customer\nDisallow: /auth\nDisallow: /search\nDisallow: /success\n\nSitemap: ${siteUrl(req)}/sitemap.xml\n`);
+});
+
 // 404 handler
 app.use((req, res) => {
+  res.locals.seo = { noindex: true };
   res.status(404).render("404", { title: "Page not found" });
 });
 

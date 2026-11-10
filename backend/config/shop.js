@@ -4,13 +4,20 @@
 // Collections are matched against each product's category, tags, season and name (case-insensitive).
 // "Just for fun" catches everything that doesn't match another collection.
 export const COLLECTIONS = [
-  { id: "faith", name: "Mission & faith", match: /mission|christ|faith|jesus|easter|church|scripture/i },
-  { id: "christmas", name: "Christmas", match: /christmas|nativity|wise men/i },
-  { id: "mental-health", name: "Mental health", match: /mental|semicolon|press on/i },
-  { id: "cats", name: "Cats", match: /\bcats?\b|animal/i },
-  { id: "muertos", name: "Día de los Muertos", match: /muertos/i },
-  { id: "halloween-fall", name: "Halloween & fall", match: /halloween|fall|autumn|witch/i },
-  { id: "fun", name: "Just for fun", match: null },
+  { id: "faith", name: "Mission & faith", match: /mission|christ|faith|jesus|easter|church|scripture/i,
+    blurb: "Custom missionary shirts, P-Day shirts and faith tees for missionaries, families and church groups." },
+  { id: "christmas", name: "Christmas", match: /christmas|nativity|wise men/i,
+    blurb: "Christmas shirts that keep Christ in the season: the Nativity, the Wise Men and the names of Jesus." },
+  { id: "mental-health", name: "Mental health", match: /mental|semicolon|press on/i,
+    blurb: "Mental health awareness shirts: semicolon designs, PRESS ON and reminders for the hard days." },
+  { id: "cats", name: "Cats", match: /\bcats?\b|animal/i,
+    blurb: "Cat shirts for cat people, from cozy fall cats to cats dressed as ghosts." },
+  { id: "muertos", name: "Día de los Muertos", match: /muertos/i,
+    blurb: "Día de los Muertos shirts: colorful sugar skulls, marigolds and dancing skeletons." },
+  { id: "halloween-fall", name: "Halloween & fall", match: /halloween|fall|autumn|witch/i,
+    blurb: "Halloween and fall shirts: witches, ghosts, pumpkins and botanical skeletons." },
+  { id: "fun", name: "Just for fun", match: null,
+    blurb: "Funny shirts and gifts, from Bigfoot to calling in sick." },
 ];
 
 export function collectionsFor(product) {

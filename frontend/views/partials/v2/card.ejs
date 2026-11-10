@@ -1,4 +1,4 @@
-<a class="prod" href="/shop/<%= p._id %>">
+<a class="prod" href="<%= typeof productPath === 'function' ? productPath(p) : '/shop/' + p._id %>">
   <span class="ph">
     <img src="<%= p.images && p.images[0] || '/images/VentureCreations.webp' %>" alt="<%= p.name %>" loading="lazy">
     <% if (p.images && p.images[1]) { %><img class="alt" src="<%= p.images[1] %>" alt="" loading="lazy"><% } %>

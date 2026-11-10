@@ -2,10 +2,10 @@
 
 <div class="gut"><div class="in pdp">
   <div class="gallery">
-    <div class="main"><img id="mainImg" src="<%= product.images[0] %>" alt="<%= product.name %>"></div>
+    <div class="main"><img id="mainImg" src="<%= product.images[0] %>" alt="<%= product.name %> t-shirt by Venture Creations"></div>
     <% if (product.images.length > 1) { %>
       <div class="thumbs" id="thumbs">
-        <% product.images.forEach((src, i) => { %><button type="button" aria-pressed="<%= i === 0 %>" data-src="<%= src %>" aria-label="Photo <%= i + 1 %>"><img src="<%= src %>" alt="" loading="lazy"></button><% }) %>
+        <% product.images.forEach((src, i) => { %><button type="button" aria-pressed="<%= i === 0 %>" data-src="<%= src %>" aria-label="Photo <%= i + 1 %> of <%= product.name %>"><img src="<%= src %>" alt="<%= product.name %>, photo <%= i + 1 %>" loading="lazy"></button><% }) %>
       </div>
     <% } %>
   </div>
@@ -16,6 +16,7 @@
       <h1><%= product.name %></h1>
     </div>
     <div class="price tabnum">$<%= product.price.toFixed(2) %></div>
+    <% if (product.description) { %><div class="pdesc"><%= product.description %></div><% } %>
     <input type="hidden" name="productId" value="<%= product._id %>">
 
     <% if (product.colors && product.colors.length) { %>

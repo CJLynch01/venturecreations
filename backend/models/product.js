@@ -8,6 +8,7 @@ const productSchema = new mongoose.Schema({
   category: String,
   stock: Number,
   images: [String],
+  description: { type: String, maxlength: 5000 },   // shown on the product page and to search engines
 
   seasonalCategory: {
     type: String,

@@ -323,3 +323,4 @@ footer.site .copy{grid-column:1/-1;border-top:1px solid var(--line);padding-top:
 .style[aria-current=true]{border:2px solid var(--ink)}
 .style:hover{border-color:var(--mauve)}
 @media (max-width:420px){.styles{grid-template-columns:1fr}}
+.pdesc{color:var(--muted);white-space:pre-line;max-width:60ch}

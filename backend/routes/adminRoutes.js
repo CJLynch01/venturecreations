@@ -52,7 +52,7 @@ router.get("/products/new", ensureAdmin, (req, res) => {
 // Handle Add Product Form
 router.post("/products/new", ensureAdmin, async (req, res) => {
   try {
-    const { name, price, sizes, colors, category, seasonalCategory, tags } = req.body;
+    const { name, price, sizes, colors, category, seasonalCategory, tags, description } = req.body;
     let { images } = req.body;
 
     // Ensure 'images' is an array
@@ -70,7 +70,8 @@ router.post("/products/new", ensureAdmin, async (req, res) => {
       category,
       images: cleanImages,
       seasonalCategory: seasonalCategory || 'None',
-      tags: tags ? tags.split(',').map(t => t.trim().toLowerCase()) : []
+      tags: tags ? tags.split(',').map(t => t.trim().toLowerCase()) : [],
+      description: (description || '').trim().slice(0, 5000)
     });
 
     await newProduct.save();
@@ -96,7 +97,7 @@ router.get("/products/edit/:id", ensureAdmin, async (req, res) => {
 // Handle Edit Product Form Submission
 router.post("/products/edit/:id", ensureAdmin, async (req, res) => {
   try {
-    const { name, price, sizes, colors, category, seasonalCategory, tags, action } = req.body;
+    const { name, price, sizes, colors, category, seasonalCategory, tags, action, description } = req.body;
     let { images, deleteImages } = req.body;
 
     // Normalize input
@@ -117,7 +118,8 @@ router.post("/products/edit/:id", ensureAdmin, async (req, res) => {
       category,
       images: cleanImages,
       seasonalCategory: seasonalCategory || 'None',
-      tags: tags ? tags.split(',').map((t) => t.trim().toLowerCase()) : []
+      tags: tags ? tags.split(',').map((t) => t.trim().toLowerCase()) : [],
+      description: (description || '').trim().slice(0, 5000)
     });
 
     if (action === 'deleteImages') {
