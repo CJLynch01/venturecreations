@@ -110,6 +110,8 @@ app.use(async (req, res, next) => {
   res.locals.productPath = productPath;
   res.locals.trackingFor = trackingFor;
   res.locals.carriers = CARRIERS;
+  // Search Console / Bing Webmaster ownership codes, pasted into Render as env vars
+  res.locals.siteVerify = { google: process.env.GOOGLE_SITE_VERIFICATION || "", bing: process.env.BING_SITE_VERIFICATION || "" };
   res.locals.seo = { canonical: siteUrl(req) + req.path, noindex: /^\/(cart|checkout|customer|auth|admin|search|success)/.test(req.path) };
   next();
 });
