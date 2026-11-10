@@ -8,6 +8,7 @@ import Order from "../models/Order.js";
 import Setting from "../models/Setting.js";
 import { dashboardData, splitItem, ORDER_STEPS } from "../lib/dashboard.js";
 import { photoUpload, savePhotos, uploadsEnabled } from "../lib/uploads.js";
+import { CARRIERS, cleanTracking, guessCarrier } from "../lib/tracking.js";
 
 const router = express.Router();
 
@@ -21,14 +22,37 @@ router.get("/", ensureAdmin, async (req, res) => {
   }
 });
 
+// Tracking number and carrier from the order form (carrier guessed from the number if not picked)
+function trackingFromForm(b) {
+  const trackingNumber = cleanTracking(b.trackingNumber);
+  if (!trackingNumber) return { trackingNumber: "", carrier: "" };
+  return { trackingNumber, carrier: CARRIERS[b.carrier] ? b.carrier : guessCarrier(trackingNumber) };
+}
+
 // Move an order along: paid -> printed -> shipped (customers see this on their orders page)
 router.post("/orders/:id/status", ensureAdmin, async (req, res) => {
   try {
-    if (ORDER_STEPS.includes(req.body.status)) await Order.findByIdAndUpdate(req.params.id, { status: req.body.status });
+    const status = req.body.status;
+    if (ORDER_STEPS.includes(status)) {
+      const update = { status, [`${status}At`]: new Date() };
+      if (status === "shipped") Object.assign(update, trackingFromForm(req.body));
+      await Order.findByIdAndUpdate(req.params.id, update);
+    }
     res.redirect(req.body.back === "orders" ? "/admin/orders" : "/admin#queue");
   } catch (err) {
     console.error("Order status error:", err);
     res.status(500).send("Couldn't update the order.");
+  }
+});
+
+// Add or fix the tracking number on an order that already shipped
+router.post("/orders/:id/tracking", ensureAdmin, async (req, res) => {
+  try {
+    await Order.findByIdAndUpdate(req.params.id, trackingFromForm(req.body));
+    res.redirect(req.body.back === "orders" ? "/admin/orders" : "/admin#queue");
+  } catch (err) {
+    console.error("Tracking update error:", err);
+    res.status(500).send("Couldn't save the tracking number.");
   }
 });
 

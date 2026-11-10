@@ -21,6 +21,7 @@ import BlogPost from "./models/BlogPost.js";
 import * as SHOP from "./config/shop.js";
 import { cartCount, clearCart } from "./lib/cart.js";
 import { seasonMiddleware, seasonFirst } from "./config/seasons.js";
+import { trackingFor, CARRIERS } from "./lib/tracking.js";
 import { withSlugs, siteUrl, absolute, productPath, productSummary, productJsonLd, breadcrumbJsonLd, storeJsonLd } from "./lib/seo.js";
 
 // Routes
@@ -103,11 +104,12 @@ app.use(async (req, res, next) => {
   res.locals.testSite = TEST_SITE;
   res.locals.path = req.path;
   try { res.locals.cartCount = await cartCount(req); } catch (err) { console.error("Cart count failed:", err); res.locals.cartCount = 0; }
-  res.locals.cart = [];   // old admin templates read this
   // Search and link-preview defaults; pages fill in res.locals.seo with their own title, description and photo
   res.locals.siteUrl = siteUrl(req);
   res.locals.absolute = src => absolute(req, src);
   res.locals.productPath = productPath;
+  res.locals.trackingFor = trackingFor;
+  res.locals.carriers = CARRIERS;
   res.locals.seo = { canonical: siteUrl(req) + req.path, noindex: /^\/(cart|checkout|customer|auth|admin|search|success)/.test(req.path) };
   next();
 });

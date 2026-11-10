@@ -1,4 +1,9 @@
 <%- include('../partials/v2/head') %>
+<%
+  const day = d => d ? new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'America/Denver' }) : '';
+  const STEPS = [['paid', 'Ordered', 'createdAt'], ['printed', 'Made', 'printedAt'], ['shipped', 'Shipped', 'shippedAt']];
+  const NOW = { paid: 'We got your order and will start on it soon.', printed: 'Your shirts are made and getting packed.', shipped: 'On the way!' };
+%>
 <section class="page gut"><div class="narrow" style="display:grid;gap:20px">
   <div><div class="eyebrow">My account</div><h1 style="font-size:clamp(32px,5vw,48px)">Hi, <em><%= user.name ? user.name.split(' ')[0] : 'there' %></em></h1>
     <p class="muted"><%= user.email %> · <a href="/auth/logout">Sign out</a></p></div>
@@ -6,12 +11,23 @@
     <h2 style="font-size:26px">Your orders</h2>
     <% if (!orders.length) { %>
       <p class="muted">No orders yet. <a href="/shop">Find a shirt</a></p>
-    <% } else { orders.forEach(order => { %>
+    <% } else { orders.forEach(order => {
+         const status = order.status || 'paid';
+         const at = STEPS.findIndex(s => s[0] === status);
+         const track = trackingFor(order); %>
       <div class="order">
-        <div class="line" style="display:flex;justify-content:space-between;gap:12px"><b><%= order.createdAt.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) %></b><span class="tabnum">$<%= order.total.toFixed(2) %> · <%= order.status %></span></div>
+        <div class="line" style="display:flex;justify-content:space-between;gap:12px"><b><%= order.createdAt.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) %></b><span class="tabnum">$<%= order.total.toFixed(2) %></span></div>
+        <ol class="otrack" aria-label="Order progress">
+          <% STEPS.forEach(([key, label, field], i) => { %>
+            <li class="<%= i < at ? 'done' : i === at ? 'now' : '' %>"<%= i === at ? ' aria-current=step' : '' %>><span><%= label %></span><small><%= i <= at ? day(order[field]) : '' %></small></li>
+          <% }) %>
+        </ol>
+        <p class="otrack-msg"><%= NOW[status] || '' %>
+          <% if (track) { %> <a href="<%= track.url %>" target="_blank" rel="noopener">Track it with <%= track.carrier %> →</a><% } %></p>
         <% order.items.forEach(item => { %><span class="muted" style="font-size:14px"><%= item.quantity %> × <%= item.name %></span><% }) %>
       </div>
     <% }) } %>
   </div>
+  <p class="muted" style="font-size:14px">Questions about an order? <a href="/contact">Send us a note</a>.</p>
 </div></section>
 <%- include('../partials/v2/foot') %>

@@ -3,6 +3,9 @@
   const next = { paid: ['printed', 'Mark printed'], printed: ['shipped', 'Mark shipped'] }[o.status];
   const addr = o.shippingAddress || {};
   const when = new Date(o.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'America/Denver' });
+  const backTo = typeof back !== 'undefined' ? back : '';
+  const track = trackingFor(o);
+  const carrierPick = sel => `<select name="carrier" aria-label="Carrier"><option value="">Carrier: guess</option>${Object.entries(carriers).map(([k, c]) => `<option value="${k}"${sel === k ? ' selected' : ''}>${c.name}</option>`).join('')}</select>`;
 %>
 <article class="ad-order ad-st-<%= o.status %>">
   <div class="ad-order-top">
@@ -15,10 +18,33 @@
         <% if (l.custom) { %><span class="ad-custom">Custom: send a proof</span><% } %></span></li>
     <% }) %>
   </ul>
+  <% if (o.status === 'printed') { %>
+    <details class="ad-ship"><summary>Ship to</summary>
+      <address><%- [addr.name, addr.line1, addr.line2, [[addr.city, addr.state].filter(Boolean).join(', '), addr.postal_code].filter(Boolean).join(' '), addr.country && addr.country !== 'US' ? addr.country : ''].filter(Boolean).map(x => String(x).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c])).join('<br>') %></address></details>
+  <% } %>
+  <% if (o.status === 'shipped') { %>
+    <div class="ad-track">
+      <% if (track) { %><span>Tracking: <a href="<%= track.url %>" target="_blank" rel="noopener"><%= track.carrier %> <%= track.number %></a></span><% } else { %><span class="muted">No tracking number</span><% } %>
+      <details><summary><%= track ? 'Change' : 'Add one' %></summary>
+        <form action="/admin/orders/<%= o._id %>/tracking" method="POST" class="ad-track-form">
+          <input type="hidden" name="back" value="<%= backTo %>">
+          <input type="text" name="trackingNumber" value="<%= o.trackingNumber || '' %>" placeholder="Tracking number" aria-label="Tracking number" autocomplete="off">
+          <%- carrierPick(o.carrier) %>
+          <button class="btn ghost" type="submit">Save</button>
+        </form></details>
+    </div>
+  <% } %>
   <div class="ad-order-foot">
     <span class="tabnum">$<%= (o.total || 0).toFixed(2) %></span>
-    <% if (next) { %>
-      <form action="/admin/orders/<%= o._id %>/status" method="POST"><input type="hidden" name="status" value="<%= next[0] %>"><input type="hidden" name="back" value="<%= typeof back !== 'undefined' ? back : '' %>"><button class="btn" type="submit"><%= next[1] %></button></form>
+    <% if (next && next[0] === 'shipped') { %>
+      <form action="/admin/orders/<%= o._id %>/status" method="POST" class="ad-track-form">
+        <input type="hidden" name="status" value="shipped"><input type="hidden" name="back" value="<%= backTo %>">
+        <input type="text" name="trackingNumber" placeholder="Tracking number (optional)" aria-label="Tracking number" autocomplete="off">
+        <%- carrierPick('') %>
+        <button class="btn" type="submit">Mark shipped</button>
+      </form>
+    <% } else if (next) { %>
+      <form action="/admin/orders/<%= o._id %>/status" method="POST"><input type="hidden" name="status" value="<%= next[0] %>"><input type="hidden" name="back" value="<%= backTo %>"><button class="btn" type="submit"><%= next[1] %></button></form>
     <% } %>
   </div>
 </article>

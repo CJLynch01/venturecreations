@@ -22,7 +22,11 @@ const orderSchema = new mongoose.Schema({
     postal_code: String,
     country: String,
   },
-  status: { type: String, default: "paid" },
+  status: { type: String, default: "paid" },   // paid -> printed -> shipped
+  printedAt: Date,
+  shippedAt: Date,
+  carrier: String,          // usps, ups or fedex (lib/tracking.js)
+  trackingNumber: String,
   createdAt: { type: Date, default: Date.now },
 });
 
