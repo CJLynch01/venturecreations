@@ -8,6 +8,8 @@ import Order from "../models/Order.js";
 import Setting from "../models/Setting.js";
 import { dashboardData, splitItem, ORDER_STEPS } from "../lib/dashboard.js";
 import { photoUpload, savePhotos, uploadsEnabled } from "../lib/uploads.js";
+import { analyticsData } from "../lib/analytics.js";
+import { withSlugs, productPath } from "../lib/seo.js";
 import { CARRIERS, cleanTracking, guessCarrier } from "../lib/tracking.js";
 
 const router = express.Router();
@@ -66,6 +68,18 @@ router.get("/orders", ensureAdmin, async (req, res) => {
   } catch (err) {
     console.error("Orders page error:", err);
     res.status(500).send("Failed to load orders.");
+  }
+});
+
+// Analytics: visitors, shirts viewed, where people come from, cart and checkout
+router.get("/analytics", ensureAdmin, async (req, res) => {
+  try {
+    const days = [7, 30, 90].includes(Number(req.query.days)) ? Number(req.query.days) : 30;
+    const names = new Map(withSlugs(await Product.find({}, { name: 1, createdAt: 1 }).lean()).map(p => [productPath(p), p.name]));
+    res.render("admin/analytics", { title: "Analytics", a: await analyticsData(days, names) });
+  } catch (err) {
+    console.error("Analytics error:", err);
+    res.status(500).send("Couldn't load analytics.");
   }
 });
 

@@ -1,0 +1,131 @@
+<%- include('../partials/v2/head') %>
+<%
+  const t = a.totals;
+  const money = n => '$' + Number(n || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const num = n => Number(n || 0).toLocaleString('en-US');
+  // Change from the period before, as words and an arrow (never color alone)
+  const change = (now, before) => {
+    if (!before) return now ? 'new this period' : 'no change';
+    const p = Math.round(((now - before) / before) * 100);
+    return p === 0 ? 'same as before' : (p > 0 ? '▲ ' : '▼ ') + Math.abs(p) + '% vs. the ' + a.days + ' days before';
+  };
+  const short = d => new Date(d + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+
+  // Visitors per day: one series in her blue, rounded bar tops, a quiet axis
+  const S = a.series, W = 640, H = 220, L = 34, R = 6, T = 16, B = 26;
+  const max = Math.max(...S.map(d => d.visitors), 0);
+  const step = max <= 10 ? 2 : max <= 50 ? 10 : max <= 200 ? 50 : max <= 1000 ? 200 : 500;
+  const top = Math.max(step * 2, Math.ceil(max / step) * step);
+  const slot = (W - L - R) / S.length, bw = Math.max(2, Math.min(22, slot * 0.7));
+  const y = v => T + (H - T - B) * (1 - v / top);
+  const bar = (x, v) => { const yy = y(v), base = H - B, r = Math.min(3, (base - yy) / 2, bw / 2); return `M${x},${base} V${yy + r} Q${x},${yy} ${x + r},${yy} H${x + bw - r} Q${x + bw},${yy} ${x + bw},${yy + r} V${base} Z`; };
+  const every = S.length <= 7 ? 1 : S.length <= 30 ? 5 : 15;
+  const any = max > 0;
+  const listMax = list => Math.max(...list.map(x => x.visitors || x.views || x.n || 0), 1);
+%>
+<section class="page gut ad"><div class="in">
+  <div class="ad-head">
+    <div><a href="/admin" style="font-size:14px">← Dashboard</a><h1>Analytics</h1></div>
+    <nav class="chips" aria-label="Time range" style="margin:0">
+      <% [7, 30, 90].forEach(d => { %><a href="/admin/analytics?days=<%= d %>" aria-current="<%= a.days === d %>">Last <%= d %> days</a><% }) %>
+    </nav>
+  </div>
+
+  <div class="ad-tiles">
+    <div class="ad-tile"><span>Visitors</span><b class="tabnum"><%= num(t.visitors) %></b><small><%= change(t.visitors, t.prevVisitors) %></small></div>
+    <div class="ad-tile"><span>Pages viewed</span><b class="tabnum"><%= num(t.views) %></b><small><%= change(t.views, t.prevViews) %></small></div>
+    <div class="ad-tile"><span>Added to cart</span><b class="tabnum"><%= num(t.carts) %></b><small><%= change(t.carts, t.prevCarts) %></small></div>
+    <div class="ad-tile"><span>Orders</span><b class="tabnum"><%= num(t.orders) %></b><small><%= money(t.sales) %> in sales</small></div>
+    <div class="ad-tile"><span>Visitors who bought</span><b class="tabnum"><%= t.conversion %>%</b><small>orders ÷ visitors</small></div>
+  </div>
+
+  <div class="ad-grid">
+    <div class="ad-main">
+      <section class="ad-card">
+        <div class="ad-card-head"><h2>Visitors per day</h2><span class="muted">since <%= short(a.startDay) %></span></div>
+        <% if (!any) { %>
+          <p class="ad-empty">No visits counted yet. Counting starts once this update is live; check back tomorrow.</p>
+        <% } else { %>
+        <div class="ad-chart">
+          <svg viewBox="0 0 <%= W %> <%= H %>" role="img" aria-label="Visitors per day for the last <%= a.days %> days">
+            <% [0, top / 2, top].forEach(v => { %>
+              <line x1="<%= L %>" x2="<%= W - R %>" y1="<%= y(v) %>" y2="<%= y(v) %>" class="ad-grid-line<%= v === 0 ? ' ad-base' : '' %>"/>
+              <text x="<%= L - 6 %>" y="<%= y(v) + 4 %>" text-anchor="end" class="ad-axis"><%= Math.round(v) %></text>
+            <% }) %>
+            <% S.forEach((d, i) => { const x = L + i * slot + (slot - bw) / 2; %>
+              <g class="ad-bar">
+                <rect x="<%= L + i * slot %>" y="<%= T %>" width="<%= slot %>" height="<%= H - T - B %>" fill="transparent"/>
+                <% if (d.visitors > 0) { %><path d="<%= bar(x, d.visitors) %>" fill="#4a5ca3"/><% } %>
+                <% if ((S.length - 1 - i) % every === 0) { %><text x="<%= x + bw / 2 %>" y="<%= H - 8 %>" text-anchor="middle" class="ad-axis"><%= short(d.day) %></text><% } %>
+                <title><%= short(d.day) %>: <%= d.visitors %> visitor<%= d.visitors === 1 ? '' : 's' %>, <%= d.views %> page<%= d.views === 1 ? '' : 's' %> viewed</title>
+              </g>
+            <% }) %>
+          </svg>
+        </div>
+        <details class="chart"><summary>Show as a table</summary><div class="tablewrap"><table class="tabnum">
+          <tr><th>Day</th><th>Visitors</th><th>Pages viewed</th></tr>
+          <% S.slice().reverse().forEach(d => { %><tr><td><%= short(d.day) %></td><td><%= d.visitors %></td><td><%= d.views %></td></tr><% }) %>
+        </table></div></details>
+        <% } %>
+      </section>
+
+      <section class="ad-card">
+        <div class="ad-card-head"><h2>From visit to order</h2><span class="muted">unique visitors at each step</span></div>
+        <div class="an-funnel">
+          <% const f0 = a.funnel[0].n || 1; a.funnel.forEach((s, i) => { %>
+            <div class="an-step">
+              <span><%= s.label %></span>
+              <span class="an-track"><i style="width:<%= Math.max(s.n ? 1.5 : 0, (s.n / f0) * 100) %>%"></i></span>
+              <b class="tabnum"><%= num(s.n) %></b>
+              <small class="tabnum muted"><%= i === 0 ? '' : (a.funnel[i - 1].n ? Math.round((s.n / a.funnel[i - 1].n) * 100) + '% of the step before' : '') %></small>
+            </div>
+          <% }) %>
+        </div>
+      </section>
+
+      <section class="ad-card">
+        <div class="ad-card-head"><h2>Shirts people looked at</h2><span class="muted">visitors · views</span></div>
+        <% if (!a.shirts.length) { %><p class="ad-empty">Shows up once people start opening shirts.</p>
+        <% } else { const m = listMax(a.shirts); %><ul class="an-list">
+          <% a.shirts.forEach(s => { %><li><a href="<%= s.path %>" target="_blank" rel="noopener"><%= s.name %></a><span class="an-track"><i style="width:<%= (s.visitors / m) * 100 %>%"></i></span><b class="tabnum"><%= num(s.visitors) %></b><small class="tabnum muted"><%= num(s.views) %></small></li><% }) %>
+        </ul><% } %>
+      </section>
+
+      <section class="ad-card">
+        <div class="ad-card-head"><h2>Most visited pages</h2><span class="muted">visitors · views</span></div>
+        <% if (!a.pages.length) { %><p class="ad-empty">Nothing yet.</p>
+        <% } else { const m = listMax(a.pages); %><ul class="an-list">
+          <% a.pages.forEach(p => { %><li><a href="<%= p.path %>" target="_blank" rel="noopener"><%= p.label %></a><span class="an-track"><i style="width:<%= (p.visitors / m) * 100 %>%"></i></span><b class="tabnum"><%= num(p.visitors) %></b><small class="tabnum muted"><%= num(p.views) %></small></li><% }) %>
+        </ul><% } %>
+      </section>
+    </div>
+
+    <aside class="ad-side">
+      <section class="ad-card">
+        <div class="ad-card-head"><h2>Where visitors came from</h2></div>
+        <% if (!a.sources.length) { %><p class="ad-empty">Shows Google, Pinterest, Etsy, Facebook and other sites that send people here.</p>
+        <% } else { const m = listMax(a.sources); %><ul class="an-list an-compact">
+          <% a.sources.forEach(s => { %><li><span><%= s.label %></span><span class="an-track"><i style="width:<%= (s.visitors / m) * 100 %>%"></i></span><b class="tabnum"><%= num(s.visitors) %></b></li><% }) %>
+        </ul><% } %>
+        <p class="muted" style="font-size:13px;margin:0">"Direct" means they typed the address, used a bookmark or tapped a link in a text.</p>
+      </section>
+
+      <section class="ad-card">
+        <div class="ad-card-head"><h2>Phone or computer</h2></div>
+        <% if (!a.devices.length) { %><p class="ad-empty">Nothing yet.</p>
+        <% } else { const tot = a.devices.reduce((x, d) => x + d.visitors, 0) || 1; %><ul class="an-list an-compact">
+          <% a.devices.forEach(d => { %><li><span><%= d.label %></span><span class="an-track"><i style="width:<%= (d.visitors / tot) * 100 %>%"></i></span><b class="tabnum"><%= Math.round((d.visitors / tot) * 100) %>%</b></li><% }) %>
+        </ul><% } %>
+      </section>
+
+      <section class="ad-card">
+        <div class="ad-card-head"><h2>What people searched for</h2></div>
+        <% if (!a.searches.length) { %><p class="ad-empty">Searches in the shop's search box show up here, which tells you what people want.</p>
+        <% } else { %><ol class="ad-rank"><% a.searches.forEach(s => { %><li><span><%= s.label %></span><b class="tabnum"><%= s.n %></b></li><% }) %></ol><% } %>
+      </section>
+
+      <p class="muted" style="font-size:13px">Counted by the site itself: no cookies, no outside trackers, and IP addresses aren't saved. Your own visits while signed in as admin aren't counted.</p>
+    </aside>
+  </div>
+</div></section>
+<%- include('../partials/v2/foot') %>

@@ -633,3 +633,18 @@ footer.site .copy{grid-column:1/-1;border-top:1px solid var(--line);padding-top:
 .msg-card{display:grid;gap:6px}
 .msg-new{border-color:var(--mauve)}
 .msg-acts{max-width:360px}
+
+/* admin: analytics */
+.an-track{display:block;height:8px;background:#eef0f6;border-radius:4px;overflow:hidden;min-width:40px}
+.an-track i{display:block;height:100%;background:#4a5ca3;border-radius:4px}
+.an-funnel{display:grid;gap:12px}
+.an-step{display:grid;grid-template-columns:150px 1fr 56px;gap:4px 12px;align-items:center;font-size:14.5px}
+.an-step b{text-align:right}
+.an-step small{grid-column:2/4;font-size:12.5px;margin-top:-4px}
+.an-list{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.an-list li{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(60px,1fr) 44px 44px;gap:10px;align-items:center;font-size:14.5px}
+.an-list li>a,.an-list li>span:first-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--ink);text-decoration:none}
+.an-list li>a:hover{color:var(--brand);text-decoration:underline}
+.an-list b,.an-list small{text-align:right}
+.an-compact li{grid-template-columns:minmax(0,1fr) minmax(60px,1fr) 44px}
+@media (max-width:560px){.an-step{grid-template-columns:120px 1fr 44px}.an-list li{grid-template-columns:minmax(0,1.4fr) 50px 36px 36px}}

@@ -22,6 +22,7 @@ import * as SHOP from "./config/shop.js";
 import { cartCount, clearCart } from "./lib/cart.js";
 import { seasonMiddleware, seasonFirst } from "./config/seasons.js";
 import { trackingFor, CARRIERS } from "./lib/tracking.js";
+import { trackVisits } from "./lib/analytics.js";
 import { withSlugs, siteUrl, absolute, productPath, productSummary, productJsonLd, breadcrumbJsonLd, storeJsonLd } from "./lib/seo.js";
 
 // Routes
@@ -115,6 +116,9 @@ app.use(async (req, res, next) => {
   res.locals.seo = { canonical: siteUrl(req) + req.path, noindex: /^\/(cart|checkout|customer|auth|admin|search|success)/.test(req.path) };
   next();
 });
+
+// Count shopper visits for the admin Analytics page (no cookies; admins and bots skipped)
+app.use(trackVisits);
 
 // View Engine
 app.set("view engine", "ejs");
