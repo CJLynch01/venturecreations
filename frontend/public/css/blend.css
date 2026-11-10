@@ -400,3 +400,5 @@ footer.site .copy{grid-column:1/-1;border-top:1px solid var(--line);padding-top:
 .idea-row summary::-webkit-details-marker{display:none}
 .idea-row summary b{font-family:var(--display);font-weight:400;font-size:20px}
 .idea-row .idea-sn{grid-column:2;font-size:14px}
+.vc-snow{display:block;border-radius:50%;background:radial-gradient(circle,#ffffff 0 42%,rgba(255,255,255,.75) 58%,rgba(255,255,255,0) 72%);filter:drop-shadow(0 0 1.5px rgba(74,92,163,.45))}
+.vc-crystal{filter:drop-shadow(0 0 1.2px rgba(74,92,163,.6))}

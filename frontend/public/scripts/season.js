@@ -52,9 +52,10 @@ function makeFX(band, opts = {}) {
   }
 
   const leaf = col => `<svg width="${rand(15, 24) | 0}" height="${rand(15, 24) | 0}" viewBox="-6 -1 12 13"><path d="M0,0 C4,2 5,7 0,11 C-5,7 -4,2 0,0 Z" fill="${col}"/><path d="M0,1 V10" stroke="#00000033" stroke-width=".6"/></svg>`;
-  const flake = s => s > 8
-    ? `<svg width="${s}" height="${s}" viewBox="-6 -6 12 12"><g stroke="#9fb0e6" stroke-width="1.1" stroke-linecap="round"><path d="M0,-5 V5 M-4.3,-2.5 L4.3,2.5 M-4.3,2.5 L4.3,-2.5"/></g><circle r="1.4" fill="#fff"/></svg>`
-    : `<svg width="${s}" height="${s}" viewBox="0 0 10 10"><circle cx="5" cy="5" r="4.2" fill="#ffffff" stroke="#aeb9d8" stroke-width=".8"/></svg>`;
+  // Snow: mostly soft white dots (no outline), with a few six-point crystals
+  const flake = s => Math.random() < .25
+    ? `<svg class="vc-crystal" width="${s + 6}" height="${s + 6}" viewBox="-6 -6 12 12"><g stroke="#ffffff" stroke-width="1.3" stroke-linecap="round"><path d="M0,-5 V5 M-4.3,-2.5 L4.3,2.5 M-4.3,2.5 L4.3,-2.5 M0,-5 l-1.4,-1.2 M0,-5 l1.4,-1.2 M0,5 l-1.4,1.2 M0,5 l1.4,1.2"/></g></svg>`
+    : `<span class="vc-snow" style="width:${s}px;height:${s}px"></span>`;
   const heart = col => `<svg width="${rand(12, 20) | 0}" height="${rand(12, 20) | 0}" viewBox="3 4 22 21"><path d="M14,24 C4,17 3,11 6,8 C9,5 13,7 14,10 C15,7 19,5 22,8 C25,11 24,17 14,24 Z" fill="${col}"/></svg>`;
   const petal = col => `<svg width="${rand(10, 15) | 0}" height="${rand(10, 15) | 0}" viewBox="-5 -6 10 12"><ellipse rx="3.6" ry="5.4" fill="${col}"/></svg>`;
   const bat = `<svg width="46" height="22" viewBox="-23 -11 46 22"><g fill="${C.ink}" opacity=".78"><path class="vc-wing" d="M-3,0 C-8,-8 -16,-9 -22,-4 C-17,-3 -15,0 -14,3 C-11,1 -8,1 -6,4 Z"/><path class="vc-wing vc-wing-r" d="M3,0 C8,-8 16,-9 22,-4 C17,-3 15,0 14,3 C11,1 8,1 6,4 Z"/><ellipse rx="3.6" ry="4.4"/><path d="M-2.6,-3.4 L-3.6,-7 L-1,-4.4 Z M2.6,-3.4 L3.6,-7 L1,-4.4 Z"/></g></svg>`;
