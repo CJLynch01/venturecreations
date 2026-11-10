@@ -11,7 +11,10 @@ const TYPES = { "image/jpeg": "jpg", "image/png": "png", "image/webp": "webp", "
 // Read the keys when first needed (the .env file loads after this module on a local run)
 let client;
 function bucket() {
-  const { AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_REGION, S3_BUCKET_NAME } = process.env;
+  // Region and bucket default to the shop's own bucket, so only the two keys are required
+  const { AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY } = process.env;
+  const AWS_REGION = process.env.AWS_REGION || "us-east-2";
+  const S3_BUCKET_NAME = process.env.S3_BUCKET_NAME || "venturecreations-images";
   if (!(AWS_ACCESS_KEY_ID && AWS_SECRET_ACCESS_KEY && AWS_REGION && S3_BUCKET_NAME)) return null;
   client ||= new S3Client({ region: AWS_REGION, credentials: { accessKeyId: AWS_ACCESS_KEY_ID, secretAccessKey: AWS_SECRET_ACCESS_KEY } });
   return { client, name: S3_BUCKET_NAME, region: AWS_REGION };

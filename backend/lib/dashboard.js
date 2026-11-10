@@ -75,7 +75,7 @@ export async function dashboardData() {
     { key: "webhook", label: "Save paid orders automatically", ok: Boolean(process.env.STRIPE_WEBHOOK_SECRET),
       how: "In Render's Environment settings, add STRIPE_WEBHOOK_SECRET from Stripe (Developers, then Webhooks). Without it, paid orders don't show up here." },
     { key: "photos", label: "Upload shirt photos from the site", ok: uploadsEnabled(),
-      how: "In Render's Environment settings, add AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_REGION (us-east-2) and S3_BUCKET_NAME (venturecreations-images), the same ones the site's .env file has. Until then, paste photo links on the Add a shirt page." },
+      how: "In Render's Environment settings, add AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY, the same ones the site's .env file has (the names must match exactly). Until then, paste photo links on the Add a shirt page." },
     { key: "google", label: "Google sign-in", ok: googleEnabled, how: "Add GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET in Render." },
     { key: "searchConsole", label: "Tell Google about the site", ok: Boolean(done.searchConsole), manual: true,
       how: "In Google Search Console (signed in to the shop's Gmail), add venturecreations.net and submit venturecreations.net/sitemap.xml." },
