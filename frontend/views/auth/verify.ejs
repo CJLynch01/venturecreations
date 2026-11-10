@@ -1,0 +1,18 @@
+<%- include('../partials/v2/head') %>
+<section class="page gut"><div class="narrow" style="max-width:480px;display:grid;gap:18px;text-align:center">
+  <% if (token) { %>
+    <div class="eyebrow">Almost there</div>
+    <h1 style="font-size:clamp(30px,5vw,44px)">Finish <em>signing in</em></h1>
+    <p class="muted">Signing in as <b><%= email %></b></p>
+    <form action="/auth/email/verify" method="POST">
+      <input type="hidden" name="token" value="<%= token %>">
+      <button class="btn block" type="submit">Sign in</button>
+    </form>
+  <% } else { %>
+    <div class="eyebrow">Sign-in link</div>
+    <h1 style="font-size:clamp(30px,5vw,44px)">That link <em>has expired</em></h1>
+    <p class="muted">Sign-in links work once and last 15 minutes. Ask for a new one and it'll be in your email in a moment.</p>
+    <a class="btn" href="/auth/register">Get a new link</a>
+  <% } %>
+</div></section>
+<%- include('../partials/v2/foot') %>

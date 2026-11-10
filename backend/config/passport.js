@@ -26,6 +26,13 @@ if (googleEnabled) passport.use(
     try {
       let user = await User.findOne({ googleId: profile.id });
 
+      // Someone who first signed in with an email link: same account, now linked to Google too
+      if (!user) {
+        const email = String(profile.emails[0].value || "");
+        user = await User.findOne({ email: { $regex: `^${email.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}$`, $options: "i" } });
+        if (user) { user.googleId = profile.id; await user.save(); }
+      }
+
       if (!user) {
         const adminEmails = process.env.ADMIN_EMAILS?.split(",").map(e => e.trim()) ?? [];
         const isAdmin = adminEmails.includes(profile.emails[0].value);

@@ -1,9 +1,44 @@
 <%- include('../partials/v2/head') %>
-<section class="page gut"><div class="narrow" style="max-width:520px;display:grid;gap:18px;text-align:center">
-  <div class="eyebrow">Your account</div>
-  <h1 style="font-size:clamp(32px,5vw,48px)">Sign in to see <em>your orders</em></h1>
-  <p class="muted">You don't need an account to shop. Signing in keeps your cart on every device and shows your order history. We use Google, so there's no password to remember.</p>
-  <% if (typeof query !== 'undefined' && query.off) { %><p class="ok">Sign-in is turned off on the test site.</p><% } %>
-  <a class="btn" href="/auth/google">Continue with Google</a>
+<%
+  const q = typeof query !== 'undefined' && query || {};
+  const errors = {
+    email: "That doesn't look like an email address. Check it and try again.",
+    send: "We couldn't send the email just now. Please try again in a minute.",
+    slow: "Too many tries. Please wait a few minutes and try again.",
+    nomail: "Email sign-in isn't set up yet. Please use Google for now.",
+  };
+%>
+<section class="page gut"><div class="narrow" style="max-width:480px;display:grid;gap:18px;text-align:center">
+  <% if (q.sent) { %>
+    <div class="eyebrow">Check your email</div>
+    <h1 style="font-size:clamp(30px,5vw,44px)">We sent you <em>a sign-in link</em></h1>
+    <p class="muted">If <b><%= email %></b> is right, a link is on its way. Tap it within 15 minutes to sign in. Check your spam folder if you don't see it.</p>
+    <% if (typeof testLink !== 'undefined' && testLink) { %>
+      <p class="ok" style="text-align:left">Test site: no email is sent. <a href="<%= testLink %>">Use the sign-in link</a></p>
+    <% } %>
+    <a href="/auth/register" class="muted" style="font-size:14px">Use a different email</a>
+  <% } else { %>
+    <div class="eyebrow">Your account</div>
+    <h1 style="font-size:clamp(30px,5vw,44px)">Sign in to see <em>your orders</em></h1>
+    <p class="muted">You don't need an account to shop. Signing in keeps your cart on every device and shows your order history.</p>
+    <% if (q.off) { %><p class="ok">Google sign-in is turned off on the test site.</p><% } %>
+    <% if (q.err && errors[q.err]) { %><p class="msg" role="alert"><%= errors[q.err] %></p><% } %>
+
+    <% if (typeof emailEnabled === 'undefined' || emailEnabled) { %>
+      <form action="/auth/email" method="POST" class="form card" style="text-align:left">
+        <div class="field"><label for="email">Email</label>
+          <input type="email" id="email" name="email" value="<%= typeof email !== 'undefined' && email || '' %>" autocomplete="email" required placeholder="you@example.com"></div>
+        <button class="btn block" type="submit">Email me a sign-in link</button>
+        <span class="muted" style="font-size:13px">No password needed. We'll email you a link that signs you in.</span>
+      </form>
+    <% } %>
+
+    <% if (typeof googleEnabled === 'undefined' || googleEnabled) { %>
+      <div class="or"><span>or</span></div>
+      <a class="btn ghost block" href="/auth/google">
+        <svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9.1 3.6l6.8-6.8C35.8 2.4 30.3 0 24 0 14.6 0 6.6 5.4 2.7 13.3l7.9 6.1C12.5 13.6 17.8 9.5 24 9.5z"/><path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.7c-.5 2.9-2.2 5.4-4.7 7.1l7.6 5.9c4.4-4.1 6.9-10.1 6.9-17.5z"/><path fill="#FBBC05" d="M10.6 28.6c-.5-1.4-.8-3-.8-4.6s.3-3.2.8-4.6l-7.9-6.1C1 16.6 0 20.2 0 24s1 7.4 2.7 10.7l7.9-6.1z"/><path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.6-5.9c-2.1 1.4-4.9 2.3-8.3 2.3-6.2 0-11.5-4.1-13.4-9.9l-7.9 6.1C6.6 42.6 14.6 48 24 48z"/></svg>
+        Continue with Google</a>
+    <% } %>
+  <% } %>
 </div></section>
 <%- include('../partials/v2/foot') %>

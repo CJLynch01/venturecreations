@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema({
-  googleId: { type: String, required: true },
+  googleId: { type: String },   // empty for people who sign in with an email link
   name: String,
   email: { type: String, required: true, unique: true },
   role: { type: String, enum: ["Admin", "Customer"], default: "Customer" },

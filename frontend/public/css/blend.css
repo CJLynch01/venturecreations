@@ -450,3 +450,6 @@ footer.site .copy{grid-column:1/-1;border-top:1px solid var(--line);padding-top:
   .vc-jack .jack-glow{animation:none}
   .season.animate .icon-pumpkin{animation:none}
 }
+/* sign-in page: "or" divider between email and Google */
+.or{display:flex;align-items:center;gap:12px;color:var(--muted);font-size:13px;text-transform:uppercase;letter-spacing:.14em}
+.or::before,.or::after{content:"";flex:1;height:1px;background:var(--line)}
