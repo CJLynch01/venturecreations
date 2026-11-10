@@ -47,6 +47,8 @@ router.post("/add", async (req, res) => {
     const { productId, size, color, quantity } = req.body;
     // Personalized shirts carry the customer's text (stored like a mission name)
     const product = await Product.findById(productId).catch(() => null);
+    // Custom mission shirts need their details, so they only go in the cart from the mission page
+    if (product && missionStyleOf(product)) throw Object.assign(new Error("Add the mission details on the mission shirt page first."), { status: 400 });
     let custom = null;
     if (product && isPersonalized(product)) {
       custom = cleanCustom({ mission: req.body.personal });

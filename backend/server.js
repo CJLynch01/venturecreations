@@ -34,6 +34,25 @@ import rateLimit from "express-rate-limit";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+const PRODUCTION = process.env.NODE_ENV === "production";
+
+// Render sits in front of the app: trust its proxy so each shopper's real IP is used for
+// rate limits (otherwise every visitor shares one limit) and secure cookies work over https
+app.set("trust proxy", 1);
+app.disable("x-powered-by");
+
+// Basic browser security headers
+app.use((req, res, next) => {
+  res.set({
+    "X-Content-Type-Options": "nosniff",
+    "X-Frame-Options": "SAMEORIGIN",
+    "Referrer-Policy": "strict-origin-when-cross-origin",
+    "Permissions-Policy": "camera=(), microphone=(), geolocation=(), payment=()",
+    "Cross-Origin-Opener-Policy": "same-origin-allow-popups",
+  });
+  if (PRODUCTION) res.set("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
+  next();
+});
 // The test site shows a banner and has checkout turned off
 const TEST_SITE = process.env.TEST_SITE === "1";
 
@@ -61,6 +80,9 @@ app.use(
     }),
     cookie: {
       maxAge: 1000 * 60 * 60 * 24 * 14,   // two weeks, so a guest's cart is still there when they come back
+      httpOnly: true,                      // page scripts can't read the login cookie
+      sameSite: "lax",                     // other sites can't post forms (cart, admin) with it
+      secure: PRODUCTION,                  // https only on the live site
     },
   })
 );
