@@ -47,8 +47,8 @@ router.post("/add", async (req, res) => {
     const { productId, size, color, quantity } = req.body;
     // Personalized shirts carry the customer's text (stored like a mission name)
     const product = await Product.findById(productId).catch(() => null);
-    // Custom mission shirts need their details, so they only go in the cart from the mission page
-    if (product && missionStyleOf(product)) throw Object.assign(new Error("Add the mission details on the mission shirt page first."), { status: 400 });
+    // Custom shirts need their details, so they only go in the cart from the custom shirts page
+    if (product && missionStyleOf(product)) throw Object.assign(new Error("Add your details on the Custom shirts page first."), { status: 400 });
     let custom = null;
     if (product && isPersonalized(product)) {
       custom = cleanCustom({ mission: req.body.personal });
@@ -64,10 +64,10 @@ router.post("/custom", async (req, res) => {
   try {
     const product = await Product.findById(req.body.productId).catch(() => null);
     const style = missionStyleOf(product);
-    if (!style) throw Object.assign(new Error("Custom mission shirts aren't available right now."), { status: 404 });
+    if (!style) throw Object.assign(new Error("Custom shirts aren't available right now."), { status: 404 });
     const custom = cleanCustom(style.things ? req.body : { mission: req.body.mission, place: req.body.place });
-    if (!custom) throw Object.assign(new Error("Type the mission name first."), { status: 400 });
-    if (!custom.place) throw Object.assign(new Error(style.things ? "Type the state or country." : "Type the country for the flag."), { status: 400 });
+    if (!custom) throw Object.assign(new Error(style.needName), { status: 400 });
+    if (!custom.place) throw Object.assign(new Error(style.needPlace), { status: 400 });
     await addItem(req, { productId: product._id, size: req.body.size, color: req.body.color, quantity: req.body.quantity, custom });
     await reply(req, res, `Added your ${custom.mission} shirt`);
   } catch (err) { fail(req, res, err); }
@@ -80,7 +80,7 @@ router.post("/group", async (req, res) => {
     const productId = req.body.productId;
     const style = missionStyleOf(await Product.findById(productId).catch(() => null));
     const custom = style ? cleanCustom(style.things ? req.body : { mission: req.body.mission, place: req.body.place }) : null;
-    if (style && !custom) throw Object.assign(new Error("Type the mission name first."), { status: 400 });
+    if (style && !custom) throw Object.assign(new Error(style.needName), { status: 400 });
     let added = 0;
     for (const [size, q] of Object.entries(sizes)) {
       const quantity = parseInt(q) || 0;

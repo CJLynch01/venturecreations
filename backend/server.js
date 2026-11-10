@@ -187,7 +187,7 @@ app.get("/shop/:key", async (req, res) => {
     if (!product) return res.status(404).render("404");
     // The custom mission shirts have their own page
     const style = SHOP.missionStyleOf(product);
-    if (style) return res.redirect(301, style.id === "original" ? "/mission" : `/mission?style=${style.id}`);
+    if (style) return res.redirect(301, style.id === "original" ? "/custom" : `/custom?style=${style.id}`);
     if (key !== product.slug) return res.redirect(301, productPath(product));
     const related = products.filter(p => String(p._id) !== String(product._id) && SHOP.collectionsFor(product).some(c => p.collections.includes(c))).slice(0, 4);
     const coll = SHOP.COLLECTIONS.find(c => SHOP.collectionsFor(product).includes(c.id));
@@ -203,23 +203,26 @@ app.get("/shop/:key", async (req, res) => {
   }
 });
 
-app.get("/mission", async (req, res) => {
+// Custom shirts (mission styles and the custom temple). /custom is the menu link; /mission keeps old links working.
+app.get(["/mission", "/custom"], async (req, res) => {
   const products = await allProducts();
   // Every custom mission style that has a product in the shop
   const styles = SHOP.MISSION_STYLES.map(s => ({ ...s, product: products.find(p => s.match.test(p.name)) })).filter(s => s.product);
   if (!styles.length) return res.status(404).render("404");
   const active = styles.find(s => s.id === req.query.style) || styles[0];
-  const canonical = siteUrl(req) + "/mission" + (active.id === styles[0].id ? "" : `?style=${active.id}`);
+  const canonical = siteUrl(req) + "/custom" + (active.id === styles[0].id ? "" : `?style=${active.id}`);
   const ld = productJsonLd(req, active.product);
   ld.offers.url = canonical;
   Object.assign(res.locals.seo, {
     canonical,
-    description: active.things
+    description: active.id === "temple"
+      ? "Custom LDS temple shirts: any temple, hand-drawn on a black tee, solid or outline, made to order."
+      : active.things
       ? "Custom missionary shirts: your mission's state or country in the middle, four things that describe the mission, and the mission name, hand-drawn and made to order."
       : "Custom missionary flag shirts with the flag of the country where they serve and the mission name, made to order.",
     image: active.product.images?.[0], type: "product", price: active.product.price, jsonld: [ld],
   });
-  res.render("mission", { title: active.things ? "Custom missionary shirts" : "Custom missionary flag shirts", styles, active, page: "mission" });
+  res.render("mission", { title: active.id === "temple" ? "Custom LDS temple shirts" : active.things ? "Custom missionary shirts" : "Custom missionary flag shirts", styles, active, page: "mission" });
 });
 
 app.get("/groups", async (req, res) => {
@@ -266,9 +269,9 @@ app.get("/sitemap.xml", async (req, res) => {
   const posts = await BlogPost.find({}, { slug: 1, updatedAt: 1, createdAt: 1 }).catch(() => []);
   const day = d => new Date(d || Date.now()).toISOString().slice(0, 10);
   const urls = [
-    { loc: "/", pri: "1.0" }, { loc: "/shop", pri: "0.9" }, { loc: "/mission", pri: "0.9" }, { loc: "/groups", pri: "0.7" },
+    { loc: "/", pri: "1.0" }, { loc: "/shop", pri: "0.9" }, { loc: "/custom", pri: "0.9" }, { loc: "/groups", pri: "0.7" },
     { loc: "/blog", pri: "0.5" }, { loc: "/contact", pri: "0.4" },
-    ...SHOP.MISSION_STYLES.slice(1).filter(s => products.some(p => s.match.test(p.name))).map(s => ({ loc: `/mission?style=${s.id}`, pri: "0.8" })),
+    ...SHOP.MISSION_STYLES.slice(1).filter(s => products.some(p => s.match.test(p.name))).map(s => ({ loc: `/custom?style=${s.id}`, pri: "0.8" })),
     ...SHOP.COLLECTIONS.filter(c => products.some(p => p.collections.includes(c.id))).map(c => ({ loc: `/shop?c=${c.id}`, pri: "0.7" })),
     ...products.filter(p => !SHOP.missionStyleOf(p)).map(p => ({ loc: productPath(p), pri: "0.8", mod: day(p.updatedAt || p.createdAt) })),
     ...posts.filter(p => p.slug).map(p => ({ loc: `/blog/${p.slug}`, pri: "0.5", mod: day(p.updatedAt || p.createdAt) })),

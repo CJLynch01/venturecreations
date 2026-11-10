@@ -3,15 +3,15 @@
 <div class="gut"><div class="in builder one">
   <form class="ctl" action="/cart/custom" method="POST" id="missionForm" data-cart-form>
     <div>
-      <div class="eyebrow">Custom mission shirts</div>
-      <h1>Every mission, <em>made to order</em></h1>
+      <div class="eyebrow">Custom shirts</div>
+      <h1><% if (active.mission) { %>Every mission, <em>made to order</em><% } else { %>Your temple, <em>made to order</em><% } %></h1>
     </div>
 
     <% if (styles.length > 1) { %>
       <div class="field"><span class="lbl">Choose a style</span>
         <div class="styles">
           <% styles.forEach(s => { %>
-            <a class="style" href="/mission?style=<%= s.id %>" aria-current="<%= s.id === active.id %>">
+            <a class="style" href="/custom?style=<%= s.id %>" aria-current="<%= s.id === active.id %>">
               <img src="<%= s.product.images[0] %>" alt="" loading="lazy">
               <span><b><%= s.name %></b><span class="muted">$<%= s.product.price.toFixed(2) %></span></span>
             </a>
@@ -22,11 +22,11 @@
     <p class="lead" style="margin:0"><%= active.blurb %></p>
     <input type="hidden" name="productId" value="<%= product._id %>">
 
-    <div class="field"><label for="mName">Mission name</label>
-      <input type="text" id="mName" name="mission" placeholder="<%= active.things ? 'Mesa, Arizona Mission' : 'England London Mission' %>" maxlength="40" autocomplete="off" required></div>
+    <div class="field"><label for="mName"><%= active.nameLabel %></label>
+      <input type="text" id="mName" name="mission" placeholder="<%= active.namePh %>" maxlength="40" autocomplete="off" required></div>
 
-    <div class="field"><label for="mPlace"><%= active.things ? 'State or country (goes in the middle)' : 'Country (for the flag)' %></label>
-      <input type="text" id="mPlace" name="place" placeholder="<%= active.things ? 'Arizona' : 'England' %>" maxlength="40" autocomplete="off" required></div>
+    <div class="field"><label for="mPlace"><%= active.placeLabel %></label>
+      <input type="text" id="mPlace" name="place" placeholder="<%= active.placePh %>" maxlength="40" autocomplete="off" required></div>
 
     <% if (active.things) { %>
       <div class="field"><span class="lbl">Four things that describe the mission</span>
@@ -50,13 +50,13 @@
     <div class="msg" id="buyMsg" role="alert"></div>
     <div class="buyrow"><span class="price tabnum">$<%= product.price.toFixed(2) %></span>
       <button class="btn" type="submit">Add to cart</button><a class="btn ghost" href="/groups?style=<%= active.id %>">Order for a group</a></div>
-    <p class="muted" style="font-size:14px;margin:0">Every mission is drawn by hand. Elisha emails you a proof of your design before anything is printed.</p>
+    <p class="muted" style="font-size:14px;margin:0">Every design is drawn by hand. Elisha emails you a proof before anything is printed.</p>
   </form>
 </div></div>
 
 <section class="blk gut" style="padding-top:0"><div class="in">
-  <div class="head"><div><div class="eyebrow">Examples · <%= active.name %></div><h2>From our press <em>to the mission field</em></h2>
-    <p class="muted" style="margin:6px 0 0;max-width:60ch">Real shirts for real missionaries and the families cheering them on.</p></div></div>
+  <div class="head"><div><div class="eyebrow">Examples · <%= active.name %></div><h2><% if (active.mission) { %>From our press <em>to the mission field</em><% } else { %>Temples <em>she's drawn</em><% } %></h2>
+    <% if (active.mission) { %><p class="muted" style="margin:6px 0 0;max-width:60ch">Real shirts for real missionaries and the families cheering them on.</p><% } %></div></div>
   <div class="realgrid"><% product.images.forEach((src, i) => { %><button type="button" data-zoom="<%= i %>" aria-label="See example <%= i + 1 %> up close"><img src="<%= src %>" alt="A finished <%= active.name %> shirt" loading="lazy"></button><% }) %></div>
   <p class="muted" style="font-size:14px;margin:12px 0 0">Tap a shirt to see it up close.</p>
 </div></section>

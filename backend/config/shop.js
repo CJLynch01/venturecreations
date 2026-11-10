@@ -16,6 +16,8 @@ export const COLLECTIONS = [
     blurb: "Día de los Muertos shirts: colorful sugar skulls, marigolds and dancing skeletons." },
   { id: "halloween-fall", name: "Halloween & fall", match: /halloween|fall|autumn|witch/i,
     blurb: "Halloween and fall shirts: witches, ghosts, pumpkins and botanical skeletons." },
+  { id: "wedding", name: "Wedding", match: /wedding|bride|bridal|matron/i,
+    blurb: "Bride, bridal party and bachelorette shirts." },
   { id: "fun", name: "Just for fun", match: null,
     blurb: "Funny shirts and gifts, from Bigfoot to calling in sick." },
 ];
@@ -33,6 +35,8 @@ const COLOR_HEX = {
   "light heather gray": "#c9cacd", "atlantic green": "#3d6c68", "olive green": "#6b6b3e", "olive": "#6b6b3e",
   "red": "#b3262e", "maroon": "#6b1f2b", "marron": "#6b1f2b", "charity pink": "#f2a7c3", "pink": "#f2a7c3",
   "autumn": "#b5652c", "forest green": "#2f4d36", "heather gray": "#9a9ca1", "sand": "#d9c7a7",
+  "gold": "#e0a526", "light blue": "#a9bde0", "kelly green": "#2e9e5b", "purple": "#7b5fb4", "natural": "#ece4d4",
+  "heather peach": "#f2b08e", "orange": "#ec7a2c",
 };
 export const colorHex = name => COLOR_HEX[String(name || "").trim().toLowerCase()] || "#9a9ca1";
 export const isDarkColor = name => {
@@ -65,11 +69,21 @@ export const TAX_ESTIMATE = 0.0725;      // shown as an estimate only; Stripe ca
 // Custom mission shirts, ordered on /mission. Each style is the product whose name matches.
 //   original: state or country in the middle, four things around it, mission name underneath
 //   flag:     the country's flag with the mission name
+//   temple:   a hand-drawn temple; the customer names the temple and the style
+// Each style says what its two text boxes ask for and how the order labels the second one.
 export const MISSION_STYLES = [
-  { id: "original", name: "The Original", match: /custom missionary shirt/i, things: true,
-    blurb: "Your state or country in the middle with a heart on the mission, two things on each side, and the mission name underneath." },
-  { id: "flag", name: "Missionary Flag", match: /missionary flag/i, things: false,
-    blurb: "The flag of the country where they serve, with the mission name." },
+  { id: "original", name: "The Original", match: /custom missionary shirt/i, things: true, mission: true,
+    blurb: "Your state or country in the middle with a heart on the mission, two things on each side, and the mission name underneath.",
+    nameLabel: "Mission name", namePh: "Mesa, Arizona Mission", placeLabel: "State or country (goes in the middle)", placePh: "Arizona", placeTag: "center",
+    needName: "Type the mission name first.", needPlace: "Type the state or country." },
+  { id: "flag", name: "Missionary Flag", match: /missionary flag/i, things: false, mission: true,
+    blurb: "The flag of the country where they serve, with the mission name.",
+    nameLabel: "Mission name", namePh: "England London Mission", placeLabel: "Country (for the flag)", placePh: "England", placeTag: "flag",
+    needName: "Type the mission name first.", needPlace: "Type the country for the flag." },
+  { id: "temple", name: "Custom LDS Temple", match: /custom lds temple/i, things: false, mission: false,
+    blurb: "Any temple, drawn by hand on a black tee. Pick the temple and whether you'd like it solid or in outline.",
+    nameLabel: "Temple", namePh: "Salt Lake Temple", placeLabel: "Style", placePh: "Solid or outline", placeTag: "style",
+    needName: "Type the temple you'd like.", needPlace: "Type solid or outline." },
 ];
 export const missionStyleOf = p => MISSION_STYLES.find(s => s.match.test(p?.name || "")) || null;
 export const MISSION_MATCH = MISSION_STYLES[0].match;   // The Original

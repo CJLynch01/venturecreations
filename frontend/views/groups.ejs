@@ -1,7 +1,7 @@
 <%- include('partials/v2/head') %>
 <%
   const tiers = [{ min: 1, off: 0 }, ...[...shop.BULK_TIERS].reverse()];
-  const designs = products.map(p => ({ id: String(p._id), name: p.name, price: p.price, colors: (p.colors || []).map(c => ({ n: c, h: shop.colorHex(c) })), sizes: p.sizes || [], image: p.images[0], style: shop.missionStyleOf(p) ? { id: shop.missionStyleOf(p).id, things: shop.missionStyleOf(p).things } : null }));
+  const designs = products.map(p => ({ id: String(p._id), name: p.name, price: p.price, colors: (p.colors || []).map(c => ({ n: c, h: shop.colorHex(c) })), sizes: p.sizes || [], image: p.images[0], style: shop.missionStyleOf(p) ? (({ id, things, nameLabel, namePh, placeLabel, placePh }) => ({ id, things, nameLabel, namePh, placeLabel, placePh }))(shop.missionStyleOf(p)) : null }));
 %>
 <section class="blk gut group"><div class="in">
   <form action="/cart/group" method="POST" id="groupForm" data-cart-form style="display:grid;gap:20px">
@@ -13,7 +13,7 @@
     <div class="field"><label for="gDesign">Design</label>
       <select id="gDesign" name="productId"><% designs.forEach(d => { %><option value="<%= d.id %>" <%= d.style && d.style.id === reqStyle ? 'selected' : '' %>><%= d.name %> · $<%= d.price.toFixed(2) %></option><% }) %></select></div>
     <div class="gmission" id="gMission" hidden>
-      <div class="field"><label for="gMissionName">Mission name for every shirt</label><input type="text" id="gMissionName" name="mission" maxlength="40" placeholder="Mesa, Arizona Mission"></div>
+      <div class="field"><label for="gMissionName" id="gNameLbl">Mission name for every shirt</label><input type="text" id="gMissionName" name="mission" maxlength="40" placeholder="Mesa, Arizona Mission"></div>
       <div class="field"><label for="gPlace" id="gPlaceLbl">State or country (the middle)</label><input type="text" id="gPlace" name="place" maxlength="40" placeholder="Arizona"></div>
       <div class="field" id="gThings"><span class="lbl">Four things that describe the mission</span>
         <div class="things"><% [0, 1, 2, 3].forEach(i => { %><label class="thing"><span><%= i + 1 %></span><input type="text" name="things[<%= i %>]" value="" placeholder="Thing <%= i + 1 %>" maxlength="30" autocomplete="off" aria-label="Thing <%= i + 1 %>"></label><% }) %></div></div>

@@ -5,7 +5,7 @@
     <div class="eyebrow"><% if (season && season.effects) { %><%= season.name %> · <% } %>Custom shirts · made to order</div>
     <h1>Shirts for <em>every venture</em></h1>
     <p class="lead">Faith, family, missions, hard days and happy ones. Soft tees with designs that say something, and every one can be made yours.</p>
-    <div class="row"><a class="btn" href="/shop">Shop the collection</a><a class="btn ghost" href="/mission">Make one custom</a></div>
+    <div class="row"><a class="btn" href="/shop">Shop the collection</a><a class="btn ghost" href="/custom">Make one custom</a></div>
   </div>
   <div class="collage">
     <% hero.forEach(p => { %><a href="<%= productPath(p) %>"><img src="<%= p.images[0] %>" alt="<%= p.name %> t-shirt"></a><% }) %>
@@ -44,7 +44,7 @@
 
 <section class="blk gut" style="padding-top:0"><div class="in">
   <div class="make">
-    <a class="mk" href="/mission"><% if (mission && mission.images[0]) { %><img src="<%= mission.images[0] %>" alt="" loading="lazy"><% } %>
+    <a class="mk" href="/custom"><% if (mission && mission.images[0]) { %><img src="<%= mission.images[0] %>" alt="" loading="lazy"><% } %>
       <span><span class="eyebrow">Custom mission shirts</span><b>Any mission, any color</b><span class="d">Your state or country in the middle and four things that describe the mission, drawn by hand.</span><span class="go">Design yours →</span></span></a>
     <a class="mk dark" href="/groups"><span class="big tabnum">-<%= Math.round(shop.BULK_TIERS[0].off * 100) %>%</span>
       <span><span class="eyebrow">Group orders</span><b>Youth groups, treks, reunions</b><span class="d">The price drops at <%= [...shop.BULK_TIERS].reverse().map(t => t.min).join(', ') %> shirts. See your total before you order.</span><span class="go">Price your group →</span></span></a>

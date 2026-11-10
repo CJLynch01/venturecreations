@@ -49,7 +49,7 @@
   </a>
   <nav class="main" id="mainNav" aria-label="Main">
     <a href="/shop" <%- path.startsWith('/shop') ? 'aria-current="page"' : '' %>>Shop</a>
-    <a href="/mission" <%- path === '/mission' ? 'aria-current="page"' : '' %>>Mission shirts</a>
+    <a href="/custom" <%- path === '/mission' || path === '/custom' ? 'aria-current="page"' : '' %>>Custom shirts</a>
     <a href="/groups" <%- path === '/groups' ? 'aria-current="page"' : '' %>>Group orders</a>
     <a href="/blog" <%- path.startsWith('/blog') ? 'aria-current="page"' : '' %>>Blog</a>
     <a href="/contact" <%- path === '/contact' ? 'aria-current="page"' : '' %>>Contact</a>

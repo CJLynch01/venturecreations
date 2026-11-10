@@ -14,10 +14,15 @@
     $('#gColors').innerHTML = d.colors.map((c, i) => `<button type="button" class="sw" style="background:${esc(c.h)}" aria-label="${esc(c.n)}" aria-pressed="${i === 0}" data-v="${esc(c.n)}"></button>`).join('');
     $('#colorIn').value = d.colors[0]?.n || ''; $('#colorName').textContent = d.colors[0]?.n || '';
     $('#qty').innerHTML = d.sizes.map(s => `<label for="q${esc(s)}">${esc(s)}<input id="q${esc(s)}" type="number" min="0" max="500" inputmode="numeric" name="sizes[${esc(s)}]" value="${qty[s] || 0}" data-s="${esc(s)}"></label>`).join('');
-    // Custom mission shirts get the mission details for the whole group (the flag style has no four things)
+    // Custom shirts get their details for the whole group (only The Original has the four things)
     $('#gMission').hidden = !d.style;
     $('#gThings').hidden = !(d.style && d.style.things);
-    $('#gPlaceLbl').textContent = d.style && !d.style.things ? 'Country (for the flag)' : 'State or country (the middle)';
+    if (d.style) {
+      $('#gNameLbl').textContent = d.style.nameLabel + ' for every shirt';
+      $('#gPlaceLbl').textContent = d.style.placeLabel;
+      $('#gMissionName').placeholder = d.style.namePh;
+      $('#gPlace').placeholder = d.style.placePh;
+    }
     $('#gMission').querySelectorAll('input').forEach(i => i.disabled = !d.style || (i.name.startsWith('things') && !d.style.things));
     calc();
   }

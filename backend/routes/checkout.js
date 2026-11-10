@@ -10,7 +10,7 @@ function lineName(l) {
   const bits = [l.size, l.color].filter(Boolean);
   if (l.custom) {
     bits.push(`"${l.custom.mission}"`);
-    if (l.custom.place) bits.push(`${missionStyleOf(l.product)?.things === false ? 'flag' : 'center'}: ${l.custom.place}`);
+    if (l.custom.place) bits.push(`${missionStyleOf(l.product)?.placeTag || 'center'}: ${l.custom.place}`);
     if (l.custom.things.length) bits.push(`things: ${l.custom.things.join(', ')}`);
   }
   return `${l.product.name}${bits.length ? ' — ' + bits.join(' · ') : ''}`.slice(0, 250);
