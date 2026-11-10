@@ -410,3 +410,4 @@ footer.site .copy{grid-column:1/-1;border-top:1px solid var(--line);padding-top:
 .vc-crystal{filter:drop-shadow(0 0 1.2px rgba(74,92,163,.6))}
 /* pinned band stays compact on phones */
 @media (max-width:600px){.season-line{gap:4px 10px;padding-block:0 6px}.season-line span{font-size:15px}.season-icon{width:28px;height:28px}.season .garland{height:22px}}
+.vc-bloom{animation:vc-spin 7s linear infinite}
