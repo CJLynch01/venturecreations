@@ -1,50 +1,17 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Shop | Venture Creations</title>
-    <link rel="stylesheet" href="/css/styles.css">
-    <script src="/scripts/home.js" defer></script>
-
-</head>
-<body>
-    <%- include("../partials/header2") %>
-
-    <section class="dashboard">
-        <div class="container">
-            <h2>Welcome, <%= user.name %>!</h2>
-            <p>This is your personal customer dashboard.</p>
-
-            <div class="info-box">
-                <p><strong>Email:</strong> <%= user.email %></p>
-                <p><strong>Account Type:</strong> <%= user.role %></p>
-            </div>
-
-            <a href="/shop" class="btn">Go to Shop</a>
-            <a href="/auth/logout" class="btn secondary">Logout</a>
-
-            <h3>Order History</h3>
-            <% if (orders.length === 0) { %>
-              <p>You haven't placed any orders yet.</p>
-            <% } else { %>
-              <% orders.forEach(order => { %>
-                <div class="order-card">
-                  <p><strong>Date:</strong> <%= order.createdAt.toLocaleDateString() %></p>
-                  <p><strong>Total:</strong> $<%= order.total.toFixed(2) %></p>
-                  <p><strong>Status:</strong> <%= order.status %></p>
-                  <ul>
-                    <% order.items.forEach(item => { %>
-                      <li><%= item.quantity %> × <%= item.name %> — $<%= item.price.toFixed(2) %></li>
-                    <% }) %>
-                  </ul>
-                </div>
-              <% }) %>
-            <% } %>
-        </div>
-    </section>
-
-    <%- include("../partials/footer") %>
-
-</body>
-</html>
+<%- include('../partials/v2/head') %>
+<section class="page gut"><div class="narrow" style="display:grid;gap:20px">
+  <div><div class="eyebrow">My account</div><h1 style="font-size:clamp(32px,5vw,48px)">Hi, <em><%= user.name ? user.name.split(' ')[0] : 'there' %></em></h1>
+    <p class="muted"><%= user.email %> · <a href="/auth/logout">Sign out</a></p></div>
+  <div class="card">
+    <h2 style="font-size:26px">Your orders</h2>
+    <% if (!orders.length) { %>
+      <p class="muted">No orders yet. <a href="/shop">Find a shirt</a></p>
+    <% } else { orders.forEach(order => { %>
+      <div class="order">
+        <div class="line" style="display:flex;justify-content:space-between;gap:12px"><b><%= order.createdAt.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) %></b><span class="tabnum">$<%= order.total.toFixed(2) %> · <%= order.status %></span></div>
+        <% order.items.forEach(item => { %><span class="muted" style="font-size:14px"><%= item.quantity %> × <%= item.name %></span><% }) %>
+      </div>
+    <% }) } %>
+  </div>
+</div></section>
+<%- include('../partials/v2/foot') %>

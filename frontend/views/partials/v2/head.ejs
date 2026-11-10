@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title><%= typeof title !== 'undefined' && title ? title + ' | ' : '' %>Venture Creations</title>
+  <meta name="description" content="Custom shirts for every venture: mission shirts, faith, mental health, cats, Día de los Muertos and seasonal tees, made to order. Group discounts.">
+  <% if (typeof testSite !== 'undefined' && testSite) { %><meta name="robots" content="noindex"><% } %>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,wght@0,400;0,600;1,400&family=Figtree:wght@400;500;600;700&family=Sacramento&display=swap">
+  <link rel="stylesheet" href="/css/blend.css">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Ccircle cx='24' cy='24' r='22' fill='%234a5ca3'/%3E%3Ctext x='24' y='25' text-anchor='middle' dominant-baseline='central' font-family='Georgia,serif' font-style='italic' font-size='19' fill='white'%3EVC%3C/text%3E%3C/svg%3E">
+  <script src="/scripts/site.js" defer></script>
+</head>
+<body>
+<% if (typeof testSite !== 'undefined' && testSite) { %><div class="testbar gut">Test site. Checkout and sign-in are turned off, nothing here charges a card.</div><% } %>
+<header class="top gut"><div class="in">
+  <a class="logo" href="/" aria-label="Venture Creations home">
+    <svg class="mark" viewBox="0 0 48 48" aria-hidden="true"><circle class="m-bg" cx="24" cy="24" r="22"/><circle class="m-ring" cx="24" cy="24" r="18.5"/><text x="24" y="25" text-anchor="middle" dominant-baseline="central">VC</text></svg>
+    <span>Venture <b>Creations</b></span>
+  </a>
+  <nav class="main" id="mainNav" aria-label="Main">
+    <a href="/shop" <%- path.startsWith('/shop') ? 'aria-current="page"' : '' %>>Shop</a>
+    <a href="/mission" <%- path === '/mission' ? 'aria-current="page"' : '' %>>Mission shirts</a>
+    <a href="/groups" <%- path === '/groups' ? 'aria-current="page"' : '' %>>Group orders</a>
+    <a href="/blog" <%- path.startsWith('/blog') ? 'aria-current="page"' : '' %>>Blog</a>
+    <a href="/contact" <%- path === '/contact' ? 'aria-current="page"' : '' %>>Contact</a>
+    <% if (user && user.role === 'Admin') { %><a href="/admin">Admin</a>
+    <% } else if (user) { %><a href="/customer/dashboard">My orders</a>
+    <% } else { %><a href="/auth/register">Sign in</a><% } %>
+  </nav>
+  <div class="hdr-right">
+    <form class="search" action="/search" method="GET" role="search"><input type="search" name="q" placeholder="Search shirts" aria-label="Search shirts"><button type="submit" aria-label="Search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg></button></form>
+    <a class="cartbtn" href="/cart" id="cartBtn">Cart <b class="tabnum" id="cartN"><%= cartCount %></b></a>
+    <button class="menubtn" id="menuBtn" type="button" aria-label="Menu" aria-expanded="false" aria-controls="mainNav"><svg viewBox="0 0 24 24"><path d="M3 6h18M3 12h18M3 18h18"/></svg></button>
+  </div>
+</div></header>
+<main id="main">

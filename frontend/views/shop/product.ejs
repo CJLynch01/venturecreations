@@ -1,69 +1,67 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title><%= product.name %> | Venture Creations</title>
-  <link rel="stylesheet" href="/css/styles.css">
-  <script src="/scripts/product.js"></script>
-  <script src="/scripts/home.js" defer></script>
+<%- include('../partials/v2/head') %>
 
-</head>
-<body>
-  <%- include('../partials/header2') %>
+<div class="gut"><div class="in pdp">
+  <div class="gallery">
+    <div class="main"><img id="mainImg" src="<%= product.images[0] %>" alt="<%= product.name %>"></div>
+    <% if (product.images.length > 1) { %>
+      <div class="thumbs" id="thumbs">
+        <% product.images.forEach((src, i) => { %><button type="button" aria-pressed="<%= i === 0 %>" data-src="<%= src %>" aria-label="Photo <%= i + 1 %>"><img src="<%= src %>" alt="" loading="lazy"></button><% }) %>
+      </div>
+    <% } %>
+  </div>
 
-  <main class="container product-details">
-    <div class="product-images">
-        <img id="mainImage" src="<%= product.images[0] %>" data-images='<%= JSON.stringify(product.images) %>' alt="<%= product.name %>">
-        <div class="image-controls">
-            <button id="prevImage" class="carousel-btn">❮</button>
-            <button id="nextImage" class="carousel-btn">❯</button>
-        </div>
-    </div>
-
-    <div class="product-info">
+  <form class="buy" action="/cart/add" method="POST" id="buyForm" data-cart-form>
+    <div>
+      <div class="eyebrow"><%= shop.COLLECTIONS.filter(c => shop.collectionsFor(product).includes(c.id)).map(c => c.name).join(' · ') %></div>
       <h1><%= product.name %></h1>
-      <p class="price">$<%= product.price.toFixed(2) %></p>
-      <p class="category"><%= product.category %></p>
-      <p>Available sizes: <%= product.sizes.join(', ') %></p>
-      <p>Colors: <%= product.colors.join(', ') %></p>
-      <p>In Stock: <%= product.stock %></p>
     </div>
+    <div class="price tabnum">$<%= product.price.toFixed(2) %></div>
+    <input type="hidden" name="productId" value="<%= product._id %>">
 
-    <!-- <form action="/cart/add" method="POST">
-        <input type="hidden" name="productId" value="<%= product._id %>">
-        <button type="submit" class="btn">Add to Cart</button>
-    </form> -->
+    <% if (product.colors && product.colors.length) { %>
+      <div class="field"><span class="lbl">Color: <span id="colorName"><%= product.colors[0] %></span></span>
+        <input type="hidden" name="color" id="colorIn" value="<%= product.colors[0] %>">
+        <div class="swatches" data-pick="color">
+          <% product.colors.forEach((c, i) => { %><button type="button" class="sw" style="background:<%= shop.colorHex(c) %>" aria-label="<%= c %>" aria-pressed="<%= i === 0 %>" data-v="<%= c %>"></button><% }) %>
+        </div></div>
+    <% } %>
 
+    <% if (product.sizes && product.sizes.length) { %>
+      <div class="field"><span class="lbl">Size</span>
+        <input type="hidden" name="size" id="sizeIn" value="">
+        <div class="sizes" data-pick="size">
+          <% product.sizes.forEach(s => { %><button type="button" aria-pressed="false" data-v="<%= s %>"><%= s %></button><% }) %>
+        </div>
+        <details class="chart"><summary>Size chart (inches)</summary>
+          <div class="tablewrap" style="margin-top:8px"><table class="tabnum">
+            <tr><th></th><% shop.SIZE_CHART.sizes.forEach(s => { %><th><%= s %></th><% }) %></tr>
+            <% shop.SIZE_CHART.rows.forEach(r => { %><tr><% r.forEach(v => { %><td><%= v %></td><% }) %></tr><% }) %>
+          </table></div>
+          <p class="muted" style="font-size:13px"><%= shop.SIZE_CHART.note %></p>
+        </details>
+      </div>
+    <% } %>
 
-    <form action="/cart/add" method="POST" class="product-options">
-      <input type="hidden" name="productId" value="<%= product._id %>">
+    <% if (shop.isPersonalized(product)) { %>
+      <div class="field"><label for="personal">Personalize it</label>
+        <input type="text" id="personal" name="personal" maxlength="40" placeholder="Country and mission, e.g. England London Mission" required autocomplete="off">
+        <span class="muted" style="font-size:13px">Tell us what goes on your shirt. Questions? <a href="/contact">Contact us</a>.</span></div>
+    <% } %>
+    <div class="msg" id="buyMsg" role="alert"></div>
+    <button class="btn block" type="submit">Add to cart</button>
+    <div class="ship">
+      <span><b>Made to order</b> just for you.</span>
+      <span>Free shipping over $<%= shop.FREE_SHIPPING_OVER %> · Satisfaction guarantee</span>
+      <span>Ordering <%= [...shop.BULK_TIERS].reverse()[0].min %> or more? <a href="/groups">Group prices</a> drop automatically in the cart.</span>
+    </div>
+  </form>
+</div></div>
 
-      <!-- Size Dropdown -->
-      <label for="size">Select Size:</label>
-      <select name="size" id="size" required>
-        <option value="" disabled selected>Select size</option>
-        <% product.sizes.forEach(size => { %>
-          <option value="<%= size %>"><%= size %></option>
-        <% }) %>
-      </select>
+<% if (related.length) { %>
+<section class="blk gut" style="padding-top:0"><div class="in">
+  <div class="head"><h2>You might also like</h2></div>
+  <div class="grid"><% related.forEach(p => { %><%- include('../partials/v2/card', { p }) %><% }) %></div>
+</div></section>
+<% } %>
 
-      <!-- Color Dropdown -->
-      <label for="color">Select Color:</label>
-      <select name="color" id="color" required>
-        <option value="" disabled selected>Select color</option>
-        <% product.colors.forEach(color => { %>
-          <option value="<%= color %>"><%= color %></option>
-        <% }) %>
-      </select>
-
-      <button type="submit" class="btn">Add to Cart</button>
-    </form>
-
-
-
-  </main>
-
-  <%- include('../partials/footer') %>
-</body>
-</html>
+<%- include('../partials/v2/foot') %>

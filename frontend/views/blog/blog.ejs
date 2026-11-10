@@ -1,45 +1,20 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Admin Dashboard | Venture Creations</title>
-    <link rel="stylesheet" href="/css/styles.css" />
-    <script src="/scripts/home.js" defer></script>
-
-</head>
-<body>                
-        
-        <%- include("../partials/header2") %>
-
-        
-        <section class="blog-page">
-            <h1>Our Blog</h1>
-
-            <% if (posts.length === 0) { %>
-            <p>No blog posts yet. Check back soon!</p>
-            <% } else { %>
-            <div class="blog-grid">
-                <% posts.forEach(post => { %>
-                <div class="blog-card">
-                    <h2><a href="/blog/<%= post.slug %>"><%= post.title %></a></h2>
-
-                    <% if (post.topic) { %>
-                        <p class="blog-topic"><strong>Topic:</strong> <%= post.topic %></p>
-                    <% } %>
-
-                    <% if (post.shortDescription) { %>
-                        <p class="description">Description: <%= post.shortDescription %></p>
-                    <% } %>
-
-                    <a href="/blog/<%= post.slug %>" class="read-more">Read More →</a>
-                </div>
-
-                <% }) %>
-            </div>
-            <% } %>
-        </section>
-
-        <%- include("../partials/footer") %>
-</body>
-</html>
+<%- include('../partials/v2/head', { title: 'Blog' }) %>
+<section class="blk gut"><div class="in">
+  <div class="head"><div><div class="eyebrow">From the studio</div><h1>The blog</h1></div></div>
+  <% if (!posts.length) { %>
+    <p class="empty">No posts yet. Check back soon.</p>
+  <% } else { %>
+    <div class="posts">
+      <% posts.forEach(post => { %>
+        <a class="post" href="/blog/<%= post.slug %>">
+          <% if (post.coverImageUrl) { %><img src="<%= post.coverImageUrl %>" alt="" loading="lazy"><% } %>
+          <div><% if (post.topic) { %><span class="eyebrow"><%= post.topic %></span><% } %>
+            <h2><%= post.title %></h2>
+            <% if (post.shortDescription) { %><p class="muted" style="margin:0"><%= post.shortDescription %></p><% } %>
+            <span class="muted" style="font-size:13px"><%= post.createdAt.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) %></span></div>
+        </a>
+      <% }) %>
+    </div>
+  <% } %>
+</div></section>
+<%- include('../partials/v2/foot') %>

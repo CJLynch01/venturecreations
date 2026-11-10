@@ -1,20 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Page Not Found | Venture Creations</title>
-  <link rel="stylesheet" href="/css/styles.css">
-</head>
-<body>
-  <%- include('partials/header2') %>
-
-  <main class="container" style="text-align:center; padding: 80px 20px;">
-    <h1>404</h1>
-    <p>Sorry, we couldn't find that page.</p>
-    <a href="/" class="btn">Go Home</a>
-  </main>
-
-  <%- include('partials/footer') %>
-</body>
-</html>
+<%- include('partials/v2/head', { title: 'Page not found' }) %>
+<section class="page gut"><div class="narrow" style="text-align:center;display:grid;gap:16px;justify-items:center;padding-block:40px">
+  <div class="eyebrow">404</div>
+  <h1 style="font-size:clamp(34px,5vw,54px)">We couldn't find <em>that page</em></h1>
+  <p class="muted">It may have moved, or the shirt may be sold out.</p>
+  <div class="buyrow"><a class="btn" href="/shop">Shop shirts</a><a class="btn ghost" href="/">Home</a></div>
+</div></section>
+<%- include('partials/v2/foot') %>

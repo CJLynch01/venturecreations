@@ -11,7 +11,10 @@ import passport from "passport";
 import GoogleStrategy from "passport-google-oauth20";
 import User from "../models/User.js";
 
-passport.use(
+// Google sign-in is only set up when its keys are present (the test site runs without it)
+export const googleEnabled = Boolean(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET);
+
+if (googleEnabled) passport.use(
   new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,

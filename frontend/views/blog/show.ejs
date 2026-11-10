@@ -1,53 +1,13 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Admin Dashboard | Venture Creations</title>
-    <link rel="stylesheet" href="/css/styles.css" />
-    <script src="/scripts/home.js" defer></script>
-
-</head>
-<body>    
-
-    <%- include("../partials/header2") %>
-
-    <main class="blog-single">
-        <article class="blog-post">
-            <h1 class="blog-title"><%= post.title %></h1>
-            <p class="blog-date"><%= post.createdAt.toLocaleDateString() %></p>
-            
-            <div class="topic-content">
-                <% if (post.topic) { %>
-                        <p class="blog-topic">Topic: <%= post.topic %></p>
-                    <% } %>
-            </div>
-
-            <div class="description-content">
-                    <% if (post.shortDescription) { %>
-                        <p class="description">Description: <%= post.shortDescription %></p>
-                    <% } %>
-            </div>
-
-            <div class="blog-content">
-                <%- post.content.replace(/\r?\n/g, "<br>") %>
-            </div>
-
-            <div class="hash-content">
-                <% if (post.hashtags && post.hashtags.length > 0) { %>
-                    <div class="hashtags">
-                    <% post.hashtags.forEach(tag => { %>
-                        <span class="tag">#<%= tag %></span>
-                    <% }) %>
-                    </div>
-                <% } %>
-            </div>
-
-            <a href="/blog" class="btn btn-secondary">← Back to Blog</a>
-        </article>
-    </main>
-
-    <%- include("../partials/footer") %>
-
-</body>
-</html>
+<%- include('../partials/v2/head', { title: post.title }) %>
+<article class="page gut"><div class="narrow article">
+  <a href="/blog" style="font-size:14px">← All posts</a>
+  <% if (post.topic) { %><div class="eyebrow" style="margin-top:22px"><%= post.topic %></div><% } %>
+  <h1><%= post.title %></h1>
+  <p class="muted" style="font-size:14px;margin:0 0 20px"><%= post.author || 'Elisha' %> · <%= post.createdAt.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) %></p>
+  <% if (post.coverImageUrl) { %><img src="<%= post.coverImageUrl %>" alt="" style="margin-bottom:24px"><% } %>
+  <% if (post.shortDescription) { %><p style="font-size:20px;color:var(--muted)"><%= post.shortDescription %></p><% } %>
+  <div><%- post.content.replace(/\r?\n/g, "<br>") %></div>
+  <% if (post.hashtags && post.hashtags.length) { %><div class="tags" style="margin-top:24px"><% post.hashtags.forEach(t => { %><span>#<%= t %></span><% }) %></div><% } %>
+  <p style="margin-top:36px"><a class="btn ghost" href="/shop">Shop the shirts</a></p>
+</div></article>
+<%- include('../partials/v2/foot') %>

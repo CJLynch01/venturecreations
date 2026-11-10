@@ -2,6 +2,7 @@
 import express from "express";
 import Product from "../models/product.js";
 import { ensureAdmin } from "../middleware/auth.js";
+import ContactMessage from "../models/ContactMessage.js";
 
 const router = express.Router();
 
@@ -17,6 +18,18 @@ router.get("/", ensureAdmin, async (req, res) => {
   } catch (error) {
     console.error("Admin page error:", error);
     res.status(500).send("Error loading admin dashboard.");
+  }
+});
+
+// Contact form messages, newest first; opening the page marks them read
+router.get("/messages", ensureAdmin, async (req, res) => {
+  try {
+    const messages = await ContactMessage.find().sort({ createdAt: -1 }).limit(200);
+    res.render("admin/messages", { title: "Messages", messages });
+    await ContactMessage.updateMany({ read: false }, { read: true });
+  } catch (err) {
+    console.error("Error loading messages:", err);
+    res.status(500).send("Failed to load messages.");
   }
 });
 

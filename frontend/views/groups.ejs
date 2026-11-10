@@ -1,0 +1,42 @@
+<%- include('partials/v2/head') %>
+<%
+  const tiers = [{ min: 1, off: 0 }, ...[...shop.BULK_TIERS].reverse()];
+  const designs = products.map(p => ({ id: String(p._id), name: p.name, price: p.price, colors: (p.colors || []).map(c => ({ n: c, h: shop.colorHex(c) })), sizes: p.sizes || [], image: p.images[0], style: shop.missionStyleOf(p) ? { id: shop.missionStyleOf(p).id, things: shop.missionStyleOf(p).things } : null }));
+%>
+<section class="blk gut group"><div class="in">
+  <form action="/cart/group" method="POST" id="groupForm" data-cart-form style="display:grid;gap:20px">
+    <div>
+      <div class="eyebrow">Group orders</div>
+      <h1>Shirts for <em>the whole group</em></h1>
+      <p>Youth conference, trek, mission prep class, family reunion, or a farewell and homecoming. Pick a design, enter how many of each size, and the price updates as you go.</p>
+    </div>
+    <div class="field"><label for="gDesign">Design</label>
+      <select id="gDesign" name="productId"><% designs.forEach(d => { %><option value="<%= d.id %>" <%= d.style && d.style.id === reqStyle ? 'selected' : '' %>><%= d.name %> · $<%= d.price.toFixed(2) %></option><% }) %></select></div>
+    <div class="gmission" id="gMission" hidden>
+      <div class="field"><label for="gMissionName">Mission name for every shirt</label><input type="text" id="gMissionName" name="mission" maxlength="40" placeholder="Mesa, Arizona Mission"></div>
+      <div class="field"><label for="gPlace" id="gPlaceLbl">State or country (the middle)</label><input type="text" id="gPlace" name="place" maxlength="40" placeholder="Arizona"></div>
+      <div class="field" id="gThings"><span class="lbl">Four things that describe the mission</span>
+        <div class="things"><% [0, 1, 2, 3].forEach(i => { %><label class="thing"><span><%= i + 1 %></span><input type="text" name="things[<%= i %>]" value="" placeholder="Thing <%= i + 1 %>" maxlength="30" autocomplete="off" aria-label="Thing <%= i + 1 %>"></label><% }) %></div></div>
+    </div>
+    <div class="field"><span class="lbl">Color: <span id="colorName"></span></span><input type="hidden" name="color" id="colorIn"><div class="swatches" id="gColors" data-pick="color"></div></div>
+    <div class="field"><span class="lbl">How many of each size</span><div class="qty" id="qty"></div></div>
+    <div class="tiers" id="tiers">
+      <% tiers.forEach((t, i) => { const next = tiers[i + 1]; %><div data-min="<%= t.min %>"><b><%= t.off ? '-' + Math.round(t.off * 100) + '%' : 'Base' %></b><%= t.min %><%= next ? '–' + (next.min - 1) : '+' %> shirts</div><% }) %>
+    </div>
+    <div class="msg" id="buyMsg" role="alert" style="color:#f0c6cf"></div>
+  </form>
+
+  <div class="sum" aria-live="polite">
+    <div class="line"><span>Shirts</span><b class="tabnum" id="gN">0</b></div>
+    <div class="line"><span>Price each</span><b class="tabnum" id="gEach">$0.00</b></div>
+    <div class="line"><span>Group discount</span><b class="tabnum save" id="gSave">None yet</b></div>
+    <div class="big tabnum" id="gTotal">$0.00</div>
+    <div class="line"><small id="gShip">Add shirts to see shipping</small></div>
+    <button class="btn light block" type="submit" form="groupForm" id="gAdd">Add group order to cart</button>
+    <small>The discount counts every shirt in your cart, so you can mix designs. Questions about a logo or names list? <a href="/contact" style="color:#f0c6cf">Contact us</a>.</small>
+  </div>
+</div></section>
+
+<script id="groupData" type="application/json"><%- JSON.stringify({ designs, tiers, freeShippingOver: shop.FREE_SHIPPING_OVER, cartCount }).replace(/</g, '\\u003c') %></script>
+<script src="/scripts/groups.js" defer></script>
+<%- include('partials/v2/foot') %>

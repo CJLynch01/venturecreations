@@ -1,74 +1,63 @@
-import dotenv from 'dotenv';
 import express from 'express';
 import stripe from '../config/stripe.js';
-import Product from '../models/product.js';
-import User from '../models/User.js';
-
-dotenv.config();
+import { getCart } from '../lib/cart.js';
+import { missionStyleOf } from '../config/shop.js';
 
 const router = express.Router();
 
-router.post('/create-checkout-session', async (req, res) => {
-  const { items } = req.body;
-
-  if (!Array.isArray(items)) {
-    console.error("Expected 'items' to be an array, but got:", items);
-    return res.status(400).json({ error: "Invalid items format" });
+// What she needs to print, written into the Stripe line item so it shows on the order
+function lineName(l) {
+  const bits = [l.size, l.color].filter(Boolean);
+  if (l.custom) {
+    bits.push(`"${l.custom.mission}"`);
+    if (l.custom.place) bits.push(`${missionStyleOf(l.product)?.things === false ? 'flag' : 'center'}: ${l.custom.place}`);
+    if (l.custom.things.length) bits.push(`things: ${l.custom.things.join(', ')}`);
   }
+  return `${l.product.name}${bits.length ? ' — ' + bits.join(' · ') : ''}`.slice(0, 250);
+}
 
+// The cart is read on the server, so prices, sizes and custom text can't be changed by the browser
+router.post('/create-checkout-session', async (req, res) => {
+  if (!stripe) return res.status(503).json({ error: 'Checkout is turned off on the test site.' });
   try {
-    // Look up real prices from the database — never trust client-sent prices
-    const productIds = items.map(item => item.productId);
-    const products = await Product.find({ _id: { $in: productIds } });
-    const productMap = Object.fromEntries(products.map(p => [p._id.toString(), p]));
+    const cart = await getCart(req);
+    if (!cart.lines.length) return res.status(400).json({ error: 'Your cart is empty.' });
 
-    const lineItems = items.map(item => {
-      const product = productMap[item.productId];
-      if (!product) throw new Error(`Product not found: ${item.productId}`);
-      return {
-        price_data: {
-          currency: 'usd',
-          product_data: { name: product.name },
-          unit_amount: Math.round(product.price * 100),
-        },
-        quantity: item.quantity,
-      };
-    });
-
-    const serverSubtotal = lineItems.reduce((sum, li) => sum + li.price_data.unit_amount * li.quantity, 0);
-
-    // Set up shipping options
-    const shippingOptions = [
-      {
-        shipping_rate: process.env.STANDARD_SHIPPING_RATE,
+    const base = process.env.CLIENT_URL || `${req.protocol}://${req.get('host')}`;
+    // Stripe needs a full https address for the photo; photos stored in the site itself start with "/"
+    const photo = src => !src ? null : src.startsWith('/') ? (base.startsWith('https://') ? base + src : null) : src;
+    const lineItems = cart.lines.map(l => ({
+      price_data: {
+        currency: 'usd',
+        product_data: { name: lineName(l), ...(photo(l.product.images?.[0]) ? { images: [photo(l.product.images[0])] } : {}) },
+        // Group discount is taken off each shirt so Stripe's total matches the cart
+        unit_amount: Math.round(l.each * (1 - cart.off) * 100),
       },
-    ];
+      quantity: l.quantity,
+    }));
+    const subtotalCents = lineItems.reduce((sum, li) => sum + li.price_data.unit_amount * li.quantity, 0);
 
-    // Add free shipping option if subtotal >= $100 (i.e., 10000 cents)
-    if (serverSubtotal >= 10000) {
-      shippingOptions.unshift({
-        shipping_rate: process.env.STRIPE_SHIPPING_FREE,
-      });
-    }
+    const standardRate = process.env.STANDARD_SHIPPING_RATE;
+    const freeRate = process.env.STRIPE_SHIPPING_FREE || process.env.FREE_SHIPPING_RATE;
+    const shippingOptions = [];
+    if (subtotalCents >= 10000 && freeRate) shippingOptions.push({ shipping_rate: freeRate });
+    if (standardRate) shippingOptions.push({ shipping_rate: standardRate });
 
-    // Create Stripe Checkout Session
     const session = await stripe.checkout.sessions.create({
       mode: 'payment',
       line_items: lineItems,
-      shipping_address_collection: {
-        allowed_countries: ['US'],
-      },
-      shipping_options: shippingOptions,
+      shipping_address_collection: { allowed_countries: ['US'] },
+      ...(shippingOptions.length ? { shipping_options: shippingOptions } : {}),
       automatic_tax: { enabled: true },
-      success_url: `${process.env.CLIENT_URL}/success`,
-      cancel_url: `${process.env.CLIENT_URL}/cancel`,
+      ...(req.user?.email ? { customer_email: req.user.email } : {}),
+      success_url: `${base}/success`,
+      cancel_url: `${base}/cart`,
     });
 
-    // Return Stripe checkout URL to frontend
     res.json({ url: session.url });
   } catch (err) {
     console.error('Error creating checkout session:', err);
-    res.status(500).send('Failed to create session');
+    res.status(500).json({ error: 'Checkout could not start. Please try again.' });
   }
 });
 

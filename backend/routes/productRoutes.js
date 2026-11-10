@@ -1,6 +1,7 @@
 import express from 'express';
 import Product from '../models/product.js';
 import { getProducts, createProduct } from '../controllers/productController.js';
+import { ensureAdmin } from '../middleware/auth.js';
 
 const router = express.Router();
 
@@ -27,7 +28,7 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-// POST /api/products
-router.post('/', createProduct);
+// POST /api/products (admins only; it used to be open to anyone)
+router.post('/', ensureAdmin, createProduct);
 
 export default router;

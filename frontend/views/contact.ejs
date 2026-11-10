@@ -1,53 +1,14 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Home | Venture Creations</title>
-  <link rel="stylesheet" href="/css/styles.css" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-  <script src="/scripts/home.js" defer></script>
-</head>
-<body>
-
-        <%- include("./partials/header2") %>
-
-            <section class="contact-section">
-            <div class="contact-wrapper">
-                <h1>Contact Us</h1>
-                <p>Have a question, special request, or need help with your order? We'd love to hear from you.</p>
-
-                <% if (success === 'true') { %>
-                <p class="success-message">Thank you! Your message has been sent.</p>
-                <% } %>
-
-                <form action="/contact" method="POST" class="contact-form">
-                <div class="form-group">
-                    <label for="name">Name</label>
-                    <input type="text" id="name" name="name" placeholder="Your name" required />
-                </div>
-
-                <div class="form-group">
-                    <label for="email">Email</label>
-                    <input type="email" id="email" name="email" placeholder="you@example.com" required />
-                </div>
-
-                <div class="form-group">
-                    <label for="subject">Subject</label>
-                    <input type="text" id="subject" name="subject" placeholder="What's this about?" required />
-                </div>
-
-                <div class="form-group">
-                    <label for="message">Message</label>
-                    <textarea id="message" name="message" rows="6" placeholder="Write your message..." required></textarea>
-                </div>
-
-                <button type="submit" class="btn btn-primary">Send Message</button>
-                </form>
-            </div>
-            </section>
-
-            <%- include("./partials/footer") %>
-
-</body>
-</html>
+<%- include('partials/v2/head', { title: 'Contact' }) %>
+<section class="page gut"><div class="narrow" style="display:grid;gap:20px">
+  <div><div class="eyebrow">Contact</div><h1 style="font-size:clamp(34px,5vw,54px)">Let's make <em>something</em></h1>
+    <p class="muted" style="font-size:18px">A question, a custom idea, a group order with a logo or a list of names? Send it here and we'll get back to you.</p></div>
+  <% if (success === 'true') { %><p class="ok">Thank you! Your message was sent. We'll reply by email.</p><% } %>
+  <form action="/contact" method="POST" class="form card">
+    <div class="field"><label for="name">Name</label><input type="text" id="name" name="name" autocomplete="name" required></div>
+    <div class="field"><label for="email">Email</label><input type="email" id="email" name="email" autocomplete="email" required></div>
+    <div class="field"><label for="subject">What's it about?</label><input type="text" id="subject" name="subject" placeholder="Group order, custom shirt, an order question…" required></div>
+    <div class="field"><label for="message">Message</label><textarea id="message" name="message" rows="6" required></textarea></div>
+    <button class="btn" type="submit">Send message</button>
+  </form>
+</div></section>
+<%- include('partials/v2/foot') %>

@@ -1,45 +1,19 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Shop | Venture Creations</title>
-  <link rel="stylesheet" href="/css/styles.css">
-  <script src="/scripts/home.js" defer></script>
+<%- include('partials/v2/head') %>
 
-</head>
-<body>
-  <%- include('partials/header2') %>
-
-  <main class="container">
-    <h1 class="page-title">Our Collection</h1>
-
-    <div class="product-grid">
-        <% products.forEach(product => { %>
-            <div class="product-card">
-                <img src="<%= product.images[0] %>" alt="<%= product.name %>">
-                <h2><%= product.name %></h2>
-                <div class="product-info">
-                    <p class="price">$<%= product.price.toFixed(2) %></p>
-                    <a href="/shop/<%= product._id %>" class="btn">View Shirt</a>
-                </div>
-            </div>
-        <% }) %>
-    </div>
-  </main>
-
-  <% if (totalPages > 1) { %>
-    <div class="pagination">
-      <% if (currentPage > 1) { %>
-        <a href="/shop?page=<%= currentPage - 1 %>" class="btn">← Prev</a>
-      <% } %>
-      <span>Page <%= currentPage %> of <%= totalPages %></span>
-      <% if (currentPage < totalPages) { %>
-        <a href="/shop?page=<%= currentPage + 1 %>" class="btn">Next →</a>
-      <% } %>
-    </div>
+<section class="blk gut"><div class="in">
+  <div class="head"><div><div class="eyebrow">The collection</div><h1><%= active === 'all' ? 'All shirts' : shop.COLLECTIONS.find(c => c.id === active).name %></h1></div></div>
+  <nav class="chips" aria-label="Collections">
+    <a href="/shop" aria-current="<%= active === 'all' %>">All<small class="tabnum"><%= total %></small></a>
+    <% shop.COLLECTIONS.forEach(c => { if (!counts[c.id]) return; %>
+      <a href="/shop?c=<%= c.id %>" aria-current="<%= active === c.id %>"><%= c.name %><small class="tabnum"><%= counts[c.id] %></small></a>
+    <% }) %>
+  </nav>
+  <% if (products.length) { %>
+    <div class="grid"><% products.forEach(p => { %><%- include('partials/v2/card', { p }) %><% }) %></div>
+  <% } else { %>
+    <p class="empty">No shirts in this collection yet.</p>
   <% } %>
+</div></section>
 
-  <%- include('partials/footer') %>
-</body>
-</html>
+<%- include('partials/v2/trust') %>
+<%- include('partials/v2/foot') %>

@@ -1,0 +1,63 @@
+<%- include('partials/v2/head') %>
+<% const product = active.product; %>
+<div class="gut"><div class="in builder one">
+  <form class="ctl" action="/cart/custom" method="POST" id="missionForm" data-cart-form>
+    <div>
+      <div class="eyebrow">Custom mission shirts</div>
+      <h1>Every mission, <em>made to order</em></h1>
+    </div>
+
+    <% if (styles.length > 1) { %>
+      <div class="field"><span class="lbl">Choose a style</span>
+        <div class="styles">
+          <% styles.forEach(s => { %>
+            <a class="style" href="/mission?style=<%= s.id %>" aria-current="<%= s.id === active.id %>">
+              <img src="<%= s.product.images[0] %>" alt="" loading="lazy">
+              <span><b><%= s.name %></b><span class="muted">$<%= s.product.price.toFixed(2) %></span></span>
+            </a>
+          <% }) %>
+        </div>
+      </div>
+    <% } %>
+    <p class="lead" style="margin:0"><%= active.blurb %></p>
+    <input type="hidden" name="productId" value="<%= product._id %>">
+
+    <div class="field"><label for="mName">Mission name</label>
+      <input type="text" id="mName" name="mission" placeholder="<%= active.things ? 'Mesa, Arizona Mission' : 'England London Mission' %>" maxlength="40" autocomplete="off" required></div>
+
+    <div class="field"><label for="mPlace"><%= active.things ? 'State or country (goes in the middle)' : 'Country (for the flag)' %></label>
+      <input type="text" id="mPlace" name="place" placeholder="<%= active.things ? 'Arizona' : 'England' %>" maxlength="40" autocomplete="off" required></div>
+
+    <% if (active.things) { %>
+      <div class="field"><span class="lbl">Four things that describe the mission</span>
+        <div class="things">
+          <% [0, 1, 2, 3].forEach(i => { %>
+            <label class="thing"><span><%= i + 1 %></span><input type="text" name="things[<%= i %>]" placeholder="Thing <%= i + 1 %>" maxlength="30" autocomplete="off" aria-label="Thing <%= i + 1 %>"></label>
+          <% }) %>
+        </div>
+        <span class="muted" style="font-size:13px">Anything that says "my mission": a food, an animal, a landmark, the weather.</span>
+      </div>
+    <% } %>
+
+    <div class="field"><span class="lbl">Shirt color: <span id="colorName"><%= product.colors[0] %></span></span>
+      <input type="hidden" name="color" id="colorIn" value="<%= product.colors[0] %>">
+      <div class="swatches" data-pick="color"><% product.colors.forEach((c, i) => { %><button type="button" class="sw" style="background:<%= shop.colorHex(c) %>" aria-label="<%= c %>" aria-pressed="<%= i === 0 %>" data-v="<%= c %>"></button><% }) %></div></div>
+
+    <div class="field"><span class="lbl">Size</span>
+      <input type="hidden" name="size" id="sizeIn" value="">
+      <div class="sizes" data-pick="size"><% product.sizes.forEach(s => { %><button type="button" aria-pressed="false" data-v="<%= s %>"><%= s %></button><% }) %></div></div>
+
+    <div class="msg" id="buyMsg" role="alert"></div>
+    <div class="buyrow"><span class="price tabnum">$<%= product.price.toFixed(2) %></span>
+      <button class="btn" type="submit">Add to cart</button><a class="btn ghost" href="/groups?style=<%= active.id %>">Order for a group</a></div>
+    <p class="muted" style="font-size:14px;margin:0">Every mission is drawn by hand. Elisha emails you a proof of your design before anything is printed.</p>
+  </form>
+</div></div>
+
+<section class="blk gut" style="padding-top:0"><div class="in">
+  <div class="head"><div><div class="eyebrow">Examples · <%= active.name %></div><h2>Missions she's <em>made</em></h2></div></div>
+  <div class="realgrid"><% product.images.forEach(src => { %><img src="<%= src %>" alt="A finished <%= active.name %> shirt" loading="lazy"><% }) %></div>
+</div></section>
+
+<%- include('partials/v2/trust') %>
+<%- include('partials/v2/foot') %>

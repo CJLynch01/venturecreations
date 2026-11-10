@@ -1,0 +1,11 @@
+<a class="prod" href="/shop/<%= p._id %>">
+  <span class="ph">
+    <img src="<%= p.images && p.images[0] || '/images/VentureCreations.webp' %>" alt="<%= p.name %>" loading="lazy">
+    <% if (p.images && p.images[1]) { %><img class="alt" src="<%= p.images[1] %>" alt="" loading="lazy"><% } %>
+    <% if (shop.missionStyleOf(p)) { %><span class="badge">Personalize it</span><% } %>
+  </span>
+  <h3><%= p.name %></h3>
+  <span class="row"><span class="tabnum">$<%= p.price.toFixed(2) %></span>
+    <% if (p.colors && p.colors.length) { %><span class="dots" aria-label="<%= p.colors.length %> colors"><% p.colors.slice(0, 5).forEach(c => { %><i style="background:<%= shop.colorHex(c) %>" title="<%= c %>"></i><% }) %></span><% } %>
+  </span>
+</a>

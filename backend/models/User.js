@@ -10,8 +10,13 @@ const userSchema = new mongoose.Schema({
       productId: { type: mongoose.Schema.Types.ObjectId, ref: "Product" },
       quantity: { type: Number, default: 1 },
       size: String,
-      color: String
-
+      color: String,
+      // Mission shirt builder details (empty for regular shirts)
+      custom: {
+        mission: String,
+        place: String,
+        things: [String]
+      }
     }
   ]
 });

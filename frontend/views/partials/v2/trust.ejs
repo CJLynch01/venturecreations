@@ -1,0 +1,6 @@
+<div class="trust gut"><div class="in">
+  <div><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 7h12v9H2zM14 10h4l3 3v3h-7M6 19a2 2 0 1 0 0-.1M17 19a2 2 0 1 0 0-.1"/></svg><span><b>Free shipping</b>on orders over $<%= shop.FREE_SHIPPING_OVER %></span></div>
+  <div><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l7 3v5c0 5-3 8-7 10-4-2-7-5-7-10V6z M9 12l2 2 4-4"/></svg><span><b>Satisfaction guarantee</b>on every shirt</span></div>
+  <div><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h16v12H4zM8 8V5h8v3M4 13h16"/></svg><span><b>Bulk discounts</b>prices drop at <%= [...shop.BULK_TIERS].reverse().map(t => t.min).join(', ') %></span></div>
+  <div><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20l4-1 11-11-3-3L5 16zM14 6l3 3"/></svg><span><b>Customizable</b>names, missions, dates</span></div>
+</div></div>

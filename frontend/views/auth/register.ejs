@@ -1,25 +1,9 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>All Products | Admin</title>
-  <link rel="stylesheet" href="/css/styles.css" />
-  <script src="/scripts/home.js" defer></script>
-
-</head>
-<body>
-    <%- include("../partials/header2") %>
-
-    <section class="register-section">
-    <div class="register-box">
-        <h2>Create Your Account</h2>
-        <p>We use Google to securely register and log you in. No password required.</p>
-        <a href="/auth/google" class="google-btn">Register with Google</a>
-    </div>
-    </section>
-
-    <%- include("../partials/footer") %>
-
-</body>
-</html>
+<%- include('../partials/v2/head') %>
+<section class="page gut"><div class="narrow" style="max-width:520px;display:grid;gap:18px;text-align:center">
+  <div class="eyebrow">Your account</div>
+  <h1 style="font-size:clamp(32px,5vw,48px)">Sign in to see <em>your orders</em></h1>
+  <p class="muted">You don't need an account to shop. Signing in keeps your cart on every device and shows your order history. We use Google, so there's no password to remember.</p>
+  <% if (typeof query !== 'undefined' && query.off) { %><p class="ok">Sign-in is turned off on the test site.</p><% } %>
+  <a class="btn" href="/auth/google">Continue with Google</a>
+</div></section>
+<%- include('../partials/v2/foot') %>

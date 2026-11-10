@@ -6,6 +6,7 @@ import User from "../models/User.js";
 const router = express.Router();
 
 router.post("/", express.raw({ type: "application/json" }), async (req, res) => {
+  if (!stripe) return res.status(503).send("Checkout is off");
   const sig = req.headers["stripe-signature"];
 
   let event;

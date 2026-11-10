@@ -1,111 +1,41 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Home | Venture Creations</title>
-  <link rel="stylesheet" href="/css/styles.css" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Noto+Serif+Display:wght@400;700&display=swap" rel="stylesheet">
-  <script src="/scripts/home.js" defer></script>
-</head>
-<body>
-  <%- include('partials/header') %>
+<%- include('partials/v2/head') %>
 
-  <main>
+<section class="home gut"><div class="in">
+  <div>
+    <div class="eyebrow">Custom shirts · made to order</div>
+    <h1>Shirts for <em>every venture</em></h1>
+    <p class="lead">Faith, family, missions, hard days and happy ones. Soft tees with designs that say something, and every one can be made yours.</p>
+    <div class="row"><a class="btn" href="/shop">Shop the collection</a><a class="btn ghost" href="/mission">Make one custom</a></div>
+  </div>
+  <div class="collage">
+    <% hero.forEach(p => { %><a href="/shop/<%= p._id %>"><img src="<%= p.images[0] %>" alt="<%= p.name %>"></a><% }) %>
+  </div>
+</div></section>
 
-    <section class="home-hero shop">
-      <div>
-        <a href="/shop" class="btn">SHOP NOW</a>
-      </div>
-    </section>
+<section class="gut" style="padding-block:34px 10px"><div class="in">
+  <div class="tiles">
+    <% collections.forEach(c => { %>
+      <a class="tile" href="/shop?c=<%= c.id %>"><img src="<%= c.cover.images[0] %>" alt="" loading="lazy"><b><%= c.name %></b></a>
+    <% }) %>
+  </div>
+</div></section>
 
-    <section class="search-bar">
-      <div>
-        <form action="/search" method="GET" class="search-form">
-          <input type="text" name="q" placeholder="Search..." />
-          <button type="submit"><i class="fas fa-search"></i></button>
-        </form>
-      </div>
-    </section>
-    
-    <section class="home-hero">
-      <div class="hero-content">
-        <h1>Custom Shirts to Support All of Life’s Ventures</h1>
-        <p>From missionary work to youth group events, we craft custom shirts that inspire confidence and unity.</p>
-      </div>
-    </section>
+<%- include('partials/v2/trust') %>
 
-    <section class="banner-images">
-      <div class="banners-home">
-        <div class="banner-item">
-          <img src="/images/banner2.webp" alt="Banner 2">
-          <div class="banner-text">
-            <span class="line-top r1c1">Custom</span>
-            <span class="line-middle r2c1">Missionary<br>Shirts</span>
-            <span class="line-bottom r3c1">Shop Now</span>
-          </div>
-        </div>
-        <div class="banner-item">
-          <img src="/images/banner1.webp" alt="Banner 1">
-          <div class="banner-text">
-            <span class="line-top r1c2">Custom</span>
-            <span class="line-middle r2c2">Group<br>Shirts</span>
-            <span class="line-bottom r3c2">Shop Now</span>
-          </div>
-        </div>
-        <div class="banner-item">
-          <img src="/images/banner3.webp" alt="Banner 3">
-          <div class="banner-text">
-            <span class="line-top r1c3">Custom</span>
-            <span class="line-middle r2c3">Business<br>Shirts</span>
-            <span class="line-bottom r3c3">Shop Now</span>
-          </div>
-        </div>
-      </div>
-    </section>
+<section class="blk gut"><div class="in">
+  <div class="head"><div><div class="eyebrow">New in the shop</div><h2>Shop by what you love</h2></div><a class="btn ghost" href="/shop">See all shirts</a></div>
+  <div class="grid">
+    <% products.forEach(p => { %><%- include('partials/v2/card', { p }) %><% }) %>
+  </div>
+</div></section>
 
-    <section class="featured-section">
-      <div class="container">
-        <h2>Newly Added Designs</h2>
-        <div class="product-grid">
-          <% products.slice(0, 4).forEach(product => { %>
-            <div class="product-card">
-              <img class="product-img" src="<%= product.images[0] %>" data-images='<%= JSON.stringify(product.images) %>' alt="<%= product.name %>">
-              <h3><%= product.name %></h3>
-              <p>$<%= product.price.toFixed(2) %></p>
-              <a href="/shop/<%= product._id %>" class="btn">View Shirt</a>
-            </div>
-          <% }) %>
-        </div>
-      </div>
-    </section>
+<section class="blk gut" style="padding-top:0"><div class="in">
+  <div class="make">
+    <a class="mk" href="/mission"><% if (mission && mission.images[0]) { %><img src="<%= mission.images[0] %>" alt="" loading="lazy"><% } %>
+      <span><span class="eyebrow">Custom mission shirts</span><b>Any mission, any color</b><span class="d">Your state or country in the middle and four things that describe the mission, drawn by hand.</span><span class="go">Design yours →</span></span></a>
+    <a class="mk dark" href="/groups"><span class="big tabnum">-<%= Math.round(shop.BULK_TIERS[0].off * 100) %>%</span>
+      <span><span class="eyebrow">Group orders</span><b>Youth groups, treks, reunions</b><span class="d">The price drops at <%= [...shop.BULK_TIERS].reverse().map(t => t.min).join(', ') %> shirts. See your total before you order.</span><span class="go">Price your group →</span></span></a>
+  </div>
+</div></section>
 
-    <section class="features-icons">
-      <div class="feature">
-        <img src="/images/shipping.png" alt="Fast Shipping">
-        <p>Fast, Free Shipping</p>
-        <p><em>On orders over $100</em></p>
-      </div>
-      <div class="feature">
-        <img src="/images/thumbup.png" alt="Customer Satisfaction">
-        <p>Satisfaction Guarantee</p>
-        <p><em>On All Of Our Products</em></p>
-      </div>
-      <div class="feature">
-        <img src="/images/bulk.png" alt="Bulk Discounts">
-        <p>Bulk Discounts</p>
-        <p><em>Available On All Products</em></p>
-      </div>
-      <div class="feature">
-        <img src="/images/customizable.png" alt="Customizable Designs">
-        <p>Customizable Designs</p>
-        <p><em>Available On All Products</em></p>
-      </div>
-    </section>
-  </main>
-
-
-  <%- include('partials/footer') %>
-</body>
-</html>
+<%- include('partials/v2/foot') %>

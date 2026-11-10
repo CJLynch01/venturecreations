@@ -1,0 +1,15 @@
+<%- include('../partials/v2/head') %>
+<section class="page gut"><div class="narrow" style="display:grid;gap:18px">
+  <div><a href="/admin" style="font-size:14px">← Admin</a><h1 style="font-size:clamp(30px,4vw,44px)">Messages</h1>
+    <p class="muted">What people sent through the contact form. Reply from your email.</p></div>
+  <% if (!messages.length) { %><p class="card muted">No messages yet.</p><% } %>
+  <% messages.forEach(m => { %>
+    <div class="card" style="display:grid;gap:6px<%= m.read ? '' : ';border-color:var(--mauve)' %>">
+      <div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap"><b><%= m.subject || '(no subject)' %><%= m.read ? '' : ' · new' %></b>
+        <span class="muted" style="font-size:13px"><%= m.createdAt.toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }) %></span></div>
+      <span class="muted" style="font-size:14px"><%= m.name %> · <a href="mailto:<%= m.email %>"><%= m.email %></a></span>
+      <p style="margin:6px 0 0;white-space:pre-wrap"><%= m.message %></p>
+    </div>
+  <% }) %>
+</div></section>
+<%- include('../partials/v2/foot') %>

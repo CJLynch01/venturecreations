@@ -1,0 +1,39 @@
+</main>
+<footer class="site gut"><div class="in">
+  <div class="brandcol">
+    <h3>Venture <em>Creations</em></h3>
+    <p>Custom shirts to support all of life's ventures. Made to order, with discounts for groups.</p>
+  </div>
+  <div><h3>Shop</h3><ul>
+    <li><a href="/shop">All shirts</a></li>
+    <% shop.COLLECTIONS.forEach(c => { %><li><a href="/shop?c=<%= c.id %>"><%= c.name %></a></li><% }) %>
+  </ul></div>
+  <div><h3>Help</h3><ul>
+    <li><a href="/mission">Custom mission shirts</a></li>
+    <li><a href="/groups">Group orders</a></li>
+    <li><a href="/contact">Contact us</a></li>
+    <li><a href="/blog">Blog</a></li>
+    <% if (user) { %><li><a href="/auth/logout">Sign out</a></li><% } else { %><li><a href="/auth/register">Sign in</a></li><% } %>
+  </ul></div>
+  <div class="copy">&copy; <%= new Date().getFullYear() %> Venture Creations. Free shipping on orders over $<%= shop.FREE_SHIPPING_OVER %>.</div>
+</div></footer>
+
+<div class="scrim" id="scrim"></div>
+<aside class="drawer" id="drawer" aria-label="Cart" aria-hidden="true">
+  <button class="x" type="button" id="drawerX" aria-label="Close cart">×</button>
+  <h2>Your cart</h2>
+  <div class="body" id="drawerBody"></div>
+  <div class="foot">
+    <div class="hint" id="drawerShip"></div>
+    <div class="prog"><i id="drawerBar" style="width:0"></i></div>
+    <div class="summary" style="border:0;padding:0">
+      <div class="line"><span>Subtotal</span><b class="tabnum" id="drawerSub">$0.00</b></div>
+      <div class="line save" id="drawerSaveRow" hidden><span id="drawerSaveLbl">Group discount</span><b class="tabnum" id="drawerSave"></b></div>
+    </div>
+    <a class="btn block" href="/cart">View cart &amp; check out</a>
+  </div>
+</aside>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script>window.VC = { freeShippingOver: <%= shop.FREE_SHIPPING_OVER %> };</script>
+</body>
+</html>

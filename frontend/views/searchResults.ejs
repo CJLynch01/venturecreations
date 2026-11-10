@@ -1,45 +1,11 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Shop | Venture Creations</title>
-    <link rel="stylesheet" href="/css/styles.css">
-    <script src="/scripts/home.js" defer></script>
-
-</head>
-<body>
-    <%- include("partials/header2") %>
-
-    <main class="container">
-    <h1>Search Results for "<%= query %>"</h1>
-
-    <% if (results.length > 0) { %>
-    <div class="product-grid">
-        <% results.forEach(product => { %>
-        <div class="product-card">
-            <img src="<%= product.images[0] %>" alt="<%= product.name %>">
-            <h3><%= product.name %></h3>
-            <p>$<%= product.price.toFixed(2) %></p>
-
-            <% if (product.seasonalCategory && product.seasonalCategory !== 'None') { %>
-            <p><strong>Season:</strong> <%= product.seasonalCategory %></p>
-            <% } %>
-
-            <% if (product.tags && product.tags.length > 0) { %>
-            <p><strong>Tags:</strong> <%= product.tags.join(', ') %></p>
-            <% } %>
-
-            <a href="/shop/<%= product._id %>" class="btn">View Product</a>
-        </div>
-        <% }) %>
-    </div>
-    <% } else { %>
-    <p>No results found.</p>
-    <% } %>
-
-    </main>
-
-    <%- include("partials/footer") %>
-</body>
-</html>
+<%- include('partials/v2/head') %>
+<section class="blk gut"><div class="in">
+  <div class="head"><div><div class="eyebrow">Search</div><h1><%= query ? `“${query}”` : 'Search the shop' %></h1></div></div>
+  <form action="/search" method="GET" class="field" style="max-width:480px;margin-bottom:26px"><input type="text" name="q" value="<%= query %>" placeholder="Try cats, mission, Halloween" aria-label="Search shirts"></form>
+  <% if (results.length) { %>
+    <div class="grid"><% results.forEach(p => { %><%- include('partials/v2/card', { p }) %><% }) %></div>
+  <% } else if (query) { %>
+    <p class="empty">No shirts match “<%= query %>”. <a href="/shop">Browse all shirts</a></p>
+  <% } %>
+</div></section>
+<%- include('partials/v2/foot') %>

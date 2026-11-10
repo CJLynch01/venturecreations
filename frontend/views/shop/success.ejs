@@ -1,22 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Payment Success | Venture Creations</title>
-  <link rel="stylesheet" href="/css/styles.css">
-  <script src="/scripts/home.js" defer></script>
-
-</head>
-<body>
-  <%- include('../partials/header2') %>
-
-  <main class="container">
-    <h1>Thank You!</h1>
-    <p><%= message %></p>
-    <a href="/shop" class="btn">Continue Shopping</a>
-  </main>
-
-  <%- include('../partials/footer') %>
-</body>
-</html>
+<%- include('../partials/v2/head') %>
+<section class="page gut"><div class="narrow" style="text-align:center;display:grid;gap:16px;justify-items:center;padding-block:40px">
+  <div class="eyebrow">Order placed</div>
+  <h1 style="font-size:clamp(34px,5vw,54px)">Thank <em>you!</em></h1>
+  <p class="muted" style="font-size:18px"><%= message %></p>
+  <div class="buyrow"><a class="btn" href="/shop">Keep shopping</a><% if (user) { %><a class="btn ghost" href="/customer/dashboard">My orders</a><% } %></div>
+</div></section>
+<%- include('../partials/v2/foot') %>
