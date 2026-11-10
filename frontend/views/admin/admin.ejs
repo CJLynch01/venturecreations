@@ -1,55 +1,123 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Admin Dashboard | Venture Creations</title>
-  <link rel="stylesheet" href="/css/styles.css" />
-  <script src="/scripts/home.js" defer></script>
+<%- include('../partials/v2/head') %>
+<%
+  const money = n => '$' + Number(n || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const first = (user && user.name ? user.name.split(' ')[0] : '') || 'there';
+  const hello = d.hour < 12 ? 'Good morning' : d.hour < 17 ? 'Good afternoon' : 'Good evening';
+  const today = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', timeZone: 'America/Denver' });
 
-</head>
-<body>
-  <%- include('../partials/header2') %>
+  // Weekly sales chart: one series, her monogram blue, rounded bar tops on a quiet axis
+  const W = 560, H = 210, L = 46, R = 8, T = 18, B = 28;
+  const maxSales = Math.max(...d.weeks.map(w => w.sales), 0);
+  const step = maxSales <= 100 ? 25 : maxSales <= 300 ? 50 : maxSales <= 1000 ? 200 : 500;
+  const top = Math.max(step * 2, Math.ceil(maxSales / step) * step);
+  const slot = (W - L - R) / d.weeks.length, bw = Math.min(34, slot * 0.56);
+  const y = v => T + (H - T - B) * (1 - v / top);
+  const bar = (x, v) => { const yy = y(v), base = H - B, r = Math.min(4, (base - yy) / 2); return `M${x},${base} V${yy + r} Q${x},${yy} ${x + r},${yy} H${x + bw - r} Q${x + bw},${yy} ${x + bw},${yy + r} V${base} Z`; };
+  const wkLabel = s => new Date(s + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  const best = d.weeks.reduce((a, w, i) => (w.sales > d.weeks[a].sales ? i : a), 0);
+  const anySales = maxSales > 0;
+%>
+<section class="page gut ad"><div class="in">
 
-  <main class="container">
-    <h1>Admin Dashboard</h1>
-    <p>Welcome, <%= user.email %>!</p>
+  <div class="ad-head">
+    <div><div class="eyebrow">Admin · <%= today %></div><h1><%= hello %>, <em><%= first %></em></h1></div>
+    <div class="buyrow"><a class="btn" href="/admin/products/new">Add a shirt</a><a class="btn ghost" href="/admin/blog/new">Write a post</a><a class="btn ghost" href="/">View the shop</a></div>
+  </div>
 
-    
-    <a href="/admin/blog">Manage Blog Posts</a> · <a href="/admin/messages">Contact messages</a> · <a href="/admin/ideas">Ideas</a>
+  <% if (d.setup.length) { %>
+  <div class="ad-setup">
+    <h2>Finish setting up <span class="muted tabnum">(<%= d.setup.length %> left)</span></h2>
+    <% d.setup.forEach(s => { %>
+      <details><summary><span class="ad-dot"></span><%= s.label %></summary><p><%= s.how %></p>
+        <% if (s.manual) { %><form action="/admin/setup/<%= s.key %>" method="POST"><button class="btn ghost" type="submit">Mark done</button></form><% } %></details>
+    <% }) %>
+  </div>
+  <% } %>
 
+  <div class="ad-tiles">
+    <a class="ad-tile" href="/admin/orders"><span>Orders in <%= d.month.name %></span><b class="tabnum"><%= d.month.orders %></b><small class="tabnum"><%= d.month.shirts %> shirts</small></a>
+    <a class="ad-tile" href="/admin/orders"><span>Sales in <%= d.month.name %></span><b class="tabnum"><%= money(d.month.sales) %></b><small>before Stripe fees</small></a>
+    <a class="ad-tile <%= d.toPrint ? 'ad-attn' : '' %>" href="#queue"><span>To print</span><b class="tabnum"><%= d.toPrint %></b><small><%= d.toPrint ? 'orders waiting' : 'all caught up' %></small></a>
+    <a class="ad-tile <%= d.toShip ? 'ad-attn' : '' %>" href="#queue"><span>To ship</span><b class="tabnum"><%= d.toShip %></b><small><%= d.toShip ? 'printed, not shipped' : 'nothing waiting' %></small></a>
+    <a class="ad-tile <%= d.unread ? 'ad-attn' : '' %>" href="/admin/messages"><span>New messages</span><b class="tabnum"><%= d.unread %></b><small>from the contact form</small></a>
+  </div>
 
-    <section class="dashboard-controls">
-      <h2>Manage Products</h2>
-      <a href="/admin/products/new" class="btn">Add New Product</a>
-      <a href="/admin/products" class="btn">View All Products</a>
-    </section>
+  <div class="ad-grid">
+    <div class="ad-main">
+      <section class="ad-card" id="queue">
+        <div class="ad-card-head"><h2>Print &amp; ship</h2><a href="/admin/orders">All orders →</a></div>
+        <% if (!d.queue.length) { %>
+          <p class="ad-empty">All caught up. New paid orders show up here with the sizes, colors and any custom text to print.</p>
+        <% } else { d.queue.forEach(o => { %><%- include('../partials/v2/order', { o, back: '' }) %><% }) } %>
+        <% if (d.moreOpen) { %><a class="btn ghost" href="/admin/orders">See <%= d.moreOpen %> more open order<%= d.moreOpen === 1 ? '' : 's' %></a><% } %>
+      </section>
 
-    <div class="product-grid">
-      <% if (products.length === 0) { %>
-        <p>No products available. Start by adding one.</p>
-      <% } else { %>
-        <% products.forEach(product => { %>
-          <div class="product-card">
-            <% if (product.images && product.images.length > 0) { %>
-              <img src="<%= product.images[0] %>" alt="<%= product.name %>">
-            <% } else { %>
-              <p>No image available</p>
-            <% } %>
-            <h3><%= product.name %></h3>
-            <p>$<%= product.price.toFixed(2) %></p>
-            <div class="admin-actions">
-              <a href="/admin/products/edit/<%= product._id %>" class="btn">Edit</a>
-              <form action="/admin/products/delete/<%= product._id %>" method="POST" style="display:inline;">
-                <button type="submit" class="btn delete-btn">Delete</button>
-              </form>
-            </div>
-          </div>
-        <% }) %>
-      <% } %>
+      <section class="ad-card">
+        <div class="ad-card-head"><h2>Sales by week</h2><span class="muted">last 8 weeks</span></div>
+        <% if (!anySales) { %>
+          <p class="ad-empty">No sales in the last 8 weeks yet. Each week's total shows here once orders come in.</p>
+        <% } else { %>
+        <div class="ad-chart">
+          <svg viewBox="0 0 <%= W %> <%= H %>" role="img" aria-label="Sales by week for the last 8 weeks">
+            <% [0, top / 2, top].forEach(v => { %>
+              <line x1="<%= L %>" x2="<%= W - R %>" y1="<%= y(v) %>" y2="<%= y(v) %>" class="ad-grid-line<%= v === 0 ? ' ad-base' : '' %>"/>
+              <text x="<%= L - 8 %>" y="<%= y(v) + 4 %>" text-anchor="end" class="ad-axis">$<%= Math.round(v) %></text>
+            <% }) %>
+            <% d.weeks.forEach((w, i) => { const x = L + i * slot + (slot - bw) / 2; const show = i === d.weeks.length - 1 || i === best; %>
+              <g class="ad-bar">
+                <rect x="<%= L + i * slot %>" y="<%= T %>" width="<%= slot %>" height="<%= H - T - B %>" fill="transparent"/>
+                <% if (w.sales > 0) { %><path d="<%= bar(x, w.sales) %>" fill="#4a5ca3"/><% } %>
+                <text x="<%= x + bw / 2 %>" y="<%= y(w.sales) - 6 %>" text-anchor="middle" class="ad-val<%= show && w.sales > 0 ? ' ad-val-on' : '' %>"><%= money(w.sales) %></text>
+                <text x="<%= x + bw / 2 %>" y="<%= H - 8 %>" text-anchor="middle" class="ad-axis"><%= wkLabel(w.start) %></text>
+                <title>Week of <%= wkLabel(w.start) %>: <%= money(w.sales) %> from <%= w.orders %> order<%= w.orders === 1 ? '' : 's' %></title>
+              </g>
+            <% }) %>
+          </svg>
+        </div>
+        <details class="chart"><summary>Show as a table</summary><div class="tablewrap"><table class="tabnum">
+          <tr><th>Week of</th><th>Orders</th><th>Sales</th></tr>
+          <% d.weeks.slice().reverse().forEach(w => { %><tr><td><%= wkLabel(w.start) %></td><td><%= w.orders %></td><td><%= money(w.sales) %></td></tr><% }) %>
+        </table></div></details>
+        <% } %>
+      </section>
     </div>
-  </main>
 
-  <%- include('../partials/footer') %>
-</body>
-</html>
+    <aside class="ad-side">
+      <section class="ad-card">
+        <div class="ad-card-head"><h2>Top sellers</h2><span class="muted">120 days</span></div>
+        <% if (!d.topSellers.length) { %><p class="ad-empty">Shows up after the first few orders.</p>
+        <% } else { %><ol class="ad-rank"><% d.topSellers.forEach(s => { %><li><span><%= s.name %></span><b class="tabnum"><%= s.qty %></b></li><% }) %></ol><% } %>
+      </section>
+
+      <section class="ad-card">
+        <div class="ad-card-head"><h2>Messages</h2><a href="/admin/messages"><%= d.unread ? d.unread + ' new →' : 'All →' %></a></div>
+        <% if (!d.latestMessages.length) { %><p class="ad-empty">No messages yet.</p>
+        <% } else { d.latestMessages.forEach(m => { %>
+          <a class="ad-msg" href="/admin/messages"><b><%= m.subject || '(no subject)' %><%= m.read ? '' : ' · new' %></b><span class="muted"><%= m.name %> · <%= new Date(m.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) %></span></a>
+        <% }) } %>
+      </section>
+
+      <section class="ad-card">
+        <div class="ad-card-head"><h2>Ideas</h2><a href="/admin/ideas">Open →</a></div>
+        <div class="ideas-sum"><% Object.entries(d.ideas.byStatus).forEach(([st, n]) => { %><span class="ist ist-<%= st.toLowerCase().replace(/\s+/g, '-') %>"><%= st %> <b class="tabnum"><%= n %></b></span><% }) %></div>
+        <% if (d.ideas.next.length) { %><ul class="ad-list"><% d.ideas.next.forEach(i => { %><li><%= i.title %></li><% }) %></ul><% } %>
+        <% if (!d.ideas.total) { %><p class="ad-empty">Opening Ideas starts the list.</p><% } %>
+      </section>
+
+      <section class="ad-card">
+        <div class="ad-card-head"><h2>Holiday look</h2></div>
+        <% if (season) { %>
+          <p style="margin:0"><b><%= season.name %></b> · decorations <%= season.effects ? 'showing now' : 'start closer to the day' %></p>
+        <% } else { %><p class="muted" style="margin:0">No holiday right now.</p><% } %>
+        <p class="muted" style="font-size:13px;margin:8px 0 0">Preview: <a href="/?season=christmas">Christmas</a> · <a href="/?season=halloween">Halloween</a> · <a href="/?season=thanksgiving">Thanksgiving</a> · <a href="/?season=easter">Easter</a> · <a href="/?season=off">today</a></p>
+      </section>
+
+      <section class="ad-card">
+        <div class="ad-card-head"><h2>Catalog</h2><a href="/admin/products"><%= d.productCount %> shirts →</a></div>
+        <div class="ad-thumbs"><% d.newest.forEach(p => { %><a href="/admin/products/edit/<%= p._id %>" title="Edit <%= p.name %>"><img src="<%= p.images && p.images[0] %>" alt="<%= p.name %>" loading="lazy"></a><% }) %></div>
+        <p class="muted" style="font-size:13px;margin:10px 0 0"><a href="/admin/products/new">Add a shirt</a> · <a href="/admin/blog">Blog posts</a></p>
+      </section>
+    </aside>
+  </div>
+</div></section>
+<%- include('../partials/v2/foot') %>

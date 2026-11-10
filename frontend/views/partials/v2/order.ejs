@@ -1,0 +1,24 @@
+<%
+  // One order: who, where, what to print (custom text called out) and the next step button
+  const next = { paid: ['printed', 'Mark printed'], printed: ['shipped', 'Mark shipped'] }[o.status];
+  const addr = o.shippingAddress || {};
+  const when = new Date(o.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'America/Denver' });
+%>
+<article class="ad-order ad-st-<%= o.status %>">
+  <div class="ad-order-top">
+    <div><b><%= addr.name || 'Customer' %></b><span class="muted"><%= when %><%= addr.city ? ' · ' + addr.city + (addr.state ? ', ' + addr.state : '') : '' %></span></div>
+    <span class="ad-pill ad-pill-<%= o.status %>"><%= { paid: 'To print', printed: 'To ship', shipped: 'Shipped' }[o.status] || o.status %></span>
+  </div>
+  <ul class="ad-lines">
+    <% o.lines.forEach(l => { %>
+      <li><span class="ad-qty tabnum"><%= l.quantity %>×</span><span><b><%= l.name %></b><% if (l.details) { %><span class="ad-det"><%= l.details %></span><% } %>
+        <% if (l.custom) { %><span class="ad-custom">Custom: send a proof</span><% } %></span></li>
+    <% }) %>
+  </ul>
+  <div class="ad-order-foot">
+    <span class="tabnum">$<%= (o.total || 0).toFixed(2) %></span>
+    <% if (next) { %>
+      <form action="/admin/orders/<%= o._id %>/status" method="POST"><input type="hidden" name="status" value="<%= next[0] %>"><input type="hidden" name="back" value="<%= typeof back !== 'undefined' ? back : '' %>"><button class="btn" type="submit"><%= next[1] %></button></form>
+    <% } %>
+  </div>
+</article>

@@ -1,0 +1,11 @@
+<%- include('../partials/v2/head') %>
+<section class="page gut ad"><div class="in" style="display:grid;gap:20px">
+  <div><a href="/admin" style="font-size:14px">← Dashboard</a><h1 style="font-size:clamp(30px,4vw,44px)">Orders</h1></div>
+  <nav class="chips" aria-label="Order status">
+    <a href="/admin/orders" aria-current="<%= !status %>">All</a>
+    <% steps.forEach(s => { %><a href="/admin/orders?status=<%= s %>" aria-current="<%= status === s %>"><%= { paid: 'To print', printed: 'To ship', shipped: 'Shipped' }[s] %></a><% }) %>
+  </nav>
+  <% if (!orders.length) { %><p class="ad-empty card">No orders here yet.</p><% } %>
+  <div class="ad-orders"><% orders.forEach(o => { %><%- include('../partials/v2/order', { o, back: 'orders' }) %><% }) %></div>
+</div></section>
+<%- include('../partials/v2/foot') %>

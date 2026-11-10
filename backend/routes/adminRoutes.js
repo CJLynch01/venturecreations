@@ -4,21 +4,57 @@ import Product from "../models/product.js";
 import { ensureAdmin } from "../middleware/auth.js";
 import ContactMessage from "../models/ContactMessage.js";
 import Idea, { IDEA_STATUSES } from "../models/Idea.js";
+import Order from "../models/Order.js";
+import Setting from "../models/Setting.js";
+import { dashboardData, splitItem, ORDER_STEPS } from "../lib/dashboard.js";
 
 const router = express.Router();
 
-// Admin Dashboard - View recent products
+// Admin dashboard: orders to print and ship, sales, messages, ideas, setup steps
 router.get("/", ensureAdmin, async (req, res) => {
   try {
-    const products = await Product.find().sort({ _id: -1 }).limit(3); // Most recent
-    res.render("admin/admin", {
-      user: req.user,
-      products,
-      page: "admin"
-    });
+    res.render("admin/admin", { title: "Dashboard", d: await dashboardData(), page: "admin" });
   } catch (error) {
     console.error("Admin page error:", error);
     res.status(500).send("Error loading admin dashboard.");
+  }
+});
+
+// Move an order along: paid -> printed -> shipped (customers see this on their orders page)
+router.post("/orders/:id/status", ensureAdmin, async (req, res) => {
+  try {
+    if (ORDER_STEPS.includes(req.body.status)) await Order.findByIdAndUpdate(req.params.id, { status: req.body.status });
+    res.redirect(req.body.back === "orders" ? "/admin/orders" : "/admin#queue");
+  } catch (err) {
+    console.error("Order status error:", err);
+    res.status(500).send("Couldn't update the order.");
+  }
+});
+
+// Every order, newest first, optionally one status
+router.get("/orders", ensureAdmin, async (req, res) => {
+  try {
+    const status = ORDER_STEPS.includes(req.query.status) ? req.query.status : "";
+    const orders = await Order.find(status ? { status } : {}).sort({ createdAt: -1 }).limit(300).lean();
+    res.render("admin/orders", { title: "Orders", status, steps: ORDER_STEPS,
+      orders: orders.map(o => ({ ...o, status: o.status || "paid", lines: (o.items || []).map(it => ({ ...it, ...splitItem(it.name) })) })) });
+  } catch (err) {
+    console.error("Orders page error:", err);
+    res.status(500).send("Failed to load orders.");
+  }
+});
+
+// Setup steps she does by hand (like Google Search Console) can be checked off
+router.post("/setup/:key", ensureAdmin, async (req, res) => {
+  try {
+    if (/^[a-zA-Z]{1,30}$/.test(req.params.key)) {
+      const cur = (await Setting.findOne({ key: "setup.done" }))?.value || {};
+      await Setting.findOneAndUpdate({ key: "setup.done" }, { value: { ...cur, [req.params.key]: true }, updatedAt: new Date() }, { upsert: true });
+    }
+    res.redirect("/admin");
+  } catch (err) {
+    console.error("Setup step error:", err);
+    res.status(500).send("Couldn't save that.");
   }
 });
 
