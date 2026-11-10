@@ -94,6 +94,21 @@ function makeFX(band, opts = {}) {
     <path d="M0,-12 q1,-8 6,-11" stroke="#2f6a64" stroke-width="3.4" fill="none" stroke-linecap="round"/>
     <g class="jack-glow" fill="#ffd27a"><path d="M-14,-3 L-6,-3 L-10,-10 Z"/><path d="M6,-3 L14,-3 L10,-10 Z"/><path d="M-2,1 L2,1 L0,-3 Z"/><path d="M-15,7 L-10,9 L-7,6 L-3,10 L0,7 L3,10 L7,6 L10,9 L15,7 C12,16 -12,16 -15,7 Z"/></g></svg>`;
 
+  // Back to school: falling pencils, crayons, letters and an A+ paper, and a school bus along the bottom
+  const pencil = () => `<svg width="${rand(34, 46) | 0}" height="11" viewBox="0 0 40 10"><rect x="6" y="1" width="26" height="8" fill="#e0b030"/><path d="M6,3.7 H32 M6,6.3 H32" stroke="#c9961f" stroke-width=".7"/><rect x="31" y="1" width="2.4" height="8" fill="#a0a3a8"/><rect x="33.4" y="1" width="5" height="8" rx="1.6" fill="#e3b3c0"/><path d="M0,5 L6,1 V9 Z" fill="#ead2ab"/><path d="M0,5 L2.3,3.6 V6.4 Z" fill="#1c2233"/></svg>`;
+  const crayon = col => `<svg width="${rand(30, 40) | 0}" height="10" viewBox="0 0 36 10"><rect x="6" y="1" width="28" height="8" rx="1.5" fill="${col}"/><rect x="12" y="1" width="14" height="8" fill="#ffffff" opacity=".35"/><path d="M12,1 V9 M26,1 V9" stroke="#00000033" stroke-width=".6"/><path d="M0.5,5 L6,1.6 V8.4 Z" fill="${col}"/></svg>`;
+  const letter = (ch, col) => `<svg width="${rand(18, 28) | 0}" height="${rand(18, 28) | 0}" viewBox="0 0 20 20"><text x="10" y="15.5" text-anchor="middle" font-family="'Bodoni Moda',Georgia,serif" font-size="17" font-weight="600" fill="${col}">${ch}</text></svg>`;
+  const aplus = `<svg width="30" height="36" viewBox="0 0 30 36"><rect x="1" y="1" width="28" height="34" rx="1.5" fill="#ffffff" stroke="#c9cbd6"/><path d="M6,1 V35" stroke="#e3b3c0" stroke-width=".8"/><path d="M3,9 H27 M3,14 H27 M3,19 H27 M3,24 H27 M3,29 H27" stroke="#9fb0e6" stroke-width=".6"/><text x="16" y="23" text-anchor="middle" font-family="'Bodoni Moda',Georgia,serif" font-size="13" font-weight="600" fill="#d33a3a">A+</text></svg>`;
+  const bus = `<svg width="${small ? 110 : 150}" height="${small ? 52 : 70}" viewBox="0 0 120 56">
+    <path d="M6,12 Q6,6 12,6 H92 Q100,6 102,14 L104,26 H114 Q118,26 118,32 V44 H6 Z" fill="#e8b420" stroke="#9a7414" stroke-width="1"/>
+    <rect x="6" y="30" width="112" height="3" fill="#1c2233" opacity=".8"/><rect x="6" y="37" width="112" height="2" fill="#1c2233" opacity=".55"/>
+    ${[12, 28, 44, 60, 76].map(x => `<rect x="${x}" y="11" width="12" height="11" rx="1.5" fill="#cfe0f5" stroke="#9a7414" stroke-width=".6"/>`).join('')}
+    <rect x="91" y="11" width="9" height="19" rx="1" fill="#cfe0f5" stroke="#9a7414" stroke-width=".6"/><path d="M95.5,11 V30" stroke="#9a7414" stroke-width=".6"/>
+    <rect x="114" y="34" width="5" height="4" rx="1" fill="#ffefb0"/><rect x="5" y="34" width="3" height="4" fill="#d33a3a"/>
+    <g class="bus-wheel"><circle cx="26" cy="45" r="7" fill="#1c2233"/><circle cx="26" cy="45" r="2.6" fill="#a0a3a8"/><path d="M26,40 V50 M21,45 H31" stroke="#a0a3a8" stroke-width="1"/></g>
+    <g class="bus-wheel"><circle cx="96" cy="45" r="7" fill="#1c2233"/><circle cx="96" cy="45" r="2.6" fill="#a0a3a8"/><path d="M96,40 V50 M91,45 H101" stroke="#a0a3a8" stroke-width="1"/></g>
+  </svg>`;
+
   // Christmas: Santa's sleigh and two reindeer (the lead one with a red nose) flying across the sky
   const reindeer = (x, y, nose) => `<g transform="translate(${x},${y})">
     <path class="rd-legs" d="M-10,4 l-3,10 M-6,4 l2,10 M8,4 l-2,10 M12,4 l3,10" stroke="#5e4433" stroke-width="2" stroke-linecap="round" fill="none"/>
@@ -267,8 +282,12 @@ function makeFX(band, opts = {}) {
     } else if (kind === 'july4') {
       fireworks();
     } else if (kind === 'backtoschool') {
-      const go = () => fly(plane, { y: [10, 50], dur: [9, 12], cls: 'vc-plane', rtl: false });
-      later(go, 1500); every(go, ms(16000));
+      const go = () => { fly(plane, { y: [12, 55], dur: [8, 11], cls: 'vc-plane', rtl: false }); if (Math.random() < .4) later(() => fly(plane, { y: [20, 60], dur: [9, 12], cls: 'vc-plane', rtl: true }), 1800); };
+      later(go, 1200); every(go, ms(9000));
+      const supply = () => { const r = Math.random(); return r < .3 ? pencil() : r < .6 ? crayon(pick([C.blue, '#d33a3a', C.green, C.mauve, C.gold])) : r < .9 ? letter(pick(['A', 'B', 'C', '1', '2', '3']), pick([C.blue, '#d33a3a', C.green, C.mauve])) : aplus; };
+      for (let i = 0; i < n(small ? 10 : 18); i++) piece(supply(), { dur: [9, 15], delay: [0, 15], cls: 'vc-tumble' });
+      const drive = () => fly(bus, { y: [small ? 82 : 79, small ? 84 : 81], dur: [small ? 9 : 12, small ? 11 : 15], cls: 'vc-bus', rtl: false });
+      later(drive, 2500); every(drive, ms(20000));
     }
   }
   function stop() {

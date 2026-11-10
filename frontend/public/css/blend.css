@@ -438,3 +438,7 @@ footer.site .copy{grid-column:1/-1;border-top:1px solid var(--line);padding-top:
 @keyframes vc-peek{0%,55%,100%{transform:translateY(0)}62%,88%{transform:translateY(-60px)}70%{transform:translateY(-54px) rotate(-6deg)}78%{transform:translateY(-60px) rotate(5deg)}}
 .vc-jack .jack-glow{animation:vc-candle 1.6s steps(1) infinite}
 @keyframes vc-candle{0%,100%{fill:#ffd27a;filter:drop-shadow(0 0 4px #ffb347)}30%{fill:#ffe9a8;filter:drop-shadow(0 0 7px #ffb347)}55%{fill:#f4c063;filter:drop-shadow(0 0 2px #ffb347)}80%{fill:#ffdc8c;filter:drop-shadow(0 0 6px #ffb347)}}
+/* Back to school: the bus bumps along with its wheels turning */
+.vc-bus svg{animation:vc-bump .32s ease-in-out infinite alternate}
+@keyframes vc-bump{from{transform:translateY(0)}to{transform:translateY(-1.6px)}}
+.vc-bus .bus-wheel{transform-box:fill-box;transform-origin:50% 50%;animation:vc-spin .7s linear infinite}
