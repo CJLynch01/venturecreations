@@ -65,7 +65,7 @@ nav.main a:hover,nav.main a[aria-current=page]{color:var(--brand)}
 .search input:focus{outline:none}
 .search button{border:0;background:none;padding:0 10px}
 .search svg{width:17px;height:17px;stroke:var(--muted);fill:none;stroke-width:2}
-@media (max-width:1240px){.search{display:none}}
+@media (max-width:1340px){.search{display:none}}
 @media (max-width:1000px){nav.main{gap:14px}nav.main a{letter-spacing:.08em}}
 @media (max-width:900px){
   nav.main{position:absolute;left:0;right:0;top:100%;background:var(--card);border-bottom:1px solid var(--line);flex-direction:column;align-items:stretch;gap:0;padding:8px max(16px,env(safe-area-inset-left,0px));display:none}
