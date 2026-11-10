@@ -20,6 +20,7 @@ import BlogPost from "./models/BlogPost.js";
 // Shop settings and cart
 import * as SHOP from "./config/shop.js";
 import { cartCount, clearCart } from "./lib/cart.js";
+import { seasonMiddleware, seasonFirst } from "./config/seasons.js";
 import { withSlugs, siteUrl, absolute, productPath, productSummary, productJsonLd, breadcrumbJsonLd, storeJsonLd } from "./lib/seo.js";
 
 // Routes
@@ -92,6 +93,9 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
+// Current holiday season (decoration + seasonal shirts first); preview others with ?season=christmas
+app.use(seasonMiddleware);
+
 // Everything every page needs: who's signed in, the cart badge, shop settings
 app.use(async (req, res, next) => {
   res.locals.user = req.user;
@@ -143,20 +147,24 @@ app.get("/", async (req, res) => {
   const mission = missionProduct(products);
   // Top photos: shirts she tags "featured" come first, then the newest
   const featured = p => (p.tags || []).some(t => /featured/i.test(t));
-  const hero = [...products.filter(featured), ...products.filter(p => !featured(p))].filter(p => p !== mission && p.images?.length).slice(0, 4);
+  const season = res.locals.season;
+  const hero = seasonFirst([...products.filter(featured), ...products.filter(p => !featured(p))], season).filter(p => p !== mission && p.images?.length).slice(0, 4);
+  // This season's shirts, and the next holiday's when it's close (Christmas during Thanksgiving)
+  const seasonal = season ? products.filter(season.match).slice(0, 8) : [];
+  const upcoming = season?.upcoming ? products.filter(season.upcoming.match).slice(0, 8) : [];
   Object.assign(res.locals.seo, {
     canonical: siteUrl(req) + "/",
     description: "Custom shirts for every venture: custom missionary shirts, Christmas and faith tees, mental health, cats, Día de los Muertos and Halloween shirts, made to order with group discounts.",
     image: hero[0]?.images?.[0], jsonld: [storeJsonLd(req)],
   });
-  res.render("home", { title: "Custom shirts for every venture", products: products.slice(0, 8), hero, collections, mission, page: "home" });
+  res.render("home", { title: "Custom shirts for every venture", products: products.slice(0, 8), hero, collections, mission, seasonal, upcoming, page: "home" });
 });
 
 app.get("/shop", async (req, res) => {
   const products = await allProducts();
   const active = SHOP.COLLECTIONS.find(c => c.id === req.query.c) ? req.query.c : "all";
   const counts = Object.fromEntries(SHOP.COLLECTIONS.map(c => [c.id, products.filter(p => p.collections.includes(c.id)).length]));
-  const list = active === "all" ? products : products.filter(p => p.collections.includes(active));
+  const list = seasonFirst(active === "all" ? products : products.filter(p => p.collections.includes(active)), res.locals.season);
   const coll = SHOP.COLLECTIONS.find(c => c.id === active);
   Object.assign(res.locals.seo, {
     canonical: siteUrl(req) + "/shop" + (coll ? `?c=${coll.id}` : ""),

@@ -2,7 +2,7 @@
 
 <section class="home gut"><div class="in">
   <div>
-    <div class="eyebrow">Custom shirts · made to order</div>
+    <div class="eyebrow"><% if (season) { %><%= season.name %> · <% } %>Custom shirts · made to order</div>
     <h1>Shirts for <em>every venture</em></h1>
     <p class="lead">Faith, family, missions, hard days and happy ones. Soft tees with designs that say something, and every one can be made yours.</p>
     <div class="row"><a class="btn" href="/shop">Shop the collection</a><a class="btn ghost" href="/mission">Make one custom</a></div>
@@ -19,6 +19,19 @@
     <% }) %>
   </div>
 </div></section>
+
+<%
+  const ROW = { valentines: "Valentine's shirts", easter: 'Easter shirts', july4: '4th of July shirts', backtoschool: 'Back to school', halloween: 'Halloween shirts', thanksgiving: 'Fall favorites', christmas: 'Christmas shirts' };
+  const rows = [];
+  if (season && seasonal.length >= 2) rows.push({ eyebrow: season.name, title: ROW[season.id], list: seasonal, link: season.link });
+  if (season && season.upcoming && upcoming.length >= 2) rows.push({ eyebrow: 'Coming up', title: season.upcoming.name + ' is coming', list: upcoming, link: season.upcoming.link });
+%>
+<% rows.forEach(r => { %>
+<section class="blk gut seasonal-row" style="padding-bottom:0"><div class="in">
+  <div class="head"><div><div class="eyebrow"><%= r.eyebrow %></div><h2><%= r.title %></h2></div><a class="btn ghost" href="<%= r.link %>">See them all</a></div>
+  <div class="grid"><% r.list.slice(0, 4).forEach(p => { %><%- include('partials/v2/card', { p }) %><% }) %></div>
+</div></section>
+<% }) %>
 
 <%- include('partials/v2/trust') %>
 

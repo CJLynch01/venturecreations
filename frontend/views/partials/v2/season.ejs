@@ -1,0 +1,50 @@
+<%
+// Seasonal touch under the menu: a small garland and one greeting line, in the site's own colors.
+// Icons are simple flat shapes; season comes from backend/config/seasons.js.
+const s = typeof season !== 'undefined' && season;
+if (s) {
+  const C = { rust: '#b5652c', gold: '#c9a227', mauve: '#a97c86', blue: '#4a5ca3', green: '#2f6a64', ink: '#1c2233', brown: '#7a5a44', pink: '#e3b3c0', sky: '#9fb0e6', mint: '#a9cfc6', cream: '#ead9a6' };
+  const W = 1440, step = 36, n = Math.ceil(W / step);
+  const wave = (amp) => { let d = 'M0,4'; for (let i = 0; i < n; i++) d += ` Q${i * step + step / 2},${4 + amp} ${(i + 1) * step},4`; return d; };
+  let items = '';
+  for (let i = 0; i < n; i++) {
+    const x = i * step + step / 2, y = 7.2;   // low point of each swag (where things hang from the wire)
+    const k = i % 4;
+    if (s.id === 'christmas') {
+      const col = [C.gold, C.mauve, C.blue, C.green][k];
+      items += `<g class="tw tw${k}"><rect x="${x - 1.6}" y="${y - .6}" width="3.2" height="3" rx=".8" fill="${C.ink}" opacity=".55"/><ellipse cx="${x}" cy="${y + 6.6}" rx="3.1" ry="4.6" fill="${col}"/></g>`;
+    } else if (s.id === 'thanksgiving') {
+      const col = [C.rust, C.gold, C.mauve, C.brown][k], r = (i % 2 ? 35 : -35);
+      items += `<path transform="translate(${x},${y - .4}) rotate(${r})" d="M0,0 C4,2 5,7 0,11 C-5,7 -4,2 0,0 Z M0,1 V10" fill="${col}" stroke="${col}" stroke-width=".6"/>`;
+    } else if (s.id === 'halloween') {
+      items += i % 2
+        ? `<g transform="translate(${x},${y + 5})"><ellipse rx="4.4" ry="3.6" fill="${C.rust}"/><ellipse rx="2" ry="3.6" fill="${C.gold}" opacity=".35"/><rect x="-.6" y="-5.6" width="1.4" height="2.4" fill="${C.green}"/></g>`
+        : `<path transform="translate(${x},${y + 4})" d="M0,0 C-2,-2 -4,-1 -7,-3 C-6,0 -5,2 -3,2 C-2,1 -1,2 0,3 C1,2 2,1 3,2 C5,2 6,0 7,-3 C4,-1 2,-2 0,0 Z" fill="${C.ink}" opacity=".8"/>`;
+    } else if (s.id === 'valentines') {
+      const col = [C.mauve, C.pink][i % 2];
+      items += `<path transform="translate(${x - 4.5},${y + 1}) scale(.32)" d="M14,24 C4,17 3,11 6,8 C9,5 13,7 14,10 C15,7 19,5 22,8 C25,11 24,17 14,24 Z" fill="${col}"/>`;
+    } else if (s.id === 'easter') {
+      const col = [C.pink, C.sky, C.mint, C.cream][k];
+      items += `<g transform="translate(${x},${y + 6})"><ellipse rx="3.4" ry="4.6" fill="${col}"/><path d="M-3.3,0 l1.6,-1.2 l1.6,1.2 l1.6,-1.2 l1.6,1.2" fill="none" stroke="#fff" stroke-width=".9"/></g>`;
+    } else {   // july4, back to school: little pennants
+      const col = s.id === 'july4' ? [C.blue, '#ffffff', C.mauve][i % 3] : [C.blue, C.gold, C.green][i % 3];
+      items += `<path d="M${x - 6},${y - 3} L${x + 6},${y - 3} L${x},${y + 8} Z" fill="${col}" stroke="${C.ink}" stroke-opacity=".12" stroke-width=".6"/>`;
+    }
+  }
+  const ICON = {
+    turkey: `<g transform="translate(20,22)">${[-70, -35, 0, 35, 70].map((a, i) => `<ellipse cx="0" cy="-10" rx="4" ry="9.5" transform="rotate(${a})" fill="${[C.rust, C.gold, C.mauve, C.gold, C.rust][i]}"/>`).join('')}<ellipse cy="1" rx="7" ry="7.4" fill="${C.brown}"/><circle cy="-7.4" r="3.6" fill="#8a6a52"/><circle cx="-1.2" cy="-8" r=".6" fill="${C.ink}"/><circle cx="1.2" cy="-8" r=".6" fill="${C.ink}"/><path d="M-1,-6.6 L1,-6.6 L0,-4.8 Z" fill="${C.gold}"/><path d="M.8,-5.6 q1.4,1.2 .2,2.8" stroke="#b3262e" stroke-width="1.1" fill="none" stroke-linecap="round"/><path d="M-2.5,8 v2.4 M2.5,8 v2.4" stroke="${C.gold}" stroke-width="1.2" stroke-linecap="round"/></g>`,
+    ornament: `<g transform="translate(20,21)"><circle cy="3" r="9.5" fill="${C.blue}"/><path d="M-9.3,1 Q0,5 9.3,1" stroke="${C.gold}" stroke-width="1.4" fill="none"/><path d="M-9,6.5 Q0,10.5 9,6.5" stroke="${C.mauve}" stroke-width="1.4" fill="none"/><rect x="-3" y="-8.6" width="6" height="3.4" rx="1" fill="${C.gold}"/><path d="M0,-8.6 c-2.2,-3.6 2.2,-3.6 0,0" stroke="${C.gold}" stroke-width="1" fill="none"/><circle cx="-3.6" cy="-1" r="1.6" fill="#fff" opacity=".45"/></g>`,
+    pumpkin: `<g transform="translate(20,23)"><ellipse cx="-4" rx="6" ry="7.5" fill="${C.rust}"/><ellipse cx="4" rx="6" ry="7.5" fill="${C.rust}"/><ellipse rx="5" ry="8" fill="#c97a3c"/><path d="M0,-7.5 q.5,-3 2.6,-4" stroke="${C.green}" stroke-width="2" fill="none" stroke-linecap="round"/></g>`,
+    heart: `<path transform="translate(6,6) scale(1.05)" d="M14,24 C4,17 3,11 6,8 C9,5 13,7 14,10 C15,7 19,5 22,8 C25,11 24,17 14,24 Z" fill="${C.mauve}"/>`,
+    egg: `<g transform="translate(20,21)"><ellipse rx="8" ry="10.5" fill="${C.sky}"/><path d="M-7.6,-1 l2.5,-2 l2.5,2 l2.5,-2 l2.5,2 l2.5,-2 l2.5,2" fill="none" stroke="#fff" stroke-width="1.4"/><path d="M-7,5 H7" stroke="${C.mauve}" stroke-width="1.6"/></g>`,
+    star: `<path transform="translate(6,5) scale(1.05)" d="M14,3 L16.6,10.5 L24.5,10.5 L18,15.2 L20.5,23 L14,18.3 L7.5,23 L10,15.2 L3.5,10.5 L11.4,10.5 Z" fill="${C.blue}"/>`,
+    apple: `<g transform="translate(20,23)"><circle cx="-3" r="7.5" fill="#b3262e"/><circle cx="3" r="7.5" fill="#b3262e"/><path d="M0,-7 q1,-4 3.5,-5" stroke="${C.brown}" stroke-width="1.6" fill="none"/><path d="M1.5,-9 q5,-3 7,1 q-4,2.5 -7,-1 Z" fill="${C.green}"/></g>`,
+  };
+%>
+<div class="season season-<%= s.id %>" role="note" aria-label="<%= s.greeting %>">
+  <svg class="garland" viewBox="0 0 <%= W %> 28" preserveAspectRatio="xMidYMin slice" aria-hidden="true"><path d="<%= wave(7) %>" fill="none" stroke="#1c2233" stroke-opacity=".28" stroke-width="1"/><%- items %></svg>
+  <div class="season-line gut"><svg class="season-icon" viewBox="0 0 40 40" aria-hidden="true"><%- ICON[s.icon] || '' %></svg>
+    <span><%= s.greeting %></span><a href="<%= s.link %>"><%= s.linkText %> →</a>
+    <% if (s.preview) { %><a class="season-off" href="?season=off">Previewing <%= s.name %> · back to today</a><% } %></div>
+</div>
+<% } %>
