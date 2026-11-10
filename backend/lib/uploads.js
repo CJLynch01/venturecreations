@@ -14,7 +14,7 @@ function bucket() {
   // Region and bucket default to the shop's own bucket, so only the two keys are required
   const { AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY } = process.env;
   const AWS_REGION = process.env.AWS_REGION || "us-east-2";
-  const S3_BUCKET_NAME = process.env.S3_BUCKET_NAME || "venturecreations-images";
+  const S3_BUCKET_NAME = process.env.S3_BUCKET_NAME || process.env.S3_BUCKET || "venturecreations-images";   // Render names it S3_BUCKET
   if (!(AWS_ACCESS_KEY_ID && AWS_SECRET_ACCESS_KEY && AWS_REGION && S3_BUCKET_NAME)) return null;
   client ||= new S3Client({ region: AWS_REGION, credentials: { accessKeyId: AWS_ACCESS_KEY_ID, secretAccessKey: AWS_SECRET_ACCESS_KEY } });
   return { client, name: S3_BUCKET_NAME, region: AWS_REGION };
