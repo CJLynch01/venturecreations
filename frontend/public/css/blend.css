@@ -366,7 +366,7 @@ footer.site .copy{grid-column:1/-1;border-top:1px solid var(--line);padding-top:
 @keyframes vc-beat{0%,100%{transform:scale(1)}15%{transform:scale(1.18)}30%{transform:scale(1)}45%{transform:scale(1.12)}}
 @keyframes vc-spin{to{transform:rotate(360deg)}}
 @keyframes vc-hop{0%,100%{transform:translateY(0)}40%{transform:translateY(-5px)}}
-.vc-fx{position:fixed;inset:0;pointer-events:none;z-index:15;overflow:hidden}
+.vc-fx{position:fixed;inset:0;pointer-events:none;z-index:25;overflow:hidden}
 .vc-p{position:absolute;top:-34px;animation:vc-down linear infinite;transition:margin-left 2.4s ease-in-out}
 .vc-p.vc-up{top:auto;bottom:-34px;animation-name:vc-up}
 .vc-fx.vc-gust .vc-p{margin-left:14vw}
@@ -414,3 +414,14 @@ footer.site .copy{grid-column:1/-1;border-top:1px solid var(--line);padding-top:
 /* Easter bunny: hops across the bottom of the page */
 .vc-bunny svg{transform-origin:50% 100%;animation:vc-hopping .72s ease-in-out infinite}
 @keyframes vc-hopping{0%{transform:translateY(0) scale(1.06,.9)}18%{transform:translateY(-6px) scale(.96,1.06)}50%{transform:translateY(-34px) rotate(-7deg) scale(1)}82%{transform:translateY(-4px) rotate(2deg) scale(1)}100%{transform:translateY(0) scale(1.06,.9)}}
+/* Christmas sleigh: swoops gently while the reindeer gallop */
+.vc-sleigh svg{animation:vc-sleigh-bob 2.6s ease-in-out infinite alternate}
+@keyframes vc-sleigh-bob{from{transform:translateY(-9px) rotate(-3deg)}to{transform:translateY(11px) rotate(2deg)}}
+.rd-legs{transform-box:fill-box;transform-origin:50% 0;animation:vc-gallop .32s ease-in-out infinite alternate}
+@keyframes vc-gallop{from{transform:skewX(-20deg)}to{transform:skewX(20deg)}}
+/* Thanksgiving turkey: walks with its feet on the ground, trips forward, catches itself */
+.vc-walker svg{transform-origin:50% 96%;animation:vc-stumble 4.8s ease-in-out infinite}
+.vc-walker .tk-leg{transform-box:fill-box;transform-origin:50% 0;animation:vc-step .46s ease-in-out infinite alternate}
+.vc-walker .tk-leg-r{animation-delay:-.46s}
+@keyframes vc-step{from{transform:rotate(-20deg)}to{transform:rotate(20deg)}}
+@keyframes vc-stumble{0%,100%{transform:rotate(-4deg)}12%{transform:rotate(0) translateY(-1.5px)}25%{transform:rotate(4deg) scaleY(.97)}37%{transform:rotate(0) translateY(-1.5px)}50%{transform:rotate(-4deg)}58%{transform:rotate(22deg) translateX(3px) scaleY(.95)}64%{transform:rotate(30deg) translateX(5px) scaleY(.9)}70%{transform:rotate(-8deg) translateY(-7px) scaleY(1.05)}76%{transform:rotate(3deg) translateY(0) scaleY(.9)}82%{transform:rotate(-4deg) scaleY(1)}91%{transform:rotate(4deg) translateY(-1.5px)}}

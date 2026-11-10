@@ -74,6 +74,34 @@ function makeFX(band, opts = {}) {
   const heart = col => `<svg width="${rand(12, 20) | 0}" height="${rand(12, 20) | 0}" viewBox="3 4 22 21"><path d="M14,24 C4,17 3,11 6,8 C9,5 13,7 14,10 C15,7 19,5 22,8 C25,11 24,17 14,24 Z" fill="${col}"/></svg>`;
   // Easter: cherry blossom petals (notched at the tip) and the odd butterfly
   const petal = col => { const s = rand(11, 20) | 0; return `<svg class="vc-bloom" width="${s}" height="${s}" viewBox="-6 -6 12 12">${[0, 72, 144, 216, 288].map(a => `<ellipse cy="-2.7" rx="1.9" ry="2.8" transform="rotate(${a})" fill="${col}" stroke="#d99aab" stroke-opacity=".6" stroke-width=".35"/>`).join('')}<circle r="1.3" fill="#c9a227"/></svg>`; };
+  // Christmas: Santa's sleigh and two reindeer (the lead one with a red nose) flying across the sky
+  const reindeer = (x, y, nose) => `<g transform="translate(${x},${y})">
+    <path class="rd-legs" d="M-10,4 l-3,10 M-6,4 l2,10 M8,4 l-2,10 M12,4 l3,10" stroke="#5e4433" stroke-width="2" stroke-linecap="round" fill="none"/>
+    <ellipse rx="14" ry="6.5" fill="#8a6447"/><circle cx="-14" cy="-3" r="2" fill="#fff"/>
+    <path d="M9,-3 L15,-12 L19,-10 L14,0 Z" fill="#8a6447"/><ellipse cx="19" cy="-13" rx="5.5" ry="3.6" fill="#8a6447"/>
+    <circle cx="24.3" cy="-13" r="1.7" fill="${nose}"/><circle cx="19.5" cy="-14.2" r=".7" fill="#1c2233"/>
+    <path d="M16,-16 l-2,-6 m1,3 l-3,-1 M18.5,-16 l1,-7 m-.5,3 l3,-2" stroke="#5e4433" stroke-width="1.3" fill="none" stroke-linecap="round"/></g>`;
+  const sleigh = `<svg width="${small ? 150 : 230}" height="${small ? 42 : 64}" viewBox="0 0 200 56">
+    <path d="M58,22 Q92,16 118,21 M120,20 Q140,16 160,19" stroke="#7a5a44" stroke-width=".9" fill="none"/>
+    ${reindeer(120, 30, '#5e4433')}${reindeer(163, 26, '#d33a3a')}
+    <path d="M18,25 C13,14 27,7 33,16 L34,30 Z" fill="#a97c86"/><path d="M22,12 l4,3" stroke="#7a5a44" stroke-width="1.2"/>
+    <ellipse cx="40" cy="26" rx="9" ry="8" fill="#b3262e"/><rect x="31" y="27" width="18" height="2.6" fill="#1c2233"/>
+    <circle cx="44" cy="15" r="5" fill="#f1d3c0"/><path d="M39.5,15 C39.5,23.5 48.5,23.5 48.5,15 C46,18.5 42,18.5 39.5,15 Z" fill="#fff"/>
+    <path d="M39,12.5 C40,5 48,4 51,9 L48.5,12.5 Z" fill="#b3262e"/><circle cx="52" cy="9" r="1.8" fill="#fff"/><rect x="38.6" y="11.4" width="11" height="2.4" rx="1.2" fill="#fff"/>
+    <path d="M46,24 L58,22" stroke="#b3262e" stroke-width="3.2" stroke-linecap="round"/><circle cx="58.5" cy="22" r="1.8" fill="#1c2233"/>
+    <path d="M12,30 H58 C62,30 64,26 66,22 C68,27 66,40 56,42 H20 C14,42 11,37 12,30 Z" fill="#b3262e" stroke="#c9a227" stroke-width="1.2"/>
+    <path d="M14,48 H60 C66,48 68,44 70,40 M22,42 V48 M50,42 V48" stroke="#c9a227" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+  </svg>`;
+  // Thanksgiving: a turkey that waddles along the bottom and trips now and then
+  const walkingTurkey = `<svg width="${small ? 54 : 70}" height="${small ? 58 : 76}" viewBox="-30 -36 60 66"><g>
+    ${[-70, -35, 0, 35, 70].map((a, i) => `<ellipse cx="0" cy="-15" rx="6.5" ry="15" transform="rotate(${a})" fill="${['#b5652c', '#c9a227', '#a97c86', '#c9a227', '#b5652c'][i]}"/>`).join('')}
+    ${[-52, -17, 17, 52].map((a, i) => `<ellipse cx="0" cy="-12" rx="3" ry="9" transform="rotate(${a})" fill="${['#8f3b2a', '#d9b04a', '#d9b04a', '#8f3b2a'][i]}" opacity=".8"/>`).join('')}
+    <path class="tk-leg tk-leg-l" d="M-4,12 v10 l-3,3 M-4,22 l2,3" stroke="#c9a227" stroke-width="1.8" stroke-linecap="round" fill="none"/>
+    <path class="tk-leg tk-leg-r" d="M4,12 v10 l3,3 M4,22 l-2,3" stroke="#c9a227" stroke-width="1.8" stroke-linecap="round" fill="none"/>
+    <ellipse cy="3" rx="11" ry="12" fill="#7a5a44"/><circle cy="-11" r="5.6" fill="#8a6a52"/>
+    <circle cx="-2" cy="-12" r=".9" fill="#1c2233"/><circle cx="2" cy="-12" r=".9" fill="#1c2233"/>
+    <path d="M-1.6,-9.6 L1.6,-9.6 L0,-6.8 Z" fill="#c9a227"/><path d="M1.2,-8.6 q2.2,2 .4,4.6" stroke="#b3262e" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+  </g></svg>`;
   // Easter bunny with a basket of eggs, hopping across the bottom of the page
   const bunny = `<svg width="78" height="68" viewBox="0 0 64 56"><g stroke="#b9ab9f" stroke-width=".8">
     <circle cx="9.5" cy="35.5" r="5" fill="#ffffff"/>
@@ -137,6 +165,8 @@ function makeFX(band, opts = {}) {
     band.classList.add('animate');
 
     if (kind === 'christmas') {
+      const sleighRide = () => fly(sleigh, { y: [18, 32], dur: [small ? 9 : 13, small ? 11 : 17], cls: 'vc-sleigh', rtl: false });
+      later(sleighRide, 2500); every(sleighRide, ms(26000));
       for (let i = 0; i < n(small ? 26 : 50); i++) {
         const size = rand(7, 24) | 0;
         piece(flake(size), { dur: size < 12 ? [13, 18] : [8, 12], delay: [0, 16] });
@@ -148,6 +178,8 @@ function makeFX(band, opts = {}) {
         const svg = p.querySelector('svg'); svg.parentElement.style.setProperty('--tumble', rand(1.8, 3.8).toFixed(2) + 's');
         if (Math.random() < .5) svg.parentElement.classList.add('vc-rev');
       }
+      const strut = () => fly(walkingTurkey, { y: [small ? 82 : 79, small ? 85 : 82], dur: [small ? 14 : 20, small ? 17 : 25], cls: 'vc-walker' });
+      later(strut, 1500); every(strut, ms(28000));
       // a gust of wind now and then pushes the leaves sideways
       every(() => { layer.classList.add('vc-gust'); setTimeout(() => layer.classList.remove('vc-gust'), 2600); }, ms(14000));
     } else if (kind === 'halloween') {
