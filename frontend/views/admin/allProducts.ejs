@@ -9,12 +9,29 @@
   <% if (!products.length) { %><p class="ad-empty card">No shirts yet. Add the first one.</p><% } %>
   <div class="pl-grid">
     <% products.forEach(p => { %>
-      <a class="pl-item" href="/admin/products/edit/<%= p._id %>" data-q="<%= [p.name, p.category, ...(p.tags || [])].join(' ').toLowerCase() %>">
-        <span class="pl-ph"><% if (p.images && p.images[0]) { %><img src="<%= p.images[0] %>" alt="" loading="lazy"><% } %></span>
+      <div class="pl-item" data-q="<%= [p.name, p.category, ...(p.tags || [])].join(' ').toLowerCase() %>">
+        <a class="pl-ph" href="/admin/products/edit/<%= p._id %>" aria-label="Edit <%= p.name %>"><% if (p.images && p.images[0]) { %><img src="<%= p.images[0] %>" alt="" loading="lazy"><% } %></a>
         <b><%= p.name %></b>
         <span class="muted tabnum">$<%= Number(p.price || 0).toFixed(2) %> · <%= (p.images || []).length %> photo<%= (p.images || []).length === 1 ? '' : 's' %><%= p.seasonalCategory && p.seasonalCategory !== 'None' ? ' · ' + p.seasonalCategory : '' %></span>
-      </a>
+        <div class="pl-acts">
+          <a class="btn" href="/admin/products/edit/<%= p._id %>">Edit</a>
+          <form action="/admin/products/delete/<%= p._id %>" method="POST" class="pl-del">
+            <button class="btn ghost" type="button" data-arm>Remove</button>
+            <button class="btn pl-sure" type="submit" hidden>Yes, remove</button>
+            <button class="btn ghost" type="button" data-cancel hidden>Keep</button>
+          </form>
+        </div>
+      </div>
     <% }) %>
   </div>
 </div></section>
+<script>
+// Remove asks once more on the same card before it deletes anything
+document.querySelectorAll('.pl-del').forEach(f => {
+  const arm = f.querySelector('[data-arm]'), sure = f.querySelector('.pl-sure'), cancel = f.querySelector('[data-cancel]');
+  const set = on => { arm.hidden = on; sure.hidden = !on; cancel.hidden = !on; f.closest('.pl-item').classList.toggle('pl-arming', on); f.previousElementSibling.hidden = on; };
+  arm.addEventListener('click', () => { set(true); sure.focus(); });
+  cancel.addEventListener('click', () => set(false));
+});
+</script>
 <%- include('../partials/v2/foot') %>
