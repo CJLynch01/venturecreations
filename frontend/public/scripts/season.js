@@ -148,55 +148,74 @@ function makeFX(band, opts = {}) {
   const bat = `<svg width="46" height="22" viewBox="-23 -11 46 22"><g fill="${C.ink}" opacity=".78"><path class="vc-wing" d="M-3,0 C-8,-8 -16,-9 -22,-4 C-17,-3 -15,0 -14,3 C-11,1 -8,1 -6,4 Z"/><path class="vc-wing vc-wing-r" d="M3,0 C8,-8 16,-9 22,-4 C17,-3 15,0 14,3 C11,1 8,1 6,4 Z"/><ellipse rx="3.6" ry="4.4"/><path d="M-2.6,-3.4 L-3.6,-7 L-1,-4.4 Z M2.6,-3.4 L3.6,-7 L1,-4.4 Z"/></g></svg>`;
   const plane = `<svg width="54" height="30" viewBox="0 0 54 30"><path d="M2,15 L52,2 L30,28 L24,18 Z" fill="#fff" stroke="${C.blue}" stroke-width="1.4" stroke-linejoin="round"/><path d="M24,18 L52,2" stroke="${C.blue}" stroke-width="1.2"/></svg>`;
 
-  // Fireworks for the 4th of July: rockets rise from the bottom with a trail, then burst into
-  // streaking sparks with a soft glow, in red, blue and gold with a little white glitter
+  // Fireworks for the 4th of July: rockets rise with a trail, then burst into streaking sparks
+  // in red, blue and gold with a little white glitter. Drawn in batches (one stroke per color and
+  // brightness) with no blur, and the loop sleeps when nothing is in the air, so it stays smooth.
   function fireworks() {
     const cv = document.createElement('canvas');
     cv.className = 'vc-canvas';
     layer.appendChild(cv);
     const ctx = cv.getContext('2d');
-    const dpr = Math.min(2, devicePixelRatio || 1);
+    const dpr = Math.min(1.5, devicePixelRatio || 1);
     const size = () => { cv.width = innerWidth * dpr; cv.height = innerHeight * dpr; };
-    size(); addEventListener('resize', size);
-    const COLS = ['#d33a3a', '#3a56c9', '#e0b030', '#c2185b', '#2f7fd8'];
-    const rockets = [], sparks = [];
+    size();
+    const onResize = () => size();
+    addEventListener('resize', onResize);
+    const COLS = ['#d33a3a', '#3a56c9', '#e0b030', '#c2185b'];
+    const rockets = [], sparks = [], MAX = small ? 160 : 260;
+    let running = false;
     function launch() {
-      const col = pick(COLS);
-      rockets.push({ x: rand(.12, .88) * cv.width, y: cv.height, vy: -rand(9, 12.5) * dpr, top: rand(.12, .45) * cv.height, col });
-      if (Math.random() < .35) later(launch, 260);   // sometimes a second one right after
+      if (!cv.isConnected) { removeEventListener('resize', onResize); return; }
+      rockets.push({ x: rand(.12, .88) * cv.width, y: cv.height, vy: -rand(9, 12) * dpr, top: rand(.14, .45) * cv.height, col: pick(COLS) });
+      if (Math.random() < .3) later(launch, 280);
+      wake();
     }
     function burst(x, y, col) {
-      const count = small ? 48 : 72;
+      const count = Math.min(small ? 34 : 52, MAX - sparks.length);
       for (let i = 0; i < count; i++) {
-        const a = i / count * Math.PI * 2 + rand(-.05, .05), v = rand(2.2, 5.2) * dpr;
-        sparks.push({ x, y, px: x, py: y, vx: Math.cos(a) * v, vy: Math.sin(a) * v, life: 1, fade: rand(.010, .016), col: Math.random() < .14 ? '#fff6d8' : col });
+        const a = i / count * Math.PI * 2 + rand(-.06, .06), v = rand(2.2, 5) * dpr;
+        sparks.push({ x, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v, life: 1, fade: rand(.012, .018), col: Math.random() < .12 ? '#f3e2a6' : col });
       }
     }
-    every(launch, ms(small ? 1700 : 1150));
-    launch();
-    (function tick() {
-      if (!cv.isConnected) return;
+    function wake() { if (!running) { running = true; requestAnimationFrame(tick); } }
+    function tick() {
+      if (!cv.isConnected) { running = false; return; }
       ctx.clearRect(0, 0, cv.width, cv.height);
       ctx.lineCap = 'round';
-      for (let i = rockets.length - 1; i >= 0; i--) {
-        const r = rockets[i];
-        const oy = r.y; r.y += r.vy; r.vy += .09 * dpr;
-        ctx.globalAlpha = 1; ctx.strokeStyle = '#e0b030'; ctx.lineWidth = 2.2 * dpr; ctx.shadowBlur = 8 * dpr; ctx.shadowColor = '#ffcf6b';
-        ctx.beginPath(); ctx.moveTo(r.x, oy + 14 * dpr); ctx.lineTo(r.x, r.y); ctx.stroke();
-        if (r.y <= r.top || r.vy >= -1.5 * dpr) { burst(r.x, r.y, r.col); rockets.splice(i, 1); }
+      if (rockets.length) {
+        ctx.globalAlpha = 1; ctx.strokeStyle = '#e0b030'; ctx.lineWidth = 2.4 * dpr; ctx.beginPath();
+        for (let i = rockets.length - 1; i >= 0; i--) {
+          const r = rockets[i];
+          ctx.moveTo(r.x, r.y + 16 * dpr);
+          r.y += r.vy; r.vy += .09 * dpr;
+          ctx.lineTo(r.x, r.y);
+          if (r.y <= r.top || r.vy >= -1.5 * dpr) { burst(r.x, r.y, r.col); rockets.splice(i, 1); }
+        }
+        ctx.stroke();
       }
+      // group sparks by color and brightness so each group is one stroke
+      const groups = new Map();
       for (let i = sparks.length - 1; i >= 0; i--) {
         const p = sparks[i];
-        p.px = p.x; p.py = p.y;
         p.x += p.vx; p.y += p.vy; p.vy += .05 * dpr; p.vx *= .982; p.vy *= .982; p.life -= p.fade;
-        if (p.life <= 0) { sparks.splice(i, 1); continue; }
-        ctx.globalAlpha = Math.min(1, p.life * 1.4);
-        ctx.strokeStyle = p.col; ctx.shadowColor = p.col; ctx.shadowBlur = 10 * dpr; ctx.lineWidth = 2.6 * dpr;
-        ctx.beginPath(); ctx.moveTo(p.px - p.vx * 2.2, p.py - p.vy * 2.2); ctx.lineTo(p.x, p.y); ctx.stroke();
+        if (p.life <= 0) { sparks[i] = sparks[sparks.length - 1]; sparks.pop(); continue; }
+        const key = p.col + (Math.ceil(p.life * 4));
+        let g = groups.get(key);
+        if (!g) groups.set(key, g = { col: p.col, alpha: Math.ceil(p.life * 4) / 4, list: [] });
+        g.list.push(p);
       }
-      ctx.shadowBlur = 0; ctx.globalAlpha = 1;
-      requestAnimationFrame(tick);
-    })();
+      ctx.lineWidth = 3 * dpr;
+      for (const g of groups.values()) {
+        ctx.globalAlpha = g.alpha; ctx.strokeStyle = g.col; ctx.beginPath();
+        for (const p of g.list) { ctx.moveTo(p.x - p.vx * 2.4, p.y - p.vy * 2.4); ctx.lineTo(p.x, p.y); }
+        ctx.stroke();
+      }
+      ctx.globalAlpha = 1;
+      if (rockets.length || sparks.length) requestAnimationFrame(tick);
+      else { running = false; ctx.clearRect(0, 0, cv.width, cv.height); }
+    }
+    every(launch, ms(small ? 1900 : 1300));
+    launch();
   }
   function start() {
     layer = document.createElement('div');
