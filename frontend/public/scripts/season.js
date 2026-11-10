@@ -51,12 +51,24 @@ function makeFX(band, opts = {}) {
     setTimeout(() => el.remove(), d * 1000 + 200);
   }
 
-  // Leaves: maple, oak and elm shapes with veins and a stem
-  const LEAVES = { maple: ['M12,1 L13.6,5.2 L16.2,3.8 L15.6,8.6 L20.2,6.8 L19,10 L23,10.6 L19.4,13.6 L20.6,15.4 L15.2,15.4 L15.8,18.6 L12.8,17.2 L12.8,21 L11.2,21 L11.2,17.2 L8.2,18.6 L8.8,15.4 L3.4,15.4 L4.6,13.6 L1,10.6 L5,10 L3.8,6.8 L8.4,8.6 L7.8,3.8 L10.4,5.2 Z', 'M12,17 V4 M12,13 L18.5,8 M12,13 L5.5,8 M12,15.5 L17.5,14.5 M12,15.5 L6.5,14.5'], oak: ['M12,1 C14,2 13.5,4 15.5,4.5 C17.5,5 16,7 17.5,8 C19,9 17,11 18.5,12.5 C20,14 17,15 17,16.5 C17,18.5 14.5,18 13.2,19.5 L12.6,21 L11.4,21 L10.8,19.5 C9.5,18 7,18.5 7,16.5 C7,15 4,14 5.5,12.5 C7,11 5,9 6.5,8 C8,7 6.5,5 8.5,4.5 C10.5,4 10,2 12,1 Z', 'M12,20 V3 M12,6 L14.8,5 M12,9 L15.8,8.4 M12,12.5 L16.6,12.6 M12,16 L15.6,16.4 M12,6 L9.2,5 M12,9 L8.2,8.4 M12,12.5 L7.4,12.6 M12,16 L8.4,16.4'], elm: ['M12,1.5 C17,4 18.5,9 17.5,13 C16.8,16 14.5,18.5 12.6,19.5 L12.6,21 L11.4,21 L11.4,19.5 C9.5,18.5 7.2,16 6.5,13 C5.5,9 7,4 12,1.5 Z', 'M12,20 V3.5 M12,7 L15.2,5.6 M12,10 L16.4,8.6 M12,13 L16.6,12 M12,16 L15,15.6 M12,7 L8.8,5.6 M12,10 L7.6,8.6 M12,13 L7.4,12 M12,16 L9,15.6'] };
-  const leaf = col => {
-    const [shape, veins] = pick(Object.values(LEAVES)), sz = rand(20, 32) | 0;
-    return `<svg width="${sz}" height="${sz}" viewBox="0 0 24 24"><path d="${shape}" fill="${col}"/><path d="${veins}" fill="none" stroke="#00000038" stroke-width=".7" stroke-linecap="round"/><path d="M12,21 v2.6" stroke="#6b4b33" stroke-width="1.1" stroke-linecap="round"/></svg>`;
+  // Leaves: five shapes, each fading between two fall colors, some spotted, some mirrored
+  const LEAVES = {
+    maple: ['M12,1 L13.6,5.2 L16.2,3.8 L15.6,8.6 L20.2,6.8 L19,10 L23,10.6 L19.4,13.6 L20.6,15.4 L15.2,15.4 L15.8,18.6 L12.8,17.2 L12.8,21 L11.2,21 L11.2,17.2 L8.2,18.6 L8.8,15.4 L3.4,15.4 L4.6,13.6 L1,10.6 L5,10 L3.8,6.8 L8.4,8.6 L7.8,3.8 L10.4,5.2 Z', 'M12,17 V4 M12,13 L18.5,8 M12,13 L5.5,8 M12,15.5 L17.5,14.5 M12,15.5 L6.5,14.5'],
+    oak: ['M12,1 C14,2 13.5,4 15.5,4.5 C17.5,5 16,7 17.5,8 C19,9 17,11 18.5,12.5 C20,14 17,15 17,16.5 C17,18.5 14.5,18 13.2,19.5 L12.6,21 L11.4,21 L10.8,19.5 C9.5,18 7,18.5 7,16.5 C7,15 4,14 5.5,12.5 C7,11 5,9 6.5,8 C8,7 6.5,5 8.5,4.5 C10.5,4 10,2 12,1 Z', 'M12,20 V3 M12,6 L14.8,5 M12,9 L15.8,8.4 M12,12.5 L16.6,12.6 M12,16 L15.6,16.4 M12,6 L9.2,5 M12,9 L8.2,8.4 M12,12.5 L7.4,12.6 M12,16 L8.4,16.4'],
+    elm: ['M12,1.5 C17,4 18.5,9 17.5,13 C16.8,16 14.5,18.5 12.6,19.5 L12.6,21 L11.4,21 L11.4,19.5 C9.5,18.5 7.2,16 6.5,13 C5.5,9 7,4 12,1.5 Z', 'M12,20 V3.5 M12,7 L15.2,5.6 M12,10 L16.4,8.6 M12,13 L16.6,12 M12,16 L15,15.6 M12,7 L8.8,5.6 M12,10 L7.6,8.6 M12,13 L7.4,12 M12,16 L9,15.6'],
+    aspen: ['M12,2 C16.5,3 20,7 19.5,11.5 C19,16 15.5,19 12.6,19.6 L12.6,21 L11.4,21 L11.4,19.6 C8.5,19 5,16 4.5,11.5 C4,7 7.5,3 12,2 Z', 'M12,20 V4 M12,8 L16.5,6.5 M12,8 L7.5,6.5 M12,12 L17.5,11 M12,12 L6.5,11 M12,16 L15.5,15.5 M12,16 L8.5,15.5'],
+    willow: ['M12,0.5 C14.6,4 15.2,10 14.2,15 C13.6,17.5 12.9,19 12.5,20 L12.5,21 L11.5,21 L11.5,20 C11.1,19 10.4,17.5 9.8,15 C8.8,10 9.4,4 12,0.5 Z', 'M12,20.5 V2 M12,7 L13.7,5.8 M12,10.5 L14.2,9.4 M12,14 L13.9,13 M12,7 L10.3,5.8 M12,10.5 L9.8,9.4 M12,14 L10.1,13'],
   };
+  const FALL = [['#d9b04a', '#b5652c'], ['#b5652c', '#8f3b2a'], ['#c9a227', '#9a7a2a'], ['#a97c86', '#b5652c'], ['#dcc070', '#8a8a42'], ['#c46a3a', '#c9a227'], ['#8f3b2a', '#a97c86'], ['#7a5a44', '#c46a3a']];
+  let leafId = 0;
+  const leaf = () => {
+    const [shape, veins] = pick(Object.values(LEAVES)), [c1, c2] = pick(FALL), sz = rand(16, 38) | 0, id = 'vcl' + (++leafId);
+    const spots = Math.random() < .35 ? Array.from({ length: 2 + (Math.random() * 3 | 0) }, () => `<circle cx="${rand(8, 16).toFixed(1)}" cy="${rand(6, 16).toFixed(1)}" r="${rand(.5, 1.3).toFixed(1)}" fill="#4a2c1a" opacity=".3"/>`).join('') : '';
+    // mirror and tilt inside the drawing, so the flutter animation doesn't undo it
+    const turn = `translate(12 12) scale(${Math.random() < .5 ? -1 : 1} 1) rotate(${rand(-40, 40) | 0}) translate(-12 -12)`;
+    return `<svg width="${sz}" height="${sz}" viewBox="0 0 24 24"><defs><linearGradient id="${id}" x1="${Math.random() < .5 ? 0 : 1}" y1="0" x2="${Math.random() < .5 ? 1 : 0}" y2="1"><stop offset="0" stop-color="${c1}"/><stop offset="1" stop-color="${c2}"/></linearGradient></defs><g transform="${turn}"><path d="${shape}" fill="url(#${id})"/>${spots}<path d="${veins}" fill="none" stroke="#3a2214" stroke-opacity=".28" stroke-width=".7" stroke-linecap="round"/><path d="M12,21 v2.6" stroke="#6b4b33" stroke-width="1.1" stroke-linecap="round"/></g></svg>`;
+  };
+
   // Snow: six-point crystals in different sizes (small ones fall slower, like they're farther away)
   const flake = s => `<svg class="vc-crystal" width="${s}" height="${s}" viewBox="-6 -6 12 12"><g stroke="#ffffff" stroke-width="${s < 12 ? 1.6 : 1.2}" stroke-linecap="round"><path d="M0,-5 V5 M-4.3,-2.5 L4.3,2.5 M-4.3,2.5 L4.3,-2.5 M0,-5 l-1.4,-1.2 M0,-5 l1.4,-1.2 M0,5 l-1.4,1.2 M0,5 l1.4,1.2 M-4.3,-2.5 l-.2,-1.8 M-4.3,-2.5 l-1.7,.6 M4.3,2.5 l.2,1.8 M4.3,2.5 l1.7,-.6 M-4.3,2.5 l-1.7,-.6 M-4.3,2.5 l-.2,1.8 M4.3,-2.5 l1.7,.6 M4.3,-2.5 l.2,-1.8"/></g></svg>`;
   const heart = col => `<svg width="${rand(12, 20) | 0}" height="${rand(12, 20) | 0}" viewBox="3 4 22 21"><path d="M14,24 C4,17 3,11 6,8 C9,5 13,7 14,10 C15,7 19,5 22,8 C25,11 24,17 14,24 Z" fill="${col}"/></svg>`;
@@ -106,7 +118,12 @@ function makeFX(band, opts = {}) {
         piece(flake(size), { dur: size < 12 ? [13, 18] : [8, 12], delay: [0, 16] });
       }
     } else if (kind === 'thanksgiving') {
-      for (let i = 0; i < n(small ? 12 : 22); i++) piece(leaf(pick([C.rust, C.gold, C.mauve, C.brown])), { dur: [8, 13], delay: [0, 13], cls: 'vc-tumble' });
+      for (let i = 0; i < n(small ? 12 : 22); i++) {
+        const p = piece(leaf(), { dur: [7, 14], delay: [0, 14], cls: 'vc-tumble' });
+        // each leaf flutters at its own pace and direction
+        const svg = p.querySelector('svg'); svg.parentElement.style.setProperty('--tumble', rand(1.8, 3.8).toFixed(2) + 's');
+        if (Math.random() < .5) svg.parentElement.classList.add('vc-rev');
+      }
       // a gust of wind now and then pushes the leaves sideways
       every(() => { layer.classList.add('vc-gust'); setTimeout(() => layer.classList.remove('vc-gust'), 2600); }, ms(14000));
     } else if (kind === 'halloween') {
