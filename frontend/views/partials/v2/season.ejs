@@ -1,7 +1,7 @@
 <%
 // Seasonal touch under the menu: a small garland and one greeting line, in the site's own colors.
 // Icons are simple flat shapes; season comes from backend/config/seasons.js.
-const s = typeof season !== 'undefined' && season;
+const s = typeof season !== 'undefined' && season && season.effects && season;
 if (s) {
   const C = { rust: '#b5652c', gold: '#c9a227', mauve: '#a97c86', blue: '#4a5ca3', green: '#2f6a64', ink: '#1c2233', brown: '#7a5a44', pink: '#e3b3c0', sky: '#9fb0e6', mint: '#a9cfc6', cream: '#ead9a6' };
   const W = 1440, step = 36, n = Math.ceil(W / step);

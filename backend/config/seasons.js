@@ -1,5 +1,7 @@
-// Holiday seasons: the site picks the current one by date (Mountain time) and uses it to
-// put that season's shirts first and add a light seasonal decoration in the same colors.
+// Holiday seasons: the site picks the current one by date (Mountain time).
+// range: when that season's shirts come first (longer, people shop early).
+// fx:    when the decorations and animation show: the 3 weeks before Halloween, Thanksgiving
+//        and Christmas, and just the last few days before the other holidays.
 // To preview another season, visit any page with ?season=christmas (?season=off goes back to the real date).
 
 const TZ = "America/Denver";
@@ -38,31 +40,38 @@ const not = re => p => !re.test([p.name, p.category, ...(p.tags || [])].join(" "
 export const SEASONS = [
   { id: "valentines", name: "Valentine's Day", icon: "heart",
     range: y => [num(1, 25), num(2, 14)],
+    fx: y => [num(2, 11), num(2, 14)],
     greeting: "Valentine's Day is coming", link: "/shop", linkText: "Shirts for someone you love",
     match: words(/valentine|heart|love/i) },
   { id: "easter", name: "Easter", icon: "tulip",
     range: y => { const e = easter(y), s = minusDays(y, e.m, e.d, 21); return [num(s.m, s.d), num(e.m, e.d)]; },
+    fx: y => { const e = easter(y), s = minusDays(y, e.m, e.d, 3); return [num(s.m, s.d), num(e.m, e.d)]; },
     greeting: "He is risen. Happy Easter", link: "/shop?c=faith", linkText: "Easter and faith shirts",
     match: words(/easter|risen|resurrection|jesus|christ|scripture/i) },
   { id: "july4", name: "the 4th of July", icon: "star",
     range: y => [num(6, 20), num(7, 4)],
+    fx: y => [num(7, 1), num(7, 4)],
     greeting: "Happy 4th of July", link: "/shop", linkText: "Shop shirts",
     match: words(/july|usa|america|patriot|liberty/i) },
   { id: "backtoschool", name: "back to school", icon: "apple",
     range: y => [num(7, 25), num(8, 31)],
+    fx: y => [num(8, 18), num(8, 21)],   // the week Utah schools usually start; adjust here
     greeting: "Back to school", link: "/groups", linkText: "Class and group shirts",
     match: words(/back to school|school|teacher|class/i) },
   { id: "halloween", name: "Halloween", icon: "pumpkin",
     range: y => [num(9, 15), num(11, 2)],   // through Día de los Muertos
+    fx: y => [num(10, 11), num(10, 31)],
     greeting: "Spooky season is here", link: "/shop?c=halloween-fall", linkText: "Halloween shirts",
     match: words(/halloween|witch|ghost|skeleton|skull|spooky|muertos|pumpkin|bat\b/i), next: "thanksgiving" },
   { id: "thanksgiving", name: "Thanksgiving", icon: "turkey",
     range: y => [num(11, 3), num(11, thanksgiving(y))],
+    fx: y => [num(11, thanksgiving(y) - 20), num(11, thanksgiving(y))],
     greeting: "Happy Thanksgiving from our family to yours", link: "/shop?c=christmas", linkText: "Christmas shirts are here",
     match: p => words(/\bfall\b|autumn|thank|grateful|harvest|pumpkin|turkey/i)(p) && not(/halloween|witch|ghost|skeleton|skull|muertos/i)(p),
     next: "christmas" },
   { id: "christmas", name: "Christmas", icon: "ornament",
     range: y => [num(11, thanksgiving(y) + 1), num(12, 26)],
+    fx: y => [num(12, 5), num(12, 25)],
     greeting: "Merry Christmas", link: "/shop?c=christmas", linkText: "Christmas shirts",
     match: words(/christmas|nativity|wise men|names of jesus|santa|snow|reindeer|noel/i) },
 ];
@@ -81,7 +90,10 @@ export function seasonMiddleware(req, res, next) {
   if (q && req.session) req.session.seasonPreview = byId[q] ? q : undefined;
   const preview = req.session?.seasonPreview;
   const season = (preview && byId[preview]) || seasonFor();
-  res.locals.season = season ? { ...season, preview: Boolean(preview), upcoming: season.next ? byId[season.next] : null } : null;
+  // Decorations and animation only in the season's shorter window (always on when previewing)
+  let effects = Boolean(preview);
+  if (season && !preview) { const { y, m, d } = today(); const [a, b] = season.fx(y); effects = num(m, d) >= a && num(m, d) <= b; }
+  res.locals.season = season ? { ...season, effects, preview: Boolean(preview), upcoming: season.next ? byId[season.next] : null } : null;
   next();
 }
 
