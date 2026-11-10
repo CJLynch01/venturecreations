@@ -51,7 +51,12 @@ function makeFX(band, opts = {}) {
     setTimeout(() => el.remove(), d * 1000 + 200);
   }
 
-  const leaf = col => `<svg width="${rand(15, 24) | 0}" height="${rand(15, 24) | 0}" viewBox="-6 -1 12 13"><path d="M0,0 C4,2 5,7 0,11 C-5,7 -4,2 0,0 Z" fill="${col}"/><path d="M0,1 V10" stroke="#00000033" stroke-width=".6"/></svg>`;
+  // Leaves: maple, oak and elm shapes with veins and a stem
+  const LEAVES = { maple: ['M12,1 L13.6,5.2 L16.2,3.8 L15.6,8.6 L20.2,6.8 L19,10 L23,10.6 L19.4,13.6 L20.6,15.4 L15.2,15.4 L15.8,18.6 L12.8,17.2 L12.8,21 L11.2,21 L11.2,17.2 L8.2,18.6 L8.8,15.4 L3.4,15.4 L4.6,13.6 L1,10.6 L5,10 L3.8,6.8 L8.4,8.6 L7.8,3.8 L10.4,5.2 Z', 'M12,17 V4 M12,13 L18.5,8 M12,13 L5.5,8 M12,15.5 L17.5,14.5 M12,15.5 L6.5,14.5'], oak: ['M12,1 C14,2 13.5,4 15.5,4.5 C17.5,5 16,7 17.5,8 C19,9 17,11 18.5,12.5 C20,14 17,15 17,16.5 C17,18.5 14.5,18 13.2,19.5 L12.6,21 L11.4,21 L10.8,19.5 C9.5,18 7,18.5 7,16.5 C7,15 4,14 5.5,12.5 C7,11 5,9 6.5,8 C8,7 6.5,5 8.5,4.5 C10.5,4 10,2 12,1 Z', 'M12,20 V3 M12,6 L14.8,5 M12,9 L15.8,8.4 M12,12.5 L16.6,12.6 M12,16 L15.6,16.4 M12,6 L9.2,5 M12,9 L8.2,8.4 M12,12.5 L7.4,12.6 M12,16 L8.4,16.4'], elm: ['M12,1.5 C17,4 18.5,9 17.5,13 C16.8,16 14.5,18.5 12.6,19.5 L12.6,21 L11.4,21 L11.4,19.5 C9.5,18.5 7.2,16 6.5,13 C5.5,9 7,4 12,1.5 Z', 'M12,20 V3.5 M12,7 L15.2,5.6 M12,10 L16.4,8.6 M12,13 L16.6,12 M12,16 L15,15.6 M12,7 L8.8,5.6 M12,10 L7.6,8.6 M12,13 L7.4,12 M12,16 L9,15.6'] };
+  const leaf = col => {
+    const [shape, veins] = pick(Object.values(LEAVES)), sz = rand(20, 32) | 0;
+    return `<svg width="${sz}" height="${sz}" viewBox="0 0 24 24"><path d="${shape}" fill="${col}"/><path d="${veins}" fill="none" stroke="#00000038" stroke-width=".7" stroke-linecap="round"/><path d="M12,21 v2.6" stroke="#6b4b33" stroke-width="1.1" stroke-linecap="round"/></svg>`;
+  };
   // Snow: six-point crystals in different sizes (small ones fall slower, like they're farther away)
   const flake = s => `<svg class="vc-crystal" width="${s}" height="${s}" viewBox="-6 -6 12 12"><g stroke="#ffffff" stroke-width="${s < 12 ? 1.6 : 1.2}" stroke-linecap="round"><path d="M0,-5 V5 M-4.3,-2.5 L4.3,2.5 M-4.3,2.5 L4.3,-2.5 M0,-5 l-1.4,-1.2 M0,-5 l1.4,-1.2 M0,5 l-1.4,1.2 M0,5 l1.4,1.2 M-4.3,-2.5 l-.2,-1.8 M-4.3,-2.5 l-1.7,.6 M4.3,2.5 l.2,1.8 M4.3,2.5 l1.7,-.6 M-4.3,2.5 l-1.7,-.6 M-4.3,2.5 l-.2,1.8 M4.3,-2.5 l1.7,.6 M4.3,-2.5 l.2,-1.8"/></g></svg>`;
   const heart = col => `<svg width="${rand(12, 20) | 0}" height="${rand(12, 20) | 0}" viewBox="3 4 22 21"><path d="M14,24 C4,17 3,11 6,8 C9,5 13,7 14,10 C15,7 19,5 22,8 C25,11 24,17 14,24 Z" fill="${col}"/></svg>`;

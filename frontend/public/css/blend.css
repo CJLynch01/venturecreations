@@ -373,8 +373,8 @@ footer.site .copy{grid-column:1/-1;border-top:1px solid var(--line);padding-top:
 .vc-sway{display:block;animation:vc-sway ease-in-out infinite alternate}
 @keyframes vc-sway{from{transform:translateX(-22px) rotate(-14deg)}to{transform:translateX(22px) rotate(14deg)}}
 .vc-fx svg{display:block}
-.vc-tumble svg{animation:vc-tumble 3.4s linear infinite}
-@keyframes vc-tumble{from{transform:rotateY(0) rotate(0)}to{transform:rotateY(360deg) rotate(200deg)}}
+.vc-tumble svg{animation:vc-tumble 2.8s ease-in-out infinite alternate}
+@keyframes vc-tumble{from{transform:rotate(-35deg) rotateY(-45deg) rotateX(15deg)}to{transform:rotate(75deg) rotateY(45deg) rotateX(-15deg)}}
 .vc-fly{position:absolute;left:0;animation:vc-fly linear forwards}
 .vc-fly.vc-rtl{animation-name:vc-fly-rtl}
 @keyframes vc-fly{from{transform:translateX(-90px)}to{transform:translateX(calc(100vw + 90px))}}
