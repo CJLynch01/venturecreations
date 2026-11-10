@@ -442,3 +442,11 @@ footer.site .copy{grid-column:1/-1;border-top:1px solid var(--line);padding-top:
 .vc-bus svg{animation:vc-bump .32s ease-in-out infinite alternate}
 @keyframes vc-bump{from{transform:translateY(0)}to{transform:translateY(-1.6px)}}
 .vc-bus .bus-wheel{transform-box:fill-box;transform-origin:50% 50%;animation:vc-spin .7s linear infinite}
+/* Phones: skip the glow effects (the costliest part to draw); lights still twinkle, snow gets a crisp edge */
+@media (max-width:700px){
+  .vc-crystal,.vc-snow{filter:none}
+  .vc-crystal g{stroke:#e8ecf7}
+  .season-christmas.animate .tw{animation:twinkle 2.4s ease-in-out infinite;filter:none}
+  .vc-jack .jack-glow{animation:none}
+  .season.animate .icon-pumpkin{animation:none}
+}
