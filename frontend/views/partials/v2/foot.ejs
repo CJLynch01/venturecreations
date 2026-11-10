@@ -13,6 +13,7 @@
     <li><a href="/groups">Group orders</a></li>
     <li><a href="/contact">Contact us</a></li>
     <li><a href="/blog">Blog</a></li>
+    <li><a href="<%= shop.ETSY_URL %>" target="_blank" rel="noopener">Our Etsy shop</a></li>
     <% if (user) { %><li><a href="/auth/logout">Sign out</a></li><% } else { %><li><a href="/auth/register">Sign in</a></li><% } %>
   </ul></div>
   <div class="copy">&copy; <%= new Date().getFullYear() %> Venture Creations. Free shipping on orders over $<%= shop.FREE_SHIPPING_OVER %>.</div>

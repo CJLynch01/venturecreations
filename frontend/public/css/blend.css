@@ -617,3 +617,13 @@ footer.site .copy{grid-column:1/-1;border-top:1px solid var(--line);padding-top:
 .otrack li.done,.otrack li.now{color:var(--ink)}
 .otrack small{font-weight:400;color:var(--muted);font-size:12.5px;min-height:1.2em}
 .otrack-msg{margin:2px 0 4px;font-size:14.5px}
+
+/* home: Etsy shop band */
+.etsy{display:grid;grid-template-columns:auto 1fr auto;gap:22px;align-items:center;background:var(--card);border:1px solid var(--line);padding:22px 26px;text-decoration:none;color:var(--ink)}
+.etsy:hover{border-color:#f1641e}
+.etsy-mark{font-family:Georgia,serif;font-size:30px;color:#fff;background:#f1641e;padding:10px 16px;line-height:1}
+.etsy>span:nth-child(2){display:grid;gap:3px}
+.etsy b{font-family:var(--display);font-weight:400;font-size:26px}
+.etsy .d{color:var(--muted);font-size:15px}
+.etsy .go{font-weight:700;font-size:14px;letter-spacing:.08em;text-transform:uppercase;white-space:nowrap}
+@media (max-width:700px){.etsy{grid-template-columns:auto 1fr;padding:18px}.etsy .go{grid-column:1/-1}}

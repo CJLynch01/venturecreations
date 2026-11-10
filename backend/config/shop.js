@@ -53,6 +53,9 @@ export function bulkDiscount(totalShirts) {
 }
 export const nextTier = totalShirts => [...BULK_TIERS].reverse().find(t => t.min > totalShirts) || null;
 
+// Her Etsy shop: linked from the home page and the footer
+export const ETSY_URL = "https://www.etsy.com/shop/VentureCreationShop";
+
 export const FREE_SHIPPING_OVER = 100;   // dollars
 export const SHIPPING_FLAT = 4.99;       // shown in the cart; Stripe's shipping rate is what actually charges
 export const TAX_ESTIMATE = 0.0725;      // shown as an estimate only; Stripe calculates the real tax
