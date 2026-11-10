@@ -41,7 +41,7 @@ if (s) {
     apple: `<g transform="translate(20,23)"><circle cx="-3" r="7.5" fill="#b3262e"/><circle cx="3" r="7.5" fill="#b3262e"/><path d="M0,-7 q1,-4 3.5,-5" stroke="${C.brown}" stroke-width="1.6" fill="none"/><path d="M1.5,-9 q5,-3 7,1 q-4,2.5 -7,-1 Z" fill="${C.green}"/></g>`,
   };
 %>
-<div class="season season-<%= s.id %>" role="note" aria-label="<%= s.greeting %>">
+<div class="season season-<%= s.id %>" role="note" aria-label="<%= s.greeting %>"<%- s.id === 'christmas' ? ' data-fall="snow"' : s.id === 'thanksgiving' ? ' data-fall="leaves"' : '' %>>
   <svg class="garland" viewBox="0 0 <%= W %> 28" preserveAspectRatio="xMidYMin slice" aria-hidden="true"><path d="<%= wave(7) %>" fill="none" stroke="#1c2233" stroke-opacity=".28" stroke-width="1"/><%- items %></svg>
   <div class="season-line gut"><svg class="season-icon" viewBox="0 0 40 40" aria-hidden="true"><%- ICON[s.icon] || '' %></svg>
     <span><%= s.greeting %></span><a href="<%= s.link %>"><%= s.linkText %> →</a>

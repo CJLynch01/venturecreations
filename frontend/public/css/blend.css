@@ -338,3 +338,11 @@ footer.site .copy{grid-column:1/-1;border-top:1px solid var(--line);padding-top:
 .season .tw1{animation-delay:.8s}.season .tw2{animation-delay:1.6s}.season .tw3{animation-delay:2.4s}
 @keyframes twinkle{0%,100%{opacity:1}50%{opacity:.45}}
 @media (prefers-reduced-motion:reduce){.season .tw{animation:none}}
+/* falling leaves / snow (scripts/season.js) */
+.vc-fall{position:fixed;inset:0;pointer-events:none;z-index:15;overflow:hidden;transition:opacity 2.5s}
+.vc-fall.done{opacity:0}
+.vc-fall .vc-flake{position:absolute;top:-30px;animation:vc-drop linear infinite both}
+.vc-fall .vc-sway{display:block;animation:vc-sway ease-in-out infinite alternate}
+.vc-fall svg{display:block;opacity:.85}
+@keyframes vc-drop{from{transform:translateY(-30px)}to{transform:translateY(105vh)}}
+@keyframes vc-sway{from{transform:translateX(-18px) rotate(-12deg)}to{transform:translateX(18px) rotate(12deg)}}
