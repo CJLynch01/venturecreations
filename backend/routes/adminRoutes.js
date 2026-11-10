@@ -149,11 +149,22 @@ router.post("/ideas/:id", ensureAdmin, async (req, res) => {
 router.get("/messages", ensureAdmin, async (req, res) => {
   try {
     const messages = await ContactMessage.find().sort({ createdAt: -1 }).limit(200);
-    res.render("admin/messages", { title: "Messages", messages });
+    res.render("admin/messages", { title: "Messages", messages, deleted: req.query.deleted === "1" });
     await ContactMessage.updateMany({ read: false }, { read: true });
   } catch (err) {
     console.error("Error loading messages:", err);
     res.status(500).send("Failed to load messages.");
+  }
+});
+
+// Delete a message (spam, or one she's done with)
+router.post("/messages/:id/delete", ensureAdmin, async (req, res) => {
+  try {
+    await ContactMessage.findByIdAndDelete(req.params.id);
+    res.redirect("/admin/messages?deleted=1");
+  } catch (err) {
+    console.error("Error deleting message:", err);
+    res.status(500).send("Failed to delete the message.");
   }
 });
 

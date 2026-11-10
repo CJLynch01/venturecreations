@@ -627,3 +627,9 @@ footer.site .copy{grid-column:1/-1;border-top:1px solid var(--line);padding-top:
 .etsy .d{color:var(--muted);font-size:15px}
 .etsy .go{font-weight:700;font-size:14px;letter-spacing:.08em;text-transform:uppercase;white-space:nowrap}
 @media (max-width:700px){.etsy{grid-template-columns:auto 1fr;padding:18px}.etsy .go{grid-column:1/-1}}
+
+/* contact form: hidden spam trap */
+.hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+.msg-card{display:grid;gap:6px}
+.msg-new{border-color:var(--mauve)}
+.msg-acts{max-width:360px}
