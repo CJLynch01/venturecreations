@@ -78,3 +78,6 @@ export const SIZE_CHART = {
   rows: [["Body width", 18, 20, 22, 24, 26], ["Body length", 28, 29, 30, 31, 32]],
   note: "Unisex fit, true to size. Size up for a looser look.",
 };
+
+// How much holiday animation: 0.5 = a little, 1 = medium, 1.8 = a lot
+export const SEASON_INTENSITY = 1;

@@ -10,6 +10,7 @@ if (s) {
   for (let i = 0; i < n; i++) {
     const x = i * step + step / 2, y = 7.2;   // low point of each swag (where things hang from the wire)
     const k = i % 4;
+    const before = items.length;
     if (s.id === 'christmas') {
       const col = [C.gold, C.mauve, C.blue, C.green][k];
       items += `<g class="tw tw${k}"><rect x="${x - 1.6}" y="${y - .6}" width="3.2" height="3" rx=".8" fill="${C.ink}" opacity=".55"/><ellipse cx="${x}" cy="${y + 6.6}" rx="3.1" ry="4.6" fill="${col}"/></g>`;
@@ -30,6 +31,7 @@ if (s) {
       const col = s.id === 'july4' ? [C.blue, '#ffffff', C.mauve][i % 3] : [C.blue, C.gold, C.green][i % 3];
       items += `<path d="M${x - 6},${y - 3} L${x + 6},${y - 3} L${x},${y + 8} Z" fill="${col}" stroke="${C.ink}" stroke-opacity=".12" stroke-width=".6"/>`;
     }
+    items = items.slice(0, before) + `<g class="gi gi${k}">` + items.slice(before) + '</g>';
   }
   const ICON = {
     turkey: `<g transform="translate(20,22)">${[-70, -35, 0, 35, 70].map((a, i) => `<ellipse cx="0" cy="-10" rx="4" ry="9.5" transform="rotate(${a})" fill="${[C.rust, C.gold, C.mauve, C.gold, C.rust][i]}"/>`).join('')}<ellipse cy="1" rx="7" ry="7.4" fill="${C.brown}"/><circle cy="-7.4" r="3.6" fill="#8a6a52"/><circle cx="-1.2" cy="-8" r=".6" fill="${C.ink}"/><circle cx="1.2" cy="-8" r=".6" fill="${C.ink}"/><path d="M-1,-6.6 L1,-6.6 L0,-4.8 Z" fill="${C.gold}"/><path d="M.8,-5.6 q1.4,1.2 .2,2.8" stroke="#b3262e" stroke-width="1.1" fill="none" stroke-linecap="round"/><path d="M-2.5,8 v2.4 M2.5,8 v2.4" stroke="${C.gold}" stroke-width="1.2" stroke-linecap="round"/></g>`,
@@ -41,10 +43,12 @@ if (s) {
     apple: `<g transform="translate(20,23)"><circle cx="-3" r="7.5" fill="#b3262e"/><circle cx="3" r="7.5" fill="#b3262e"/><path d="M0,-7 q1,-4 3.5,-5" stroke="${C.brown}" stroke-width="1.6" fill="none"/><path d="M1.5,-9 q5,-3 7,1 q-4,2.5 -7,-1 Z" fill="${C.green}"/></g>`,
   };
 %>
-<div class="season season-<%= s.id %>" role="note" aria-label="<%= s.greeting %>"<%- s.id === 'christmas' ? ' data-fall="snow"' : s.id === 'thanksgiving' ? ' data-fall="leaves"' : '' %>>
+<div class="season season-<%= s.id %>" role="note" aria-label="<%= s.greeting %>" data-effect="<%= s.id %>" data-intensity="<%= typeof shop !== 'undefined' && shop.SEASON_INTENSITY || 1 %>">
+  <% if (s.id === 'christmas') { %><svg class="snowcap" viewBox="0 0 <%= W %> 10" preserveAspectRatio="none" aria-hidden="true"><path d="M0,0 H<%= W %> V4 <% for (let i = n; i > 0; i--) { %>Q<%= i * step - step / 2 %>,<%= 9 + (i % 3) %> <%= (i - 1) * step %>,4 <% } %>Z" fill="#ffffff"/></svg><% } %>
   <svg class="garland" viewBox="0 0 <%= W %> 28" preserveAspectRatio="xMidYMin slice" aria-hidden="true"><path d="<%= wave(7) %>" fill="none" stroke="#1c2233" stroke-opacity=".28" stroke-width="1"/><%- items %></svg>
-  <div class="season-line gut"><svg class="season-icon" viewBox="0 0 40 40" aria-hidden="true"><%- ICON[s.icon] || '' %></svg>
+  <div class="season-line gut"><svg class="season-icon icon-<%= s.icon %>" viewBox="0 0 40 40" aria-hidden="true"><%- ICON[s.icon] || '' %></svg>
     <span><%= s.greeting %></span><a href="<%= s.link %>"><%= s.linkText %> →</a>
+    <button type="button" class="season-toggle" aria-pressed="false">Pause animation</button>
     <% if (s.preview) { %><a class="season-off" href="?season=off">Previewing <%= s.name %> · back to today</a><% } %></div>
 </div>
 <% } %>

@@ -338,11 +338,65 @@ footer.site .copy{grid-column:1/-1;border-top:1px solid var(--line);padding-top:
 .season .tw1{animation-delay:.8s}.season .tw2{animation-delay:1.6s}.season .tw3{animation-delay:2.4s}
 @keyframes twinkle{0%,100%{opacity:1}50%{opacity:.45}}
 @media (prefers-reduced-motion:reduce){.season .tw{animation:none}}
-/* falling leaves / snow (scripts/season.js) */
-.vc-fall{position:fixed;inset:0;pointer-events:none;z-index:15;overflow:hidden;transition:opacity 2.5s}
-.vc-fall.done{opacity:0}
-.vc-fall .vc-flake{position:absolute;top:-30px;animation:vc-drop linear infinite both}
-.vc-fall .vc-sway{display:block;animation:vc-sway ease-in-out infinite alternate}
-.vc-fall svg{display:block;opacity:.85}
-@keyframes vc-drop{from{transform:translateY(-30px)}to{transform:translateY(105vh)}}
-@keyframes vc-sway{from{transform:translateX(-18px) rotate(-12deg)}to{transform:translateX(18px) rotate(12deg)}}
+/* Holiday animation (scripts/season.js). Everything sits in a layer that ignores clicks. */
+.season{position:relative}
+.season .snowcap{position:absolute;left:0;top:-1px;width:100%;height:9px;filter:drop-shadow(0 1px 1px #1c22331f);z-index:1}
+.season-toggle{border:0;background:none;color:var(--muted);font:inherit;font-size:12px;text-decoration:underline;cursor:pointer;padding:2px 4px}
+.season.animate .gi{transform-box:fill-box;transform-origin:50% 0;animation:vc-gi 3.6s ease-in-out infinite alternate}
+.season.animate .gi1{animation-delay:-.9s}.season.animate .gi2{animation-delay:-1.8s}.season.animate .gi3{animation-delay:-2.7s}
+@keyframes vc-gi{from{transform:rotate(-7deg)}to{transform:rotate(7deg)}}
+.season-christmas.animate .gi{animation:none}
+.season-christmas.animate .tw{animation:vc-glow 2.4s ease-in-out infinite}
+@keyframes vc-glow{0%,100%{opacity:1;filter:drop-shadow(0 0 3px #ffd98a)}50%{opacity:.5;filter:none}}
+.season.animate .season-icon{transform-origin:50% 15%}
+.season.animate .icon-ornament{animation:vc-swing 2.8s ease-in-out infinite alternate}
+.season.animate .icon-turkey{animation:vc-waddle 1.1s ease-in-out infinite alternate;transform-origin:50% 90%}
+.season.animate .icon-pumpkin{animation:vc-flicker 2.2s steps(1) infinite}
+.season.animate .icon-heart{animation:vc-beat 1.2s ease-in-out infinite;transform-origin:50% 55%}
+.season.animate .icon-egg{animation:vc-swing 1.6s ease-in-out infinite alternate;transform-origin:50% 90%}
+.season.animate .icon-star{animation:vc-spin 6s linear infinite;transform-origin:50% 50%}
+.season.animate .icon-apple{animation:vc-hop 1.4s ease-in-out infinite}
+@keyframes vc-swing{from{transform:rotate(-12deg)}to{transform:rotate(12deg)}}
+@keyframes vc-waddle{from{transform:translateX(-2px) rotate(-6deg)}to{transform:translateX(2px) rotate(6deg)}}
+@keyframes vc-flicker{0%,100%{filter:none}30%{filter:brightness(1.35) drop-shadow(0 0 4px #e9a531)}35%{filter:none}60%{filter:brightness(1.2) drop-shadow(0 0 3px #e9a531)}}
+@keyframes vc-beat{0%,100%{transform:scale(1)}15%{transform:scale(1.18)}30%{transform:scale(1)}45%{transform:scale(1.12)}}
+@keyframes vc-spin{to{transform:rotate(360deg)}}
+@keyframes vc-hop{0%,100%{transform:translateY(0)}40%{transform:translateY(-5px)}}
+.vc-fx{position:fixed;inset:0;pointer-events:none;z-index:15;overflow:hidden}
+.vc-p{position:absolute;top:-34px;animation:vc-down linear infinite;transition:margin-left 2.4s ease-in-out}
+.vc-p.vc-up{top:auto;bottom:-34px;animation-name:vc-up}
+.vc-fx.vc-gust .vc-p{margin-left:14vw}
+@keyframes vc-down{to{transform:translateY(calc(100vh + 70px))}}
+@keyframes vc-up{to{transform:translateY(calc(-100vh - 70px))}}
+.vc-sway{display:block;animation:vc-sway ease-in-out infinite alternate}
+@keyframes vc-sway{from{transform:translateX(-22px) rotate(-14deg)}to{transform:translateX(22px) rotate(14deg)}}
+.vc-fx svg{display:block}
+.vc-tumble svg{animation:vc-tumble 3.4s linear infinite}
+@keyframes vc-tumble{from{transform:rotateY(0) rotate(0)}to{transform:rotateY(360deg) rotate(200deg)}}
+.vc-fly{position:absolute;left:0;animation:vc-fly linear forwards}
+.vc-fly.vc-rtl{animation-name:vc-fly-rtl}
+@keyframes vc-fly{from{transform:translateX(-90px)}to{transform:translateX(calc(100vw + 90px))}}
+@keyframes vc-fly-rtl{from{transform:translateX(calc(100vw + 90px)) scaleX(-1)}to{transform:translateX(-90px) scaleX(-1)}}
+.vc-bat svg{animation:vc-bob 1.1s ease-in-out infinite alternate}
+@keyframes vc-bob{from{transform:translateY(-7px)}to{transform:translateY(7px)}}
+.vc-wing{transform-box:fill-box;transform-origin:100% 50%;animation:vc-flap .26s ease-in-out infinite alternate}
+.vc-wing-r{transform-origin:0 50%}
+@keyframes vc-flap{from{transform:scaleY(1)}to{transform:scaleY(.3)}}
+.vc-plane svg{animation:vc-glide 3s ease-in-out infinite alternate}
+@keyframes vc-glide{from{transform:translateY(-14px) rotate(-5deg)}to{transform:translateY(16px) rotate(6deg)}}
+.vc-spider{position:absolute;right:7vw;top:0;display:flex;flex-direction:column;align-items:center;animation:vc-spider 11s ease-in-out infinite}
+.vc-thread{display:block;width:1px;height:320px;background:#1c22335c}
+@keyframes vc-spider{0%,100%{transform:translateY(-345px)}35%,65%{transform:translateY(-130px)}}
+.vc-canvas{position:absolute;left:0;top:0;width:100%;height:60vh}
+/* admin ideas list */
+.ideas-sum{display:flex;gap:8px;flex-wrap:wrap}
+.ist{display:inline-flex;gap:6px;align-items:center;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:4px 10px;background:#eef0f6;color:var(--muted);white-space:nowrap}
+.ist-planned{background:#e7ebf8;color:var(--brand)}
+.ist-in-progress{background:#fbf1d6;color:#7a5d12}
+.ist-live{background:#e5f2ee;color:var(--green)}
+.ist-not-doing{background:#f1f1f1;color:#888}
+.idea-row{padding:16px 20px}
+.idea-row summary{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;align-items:center;cursor:pointer;list-style:none}
+.idea-row summary::-webkit-details-marker{display:none}
+.idea-row summary b{font-family:var(--display);font-weight:400;font-size:20px}
+.idea-row .idea-sn{grid-column:2;font-size:14px}

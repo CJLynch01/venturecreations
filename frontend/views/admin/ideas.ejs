@@ -1,0 +1,36 @@
+<%- include('../partials/v2/head') %>
+<section class="page gut"><div class="in" style="display:grid;gap:22px;max-width:1000px">
+  <div><a href="/admin" style="font-size:14px">← Admin</a>
+    <h1 style="font-size:clamp(30px,4vw,44px)">Ideas for <em>the shop</em></h1>
+    <p class="muted" style="margin:6px 0 0">What could come next. Change a status as things move along, or add your own.</p></div>
+
+  <div class="ideas-sum"><% statuses.forEach(st => { const n = ideas.filter(i => i.status === st).length; if (n) { %><span class="ist ist-<%= st.toLowerCase().replace(/\s+/g, '-') %>"><%= st %> <b class="tabnum"><%= n %></b></span><% } }) %></div>
+
+  <% ideas.forEach(idea => { %>
+    <details class="idea-row card">
+      <summary>
+        <span class="ist ist-<%= idea.status.toLowerCase().replace(/\s+/g, '-') %>"><%= idea.status %></span>
+        <b><%= idea.title %></b>
+        <span class="muted idea-sn"><%= (idea.notes || '').slice(0, 110) %><%= (idea.notes || '').length > 110 ? '…' : '' %></span>
+      </summary>
+      <form action="/admin/ideas/<%= idea._id %>" method="POST" class="form" style="margin-top:14px">
+        <div class="field"><label for="t-<%= idea._id %>">Idea</label><input type="text" id="t-<%= idea._id %>" name="title" value="<%= idea.title %>" maxlength="120" required></div>
+        <div class="field"><label for="n-<%= idea._id %>">Notes</label><textarea id="n-<%= idea._id %>" name="notes" rows="3" maxlength="2000"><%= idea.notes || '' %></textarea></div>
+        <div class="field"><label for="l-<%= idea._id %>">Link (optional)</label><input type="text" id="l-<%= idea._id %>" name="link" value="<%= idea.link || '' %>" placeholder="https://"></div>
+        <% if (idea.link) { %><a href="<%= idea.link %>" target="_blank" rel="noopener" style="font-size:14px">Open the preview →</a><% } %>
+        <div class="field"><label for="s-<%= idea._id %>">Status</label><select id="s-<%= idea._id %>" name="status"><% statuses.forEach(st => { %><option <%= st === idea.status ? 'selected' : '' %>><%= st %></option><% }) %></select></div>
+        <div class="buyrow"><button class="btn" type="submit">Save</button><button class="btn ghost" type="submit" name="action" value="delete">Remove</button></div>
+      </form>
+    </details>
+  <% }) %>
+
+  <form action="/admin/ideas" method="POST" class="form card">
+    <h2 style="font-size:24px">Add an idea</h2>
+    <div class="field"><label for="newTitle">Idea</label><input type="text" id="newTitle" name="title" maxlength="120" required></div>
+    <div class="field"><label for="newNotes">Notes</label><textarea id="newNotes" name="notes" rows="3" maxlength="2000"></textarea></div>
+    <div class="field"><label for="newLink">Link (optional)</label><input type="text" id="newLink" name="link" placeholder="https://"></div>
+    <button class="btn" type="submit">Add idea</button>
+  </form>
+  <p class="muted" style="font-size:13px">Preview links made by Claude open for whoever they've been shared with.</p>
+</div></section>
+<%- include('../partials/v2/foot') %>
