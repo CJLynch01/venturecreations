@@ -7,6 +7,9 @@ import Idea, { IDEA_STATUSES } from "../models/Idea.js";
 import Order from "../models/Order.js";
 import Setting from "../models/Setting.js";
 import { dashboardData, splitItem, ORDER_STEPS } from "../lib/dashboard.js";
+import { orderLabel, nextOrderNumber } from "../lib/orders.js";
+import crypto from "crypto";
+import { sendReceipt } from "../lib/invoice.js";
 import { photoUpload, savePhotos, uploadsEnabled } from "../lib/uploads.js";
 import { analyticsData } from "../lib/analytics.js";
 import Visit from "../models/Visit.js";
@@ -22,6 +25,86 @@ router.get("/", ensureAdmin, async (req, res) => {
   } catch (error) {
     console.error("Admin page error:", error);
     res.status(500).send("Error loading admin dashboard.");
+  }
+});
+
+// Where to land after changing an order: its invoice, the orders list, or the dashboard queue
+const backTo = req => req.body.back === "invoice" ? `/invoice/${req.params.id}` : req.body.back === "orders" ? "/admin/orders" : "/admin#queue";
+
+// ---- Invoices made by hand (Etsy, in person, Venmo, group orders) ----
+const peekNextNumber = async () => Math.max(1001, ((await Setting.findOne({ key: "orders.lastNumber" }).lean())?.value || 1000) + 1);
+const newInvoiceForm = async (res, v = {}, error = "") => res.status(error ? 400 : 200).render("admin/newInvoice", {
+  title: "New invoice", v, error, nextNumber: await peekNextNumber(),
+  products: await Product.find({}, { name: 1, price: 1 }).sort({ name: 1 }).lean() });
+
+router.get("/invoices/new", ensureAdmin, async (req, res) => {
+  try { await newInvoiceForm(res); } catch (err) { console.error("New invoice form error:", err); res.status(500).send("Couldn't load the form."); }
+});
+
+const cents = v => Math.max(0, Math.round((parseFloat(v) || 0) * 100));
+const asList = v => (Array.isArray(v) ? v : v == null ? [] : [v]).map(x => String(x));
+const clip = (v, n) => String(v || "").trim().slice(0, n);
+
+router.post("/invoices", ensureAdmin, async (req, res) => {
+  const b = req.body;
+  const items = asList(b.item), details = asList(b.details), qtys = asList(b.qty), eaches = asList(b.each);
+  const lines = items.map((item, i) => ({ item: clip(item, 120), details: clip(details[i], 160), qty: Math.min(999, Math.max(0, parseInt(qtys[i]) || 0)), each: eaches[i] }))
+    .filter(l => l.item);
+  const v = { ...b, lines, send: b.send === "1" };
+  try {
+    if (!clip(b.name, 80)) return newInvoiceForm(res, v, "Add the customer's name.");
+    if (!lines.length || lines.some(l => !l.qty)) return newInvoiceForm(res, v, "Add at least one shirt with a quantity.");
+    const email = clip(b.email, 120).toLowerCase();
+    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return newInvoiceForm(res, v, "That email doesn't look right.");
+
+    const subtotal = lines.reduce((a, l) => a + l.qty * cents(l.each), 0);
+    const discount = Math.min(subtotal, cents(b.discount)), shipping = cents(b.shipping), tax = cents(b.tax);
+    const day = /^\d{4}-\d{2}-\d{2}$/.test(b.date || "") ? new Date(`${b.date}T12:00:00-07:00`) : new Date();
+    const status = ORDER_STEPS.includes(b.status) ? b.status : "paid";
+    const payment = clip(b.payment, 30);
+
+    const order = await Order.create({
+      source: "manual", stripeSessionId: `manual-${crypto.randomUUID()}`, number: await nextOrderNumber(),
+      items: lines.map(l => ({ name: l.details ? `${l.item} — ${l.details}` : l.item, quantity: l.qty, price: (l.qty * cents(l.each)) / 100 })),
+      subtotal: subtotal / 100, discount: discount / 100, shipping: shipping / 100, tax: tax / 100,
+      total: (subtotal - discount + shipping + tax) / 100,
+      email: email || undefined, paid: Boolean(payment), paymentMethod: payment || undefined, notes: clip(b.notes, 500) || undefined,
+      shippingAddress: { name: clip(b.name, 80), line1: clip(b.line1, 120), city: clip(b.city, 60), state: clip(b.state, 20), postal_code: clip(b.postal_code, 12), country: "US" },
+      status, createdAt: day, ...(status !== "paid" ? { printedAt: day } : {}), ...(status === "shipped" ? { shippedAt: day } : {}),
+    });
+    let sent = "";
+    if (v.send && email) {
+      try { await sendReceipt(order, { again: true }); sent = "1"; }
+      catch (err) { console.error("Invoice email failed:", err.message); sent = "fail"; }
+    }
+    res.redirect(`/invoice/${order._id}${sent ? "?sent=" + sent : ""}`);
+  } catch (err) {
+    console.error("Create invoice error:", err);
+    res.status(500).send("Couldn't create the invoice.");
+  }
+});
+
+// A by-hand invoice got paid
+router.post("/orders/:id/paid", ensureAdmin, async (req, res) => {
+  try {
+    await Order.updateOne({ _id: req.params.id, source: "manual" }, { paid: true, paymentMethod: clip(req.body.payment, 30) || "Other" });
+    res.redirect(`/invoice/${req.params.id}`);
+  } catch (err) {
+    console.error("Mark paid error:", err);
+    res.status(500).send("Couldn't update the invoice.");
+  }
+});
+
+// Send the order-received email again (e.g. the customer can't find it)
+router.post("/orders/:id/receipt", ensureAdmin, async (req, res) => {
+  try {
+    const order = await Order.findById(req.params.id);
+    if (!order) return res.status(404).send("Order not found");
+    await sendReceipt(order, { again: true });
+    res.redirect(`/invoice/${order._id}?sent=1`);
+  } catch (err) {
+    console.error("Resend receipt error:", err);
+    res.status(500).send("Couldn't send the receipt: " + err.message);
   }
 });
 
@@ -41,7 +124,7 @@ router.post("/orders/:id/status", ensureAdmin, async (req, res) => {
       if (status === "shipped") Object.assign(update, trackingFromForm(req.body));
       await Order.findByIdAndUpdate(req.params.id, update);
     }
-    res.redirect(req.body.back === "orders" ? "/admin/orders" : "/admin#queue");
+    res.redirect(backTo(req));
   } catch (err) {
     console.error("Order status error:", err);
     res.status(500).send("Couldn't update the order.");
@@ -52,7 +135,7 @@ router.post("/orders/:id/status", ensureAdmin, async (req, res) => {
 router.post("/orders/:id/tracking", ensureAdmin, async (req, res) => {
   try {
     await Order.findByIdAndUpdate(req.params.id, trackingFromForm(req.body));
-    res.redirect(req.body.back === "orders" ? "/admin/orders" : "/admin#queue");
+    res.redirect(backTo(req));
   } catch (err) {
     console.error("Tracking update error:", err);
     res.status(500).send("Couldn't save the tracking number.");
@@ -60,12 +143,50 @@ router.post("/orders/:id/tracking", ensureAdmin, async (req, res) => {
 });
 
 // Every order, newest first, optionally one status
+// Orders list: one year at a time (newest first), grouped by month, 50 per page, with search
+const ORDERS_PER_PAGE = 50;
+const yearOf = d => Number(new Date(d).toLocaleDateString("en-US", { year: "numeric", timeZone: "America/Denver" }));
 router.get("/orders", ensureAdmin, async (req, res) => {
   try {
     const status = ORDER_STEPS.includes(req.query.status) ? req.query.status : "";
-    const orders = await Order.find(status ? { status } : {}).sort({ createdAt: -1 }).limit(300).lean();
-    res.render("admin/orders", { title: "Orders", status, steps: ORDER_STEPS,
-      orders: orders.map(o => ({ ...o, status: o.status || "paid", lines: (o.items || []).map(it => ({ ...it, ...splitItem(it.name) })) })) });
+    const q = String(req.query.q || "").trim().slice(0, 60);
+    const statusQ = status === "paid" ? { $or: [{ status: "paid" }, { status: { $exists: false } }] } : status ? { status } : {};
+
+    // Years that have orders (newest first); the page shows one year
+    const [first, last] = await Promise.all([Order.findOne().sort({ createdAt: 1 }).lean(), Order.findOne().sort({ createdAt: -1 }).lean()]);
+    const years = first ? Array.from({ length: yearOf(last.createdAt) - yearOf(first.createdAt) + 1 }, (_, i) => yearOf(last.createdAt) - i) : [];
+    const year = years.includes(Number(req.query.year)) ? Number(req.query.year) : years[0];
+
+    // Search covers every order (all years); otherwise the chosen year
+    const filter = { ...statusQ };
+    if (q) {
+      const re = new RegExp(q.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "i");
+      const num = Number(q.replace(/^vc-?/i, ""));
+      filter.$and = [{ $or: [{ "shippingAddress.name": re }, { "shippingAddress.city": re }, { email: re }, { "items.name": re }, ...(num ? [{ number: num }] : [])] }];
+    } else if (year) {
+      filter.createdAt = { $gte: new Date(`${year}-01-01T00:00:00-07:00`), $lt: new Date(`${year + 1}-01-01T00:00:00-07:00`) };
+    }
+
+    const total = await Order.countDocuments(filter);
+    const pages = Math.max(1, Math.ceil(total / ORDERS_PER_PAGE));
+    const page = Math.min(pages, Math.max(1, parseInt(req.query.page) || 1));
+    const orders = await Order.find(filter).sort({ createdAt: -1 }).skip((page - 1) * ORDERS_PER_PAGE).limit(ORDERS_PER_PAGE).lean();
+
+    // Month totals for the whole year (not just this page), for the month headings
+    const monthTotals = {};
+    if (!q && year) {
+      const all = await Order.find(filter, { createdAt: 1, total: 1 }).lean();
+      for (const o of all) {
+        const m = new Date(o.createdAt).toLocaleDateString("en-US", { month: "long", year: "numeric", timeZone: "America/Denver" });
+        const t = monthTotals[m] || (monthTotals[m] = { orders: 0, sales: 0 });
+        t.orders += 1; t.sales += o.total || 0;
+      }
+    }
+
+    const qs = extra => "?" + new URLSearchParams(Object.entries({ status, year: q ? "" : year || "", q, ...extra }).filter(([, v]) => v !== "" && v != null)).toString();
+    res.render("admin/orders", { title: "Orders", status, steps: ORDER_STEPS, years, year, q, page, pages, total, monthTotals, qs,
+      orders: orders.map(o => ({ ...o, label: orderLabel(o), status: o.status || "paid", lines: (o.items || []).map(it => ({ ...it, ...splitItem(it.name) })),
+        month: new Date(o.createdAt).toLocaleDateString("en-US", { month: "long", year: "numeric", timeZone: "America/Denver" }) })) });
   } catch (err) {
     console.error("Orders page error:", err);
     res.status(500).send("Failed to load orders.");

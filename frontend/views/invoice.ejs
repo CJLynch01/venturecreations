@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Invoice <%= label %> | Venture Creations</title>
+  <link rel="stylesheet" href="/css/blend.css">
+  <style>
+    body{background:var(--paper)}
+    .inv{max-width:760px;margin:32px auto;background:var(--card);border:1px solid var(--line);padding:40px 44px;display:grid;gap:26px}
+    .inv-top{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;align-items:flex-start}
+    .inv-brand{font-family:var(--display);font-size:24px;letter-spacing:.14em;text-transform:uppercase}
+    .inv-brand em{color:var(--brand)}
+    .inv h1{font-size:34px;margin:0;line-height:1}
+    .inv-meta{text-align:right;font-size:14px;color:var(--muted);display:grid;gap:2px}
+    .inv-meta b{color:var(--ink)}
+    .inv-cols{display:grid;grid-template-columns:1fr 1fr;gap:24px;font-size:14.5px;line-height:1.55}
+    .inv-cols h2{font-family:var(--body);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin:0 0 6px}
+    .inv table{width:100%;border-collapse:collapse;font-size:14.5px}
+    .inv th{text-align:left;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);border-bottom:2px solid var(--ink);padding:8px 6px}
+    .inv td{padding:10px 6px;border-bottom:1px solid var(--line);vertical-align:top;text-align:left}
+    .inv .r{text-align:right;white-space:nowrap}
+    .inv .det{display:block;color:var(--muted);font-size:13px}
+    .inv-sum{margin-left:auto;width:min(300px,100%);font-size:14.5px}
+    .inv-sum div{display:flex;justify-content:space-between;padding:4px 0}
+    .inv-sum .tot{border-top:2px solid var(--ink);margin-top:6px;padding-top:8px;font-weight:700;font-size:17px}
+    .inv-paid{display:inline-block;border:2px solid var(--green);color:var(--green);font-weight:700;letter-spacing:.14em;text-transform:uppercase;font-size:12px;padding:4px 10px}
+    .inv-unpaid{border-color:#9b2c3a;color:#9b2c3a}
+    .inv-note{background:var(--mauve-soft);padding:12px 16px;font-size:14.5px}
+    .inv-foot{font-size:13px;color:var(--muted);border-top:1px solid var(--line);padding-top:16px}
+    .inv-bar{max-width:760px;margin:24px auto 0;display:flex;gap:10px;flex-wrap:wrap;padding:0 16px}
+    @media (max-width:600px){.inv{padding:24px 18px;margin:16px}.inv-cols{grid-template-columns:1fr}.inv-meta{text-align:left}}
+    @media print{body{background:#fff}.inv-bar{display:none}.inv{border:0;margin:0;max-width:none;padding:0}}
+  </style>
+</head>
+<body>
+  <div class="inv-bar">
+    <button class="btn" type="button" onclick="window.print()">Print / Save as PDF</button>
+    <% if (isAdmin) { %>
+      <a class="btn ghost" href="/admin/orders">← Orders</a>
+      <% if (order.email) { %><form action="/admin/orders/<%= order._id %>/receipt" method="POST" style="margin:0"><button class="btn ghost" type="submit"><%= order.source === 'manual' ? 'Email this invoice' : 'Email receipt again' %></button></form><% } %>
+      <% if (order.paid === false) { %><form action="/admin/orders/<%= order._id %>/paid" method="POST" class="iv-paidform"><select name="payment" aria-label="How they paid"><% ['Cash','Venmo','Card in person','Check','Etsy','Zelle','PayPal','Other'].forEach(m => { %><option><%= m %></option><% }) %></select><button class="btn" type="submit">Mark paid</button></form><% } %>
+    <% } else { %><a class="btn ghost" href="/">Back to the shop</a><% } %>
+  </div>
+  <% if (isAdmin) { %><div class="inv-bar" style="display:block"><%- include('partials/v2/order', { o, back: 'invoice' }) %></div><% } %>
+  <% if (sent === 'fail') { %><p class="inv-bar" style="color:#9b2c3a;font-weight:600">The invoice was saved, but the email didn't send. Try "Email this invoice" again in a minute.</p><% } else if (sent) { %><p class="inv-bar" style="color:var(--green);font-weight:600">Sent to <%= order.email %>.</p><% } %>
+  <main class="inv">
+    <div class="inv-top">
+      <div><div class="inv-brand">Venture <em>Creations</em></div><div class="muted" style="font-size:13px;margin-top:4px">venturecreations.net<% if (shop) { %> · <%= shop %><% } %></div></div>
+      <div class="inv-meta"><h1>Invoice</h1><span>Order <b><%= label %></b></span><span><%= date %></span><span><% if (order.paid === false) { %><span class="inv-paid inv-unpaid">Amount due</span><% } else { %><span class="inv-paid">Paid</span><% } %></span></div>
+    </div>
+
+    <div class="inv-cols">
+      <% if (!addr.line1) { %><div><h2>Delivery</h2>Pickup or hand delivery<br><span class="muted">No shipping address</span></div><% } else { %><div><h2>Ship to</h2><%= addr.name %><br><%= addr.line1 %><% if (addr.line2) { %><br><%= addr.line2 %><% } %><br><%= [addr.city, addr.state].filter(Boolean).join(', ') %> <%= addr.postal_code %><% if (addr.country && addr.country !== 'US') { %><br><%= addr.country %><% } %></div><% } %>
+      <div><h2>Customer</h2><%= addr.name %><% if (order.email) { %><br><%= order.email %><% } %><br><span class="muted"><%= order.paid === false ? 'Not paid yet' : order.source === 'manual' ? 'Paid: ' + (order.paymentMethod || 'Other') : 'Paid by card through Stripe' %></span></div>
+    </div>
+
+    <table>
+      <tr><th>Item</th><th class="r">Qty</th><th class="r">Amount</th></tr>
+      <% lines.forEach(l => { %>
+        <tr><td><b><%= l.name %></b><% if (l.details) { %><span class="det"><%= l.details %></span><% } %></td><td class="r"><%= l.quantity %></td><td class="r">$<%= Number(l.price || 0).toFixed(2) %></td></tr>
+      <% }) %>
+    </table>
+
+    <div class="inv-sum">
+      <div><span>Subtotal</span><span>$<%= subtotal.toFixed(2) %></span></div>
+      <% if (discount) { %><div><span>Discount</span><span>−$<%= discount.toFixed(2) %></span></div><% } %>
+      <div><span>Shipping</span><span><%= shipping ? '$' + shipping.toFixed(2) : 'Free' %></span></div>
+      <div><span>Tax</span><span>$<%= tax.toFixed(2) %></span></div>
+      <div class="tot"><span><%= order.paid === false ? 'Amount due' : 'Total paid' %></span><span>$<%= total.toFixed(2) %></span></div>
+    </div>
+
+    <% if (order.notes) { %><div class="inv-note"><b>Note:</b> <%= order.notes %></div><% } %>
+    <div class="inv-foot">Thank you for supporting a small family shop. Every shirt is made to order. Questions about this order? Reply to your order email or visit venturecreations.net/contact.</div>
+  </main>
+</body>
+</html>

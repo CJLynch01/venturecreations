@@ -1,0 +1,49 @@
+<%
+  // Order-received email. Email apps ignore stylesheets, so every style is inline.
+  const ink = '#1c2233', muted = '#5b6275', line = '#e4e6ee', brand = '#4a5ca3', mauve = '#a97c86';
+  const cell = `padding:10px 0;border-bottom:1px solid ${line};vertical-align:top;font-size:14px;color:${ink}`;
+  const row = (label, value, strong) => `<tr><td style="padding:4px 0;font-size:14px;color:${strong ? ink : muted}${strong ? ';font-weight:bold' : ''}">${label}</td><td style="padding:4px 0;font-size:14px;text-align:right;color:${ink}${strong ? ';font-weight:bold' : ''}">${value}</td></tr>`;
+%><!doctype html>
+<html><body style="margin:0;background:#f4f2ef;font-family:Arial,Helvetica,sans-serif;color:<%= ink %>">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f4f2ef"><tr><td align="center" style="padding:24px 12px">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;background:#ffffff;border:1px solid <%= line %>">
+  <tr><td style="padding:24px 28px 8px">
+    <div style="font-family:Georgia,serif;font-size:22px;letter-spacing:.12em;text-transform:uppercase">Venture <i style="color:<%= brand %>;letter-spacing:.06em">Creations</i></div>
+  </td></tr>
+  <tr><td style="padding:8px 28px 4px">
+    <% const manual = order.source === 'manual', due = order.paid === false; %>
+    <div style="font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:<%= mauve %>;font-weight:bold"><%= manual ? 'Invoice' : 'Order received' %></div>
+    <h1 style="font-family:Georgia,serif;font-weight:normal;font-size:28px;margin:6px 0 4px">Thank you<%= addr.name ? ', ' + addr.name.split(' ')[0] : '' %>!</h1>
+    <p style="margin:0;color:<%= muted %>;font-size:14px">Order <b style="color:<%= ink %>"><%= label %></b> · <%= date %></p>
+    <% if (manual) { %><p style="margin:12px 0 0;font-size:15px;line-height:1.5">Here's the invoice for your order. <%= due ? 'The amount due is below.' : 'It is paid in full. Thank you!' %><% if (order.notes) { %><br><b>Note:</b> <%= order.notes %><% } %></p><% } else { %>
+    <p style="margin:12px 0 0;font-size:15px;line-height:1.5">We got your order and we'll start on it soon. Every shirt is made to order<% if (lines.some(l => l.custom)) { %>, and for custom shirts Elisha will email you a proof before printing<% } %>. We'll email you again with tracking when it ships.</p><% } %>
+  </td></tr>
+  <tr><td style="padding:16px 28px 0">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+      <% lines.forEach(l => { %>
+      <tr>
+        <td style="<%= cell %>;width:34px;color:<%= muted %>;font-weight:bold"><%= l.quantity %>×</td>
+        <td style="<%= cell %>"><b><%= l.name %></b><% if (l.details) { %><br><span style="color:<%= muted %>;font-size:13px"><%= l.details %></span><% } %></td>
+        <td style="<%= cell %>;text-align:right;white-space:nowrap"><%= money(l.price) %></td>
+      </tr>
+      <% }) %>
+    </table>
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top:10px">
+      <%- row('Subtotal', money(subtotal)) %>
+      <% if (discount) { %><%- row('Discount', '−' + money(discount)) %><% } %>
+      <%- row('Shipping', shipping ? money(shipping) : 'Free') %>
+      <%- row('Tax', money(tax)) %>
+      <%- row(order.paid === false ? 'Amount due' : 'Total paid', money(total), true) %>
+    </table>
+  </td></tr>
+  <% if (addr.line1) { %><tr><td style="padding:20px 28px 0">
+    <div style="font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:<%= muted %>;font-weight:bold">Shipping to</div>
+    <p style="margin:6px 0 0;font-size:14px;line-height:1.5"><%= addr.name %><br><%= addr.line1 %><% if (addr.line2) { %><br><%= addr.line2 %><% } %><br><%= [addr.city, addr.state].filter(Boolean).join(', ') %> <%= addr.postal_code %></p>
+  </td></tr><% } %>
+  <tr><td style="padding:22px 28px 26px">
+    <a href="<%= url %>" style="display:inline-block;background:<%= ink %>;color:#ffffff;padding:12px 22px;text-decoration:none;font-size:13px;letter-spacing:.12em;font-weight:bold">VIEW OR PRINT YOUR INVOICE</a>
+    <p style="margin:16px 0 0;font-size:13px;color:<%= muted %>;line-height:1.5">Questions about your order? Just reply to this email.<br>Venture Creations · <a href="<%= site %>" style="color:<%= brand %>"><%= site.replace(/^https?:\/\//, '') %></a></p>
+  </td></tr>
+</table>
+</td></tr></table>
+</body></html>

@@ -1,11 +1,61 @@
 <%- include('../partials/v2/head') %>
-<section class="page gut ad"><div class="in" style="display:grid;gap:20px">
-  <div><a href="/admin" style="font-size:14px">← Dashboard</a><h1 style="font-size:clamp(30px,4vw,44px)">Orders</h1></div>
-  <nav class="chips" aria-label="Order status">
-    <a href="/admin/orders" aria-current="<%= !status %>">All</a>
-    <% steps.forEach(s => { %><a href="/admin/orders?status=<%= s %>" aria-current="<%= status === s %>"><%= { paid: 'To print', printed: 'To ship', shipped: 'Shipped' }[s] %></a><% }) %>
+<%
+  const STATUS = { paid: 'To print', printed: 'To ship', shipped: 'Shipped' };
+  const when = d => new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'America/Denver' });
+  const money = n => '$' + Number(n || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  let lastMonth = '';
+%>
+<section class="page gut ad"><div class="in" style="display:grid;gap:18px">
+  <div class="ad-head" style="margin:0">
+    <div><a href="/admin" style="font-size:14px">← Dashboard</a><h1>Orders</h1></div>
+    <div class="buyrow"><a class="btn" href="/admin/invoices/new">New invoice</a></div>
+  </div>
+
+  <form class="ol-search" action="/admin/orders" method="GET" role="search">
+    <% if (status) { %><input type="hidden" name="status" value="<%= status %>"><% } %>
+    <input type="search" name="q" value="<%= q %>" class="pl-search" placeholder="Search every order: name, VC number, email, city, shirt" aria-label="Search orders">
+    <button class="btn ghost" type="submit">Search</button>
+    <% if (q) { %><a href="/admin/orders<%= status ? '?status=' + status : '' %>" style="font-size:14px">Clear</a><% } %>
+  </form>
+
+  <% if (!q && years.length) { %>
+  <nav class="chips" aria-label="Year" style="margin:0">
+    <% years.forEach(y => { %><a href="<%= qs({ year: y, page: '' }) %>" aria-current="<%= y === year %>"><%= y %></a><% }) %>
   </nav>
-  <% if (!orders.length) { %><p class="ad-empty card">No orders here yet.</p><% } %>
-  <div class="ad-orders"><% orders.forEach(o => { %><%- include('../partials/v2/order', { o, back: 'orders' }) %><% }) %></div>
+  <% } %>
+  <nav class="chips" aria-label="Order status" style="margin:0">
+    <a href="<%= qs({ status: '', page: '' }) %>" aria-current="<%= !status %>">All</a>
+    <% steps.forEach(s => { %><a href="<%= qs({ status: s, page: '' }) %>" aria-current="<%= status === s %>"><%= STATUS[s] %></a><% }) %>
+  </nav>
+
+  <% if (q) { %><p class="muted" style="margin:0"><%= total %> order<%= total === 1 ? '' : 's' %> matching "<b><%= q %></b>"</p><% } %>
+
+  <% if (!orders.length) { %><p class="ad-empty card"><%= q ? 'No orders match that search.' : 'No orders here yet.' %></p><% } else { %>
+  <div class="ol card" role="table" aria-label="Orders">
+    <div class="ol-head" role="row"><span role="columnheader">Order</span><span role="columnheader">Date</span><span role="columnheader">Customer</span><span role="columnheader">Shirts</span><span role="columnheader" class="r">Total</span><span role="columnheader">Status</span></div>
+    <% orders.forEach(o => { const a = o.shippingAddress || {}; const shirts = (o.items || []).reduce((n, i) => n + (i.quantity || 0), 0); const first = o.lines[0]; %>
+      <% if (o.month !== lastMonth) { lastMonth = o.month; const t = monthTotals[o.month]; %>
+        <div class="ol-month" role="row"><span role="cell"><%= o.month %></span><% if (t) { %><span role="cell" class="muted tabnum"><%= t.orders %> order<%= t.orders === 1 ? '' : 's' %> · <%= money(t.sales) %></span><% } %></div>
+      <% } %>
+      <a class="ol-row" role="row" href="/invoice/<%= o._id %>">
+        <span role="cell" class="ol-num"><b><%= o.label %></b><% if (o.source === 'manual') { %><small class="muted">by hand</small><% } %></span>
+        <span role="cell" class="muted"><%= when(o.createdAt) %></span>
+        <span role="cell"><b><%= a.name || 'Customer' %></b><small class="muted"><%= [a.city, a.state].filter(Boolean).join(', ') %></small></span>
+        <span role="cell"><%= shirts %> <span class="muted">· <%= first ? first.name : '' %><%= o.lines.length > 1 ? ' +' + (o.lines.length - 1) + ' more' : '' %></span><% if (o.lines.some(l => l.custom)) { %> <span class="ad-custom">Custom</span><% } %></span>
+        <span role="cell" class="r tabnum"><b><%= money(o.total) %></b><% if (o.paid === false) { %><small class="ol-unpaid">Unpaid</small><% } %></span>
+        <span role="cell"><span class="ad-pill ad-pill-<%= o.status %>"><%= STATUS[o.status] || o.status %></span></span>
+      </a>
+    <% }) %>
+  </div>
+
+  <% if (pages > 1) { %>
+  <nav class="ol-pages" aria-label="Pages">
+    <% if (page > 1) { %><a class="btn ghost" href="<%= qs({ page: page - 1 }) %>">← Newer</a><% } else { %><span></span><% } %>
+    <span class="muted tabnum">Page <%= page %> of <%= pages %> · <%= total %> orders</span>
+    <% if (page < pages) { %><a class="btn ghost" href="<%= qs({ page: page + 1 }) %>">Older →</a><% } else { %><span></span><% } %>
+  </nav>
+  <% } %>
+  <p class="muted" style="font-size:13px;margin:0">Click an order to see its invoice, print it, mark it printed or shipped, add tracking, or email it again.</p>
+  <% } %>
 </div></section>
 <%- include('../partials/v2/foot') %>

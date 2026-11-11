@@ -648,3 +648,36 @@ footer.site .copy{grid-column:1/-1;border-top:1px solid var(--line);padding-top:
 .an-list b,.an-list small{text-align:right}
 .an-compact li{grid-template-columns:minmax(0,1fr) minmax(60px,1fr) 44px}
 @media (max-width:560px){.an-step{grid-template-columns:120px 1fr 44px}.an-list li{grid-template-columns:minmax(0,1.4fr) 50px 36px 36px}}
+
+/* admin: orders list */
+.ol{padding:0;display:grid}
+.ol-head,.ol-row{display:grid;grid-template-columns:100px 110px minmax(0,1.3fr) minmax(0,1.6fr) 90px 100px;gap:12px;align-items:center;padding:12px 18px}
+.ol-head{font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);border-bottom:2px solid var(--ink)}
+.ol-row{border-bottom:1px solid var(--line);text-decoration:none;color:var(--ink);font-size:14.5px}
+.ol-row:hover{background:#f6f7fb}
+.ol-row>span{min-width:0;overflow:hidden;text-overflow:ellipsis}
+.ol-row small{display:block;font-size:12.5px}
+.ol .r{text-align:right}
+.ol-num b{color:var(--brand)}
+@media (max-width:760px){.ol-head{display:none}.ol-row{grid-template-columns:1fr auto;gap:4px 12px}.ol-row>span:nth-child(2){grid-column:1}.ol-row>span:nth-child(4){grid-column:1/-1}}
+.ol-search{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.ol-search .pl-search{flex:1 1 280px;max-width:480px}
+.ol-month{display:flex;justify-content:space-between;gap:12px;align-items:baseline;padding:16px 18px 8px;background:#f6f7fb;border-bottom:1px solid var(--line);font-family:var(--display);font-size:20px}
+.ol-month .muted{font-family:var(--body);font-size:13px}
+.ol-unpaid{display:block;color:#9b2c3a;font-weight:700;font-size:12px}
+.ol-pages{display:grid;grid-template-columns:1fr auto 1fr;gap:12px;align-items:center}
+.ol-pages>:last-child{justify-self:end}
+
+/* admin: new invoice */
+.iv-row3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.iv-lines{display:grid;gap:12px}
+.iv-line{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1.4fr) 80px 110px 36px;gap:10px;align-items:end;padding-bottom:12px;border-bottom:1px solid var(--line)}
+.iv-line input[type=number],.iv-row3 input[type=number],.iv-row3 input[type=date]{width:100%;font:inherit;font-size:16px;padding:11px 10px;border:1px solid var(--line);background:var(--card)}
+.iv-x{border:1px solid var(--line);background:var(--card);height:46px;font-size:22px;color:#9b2c3a;cursor:pointer}
+.iv-total{display:flex;justify-content:flex-end;gap:28px;font-size:15px}
+.iv-total b{font-size:18px;margin-left:6px}
+.iv-check{display:flex;gap:10px;align-items:center;font-size:15px}
+.iv-check input{width:18px;height:18px}
+.iv-paidform{display:flex;gap:8px;margin:0}
+.iv-paidform select{font:inherit;font-size:14px;padding:8px;border:1px solid var(--line);background:var(--card)}
+@media (max-width:640px){.iv-row3{grid-template-columns:1fr 1fr}.iv-line{grid-template-columns:1fr 1fr}.iv-line .iv-x{grid-column:2;justify-self:end;width:46px}}

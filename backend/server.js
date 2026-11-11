@@ -23,6 +23,9 @@ import { cartCount, clearCart } from "./lib/cart.js";
 import { seasonMiddleware, seasonFirst } from "./config/seasons.js";
 import { trackingFor, CARRIERS } from "./lib/tracking.js";
 import { trackVisits, recordView } from "./lib/analytics.js";
+import Order from "./models/Order.js";
+import { invoiceData, keyMatches } from "./lib/invoice.js";
+import { nextOrderNumber } from "./lib/orders.js";
 import { withSlugs, siteUrl, absolute, productPath, productSummary, productJsonLd, breadcrumbJsonLd, storeJsonLd } from "./lib/seo.js";
 
 // Routes
@@ -258,11 +261,28 @@ app.get("/search", searchLimiter, async (req, res) => {
   }
 });
 
+// Invoice for one order: the shop's admins, the customer who's signed in, or anyone with the emailed link
+app.get("/invoice/:id", async (req, res) => {
+  try {
+    const order = await Order.findById(req.params.id).lean().catch(() => null);
+    if (!order) return res.status(404).render("404");
+    const isAdmin = req.user?.role === "Admin";
+    const isOwner = req.user && order.userId && String(order.userId) === String(req.user._id);
+    if (!isAdmin && !isOwner && !keyMatches(order, req.query.k)) return res.status(404).render("404");
+    const o = { ...order, status: order.status || "paid" };
+    const d = invoiceData(o);
+    res.render("invoice", { ...d, o: { ...o, lines: d.lines }, isAdmin, sent: ["1", "fail"].includes(req.query.sent) ? req.query.sent : "" });
+  } catch (err) {
+    console.error("Invoice error:", err);
+    res.status(500).send("Couldn't load the invoice.");
+  }
+});
+
 // Stripe success/cancel routes
 app.get('/success', async (req, res) => {
   // Signed-in carts are cleared by the Stripe webhook; a guest's cart lives in the session
   if (!req.user) { try { await clearCart(req); res.locals.cartCount = 0; } catch (err) { console.error(err); } }
-  res.render('shop/success', { title: "Thank you", message: 'Your payment went through. Thank you! We will email you when your order ships.' });
+  res.render('shop/success', { title: "Thank you", message: 'Your payment went through. Thank you! Your receipt is on its way to your email, and we\'ll email you again when your order ships.' });
 });
 
 app.get('/cancel', (req, res) => res.redirect('/cart'));
@@ -298,11 +318,19 @@ app.use((req, res) => {
   res.status(404).render("404", { title: "Page not found" });
 });
 
+// Orders from before order numbers existed get VC numbers, oldest first (runs once; later starts find none)
+async function numberOldOrders() {
+  const old = await Order.find({ number: { $exists: false } }, { _id: 1 }).sort({ createdAt: 1 }).lean();
+  for (const o of old) await Order.updateOne({ _id: o._id, number: { $exists: false } }, { number: await nextOrderNumber() });
+  if (old.length) console.log(`Numbered ${old.length} older orders`);
+}
+
 // Connect to DB and start server
 mongoose
   .connect(process.env.MONGO_URI, process.env.MONGO_URI?.startsWith("mongodb+srv") ? { tls: true, tlsAllowInvalidCertificates: false } : {})
   .then(() => {
     console.log("MongoDB Connected");
+    numberOldOrders().catch(err => console.error("Order numbering failed:", err.message));
     app.listen(PORT, () => {
       console.log(`Server running on http://localhost:${PORT}${TEST_SITE ? " (test site)" : ""}`);
     });

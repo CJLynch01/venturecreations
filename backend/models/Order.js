@@ -13,6 +13,17 @@ const orderSchema = new mongoose.Schema({
     }
   ],
   total: Number,
+  number: Number,           // VC-1001, VC-1002... shown on the receipt and invoice
+  email: String,            // where the receipt and shipping emails go (from Stripe checkout)
+  subtotal: Number,         // shirts before discount, shipping and tax
+  discount: Number,
+  shipping: Number,
+  tax: Number,
+  receiptSentAt: Date,
+  source: { type: String, default: "site" },   // "site" (Stripe checkout) or "manual" (New invoice page)
+  paid: { type: Boolean, default: true },      // manual invoices can start unpaid
+  paymentMethod: String,                       // Stripe, Cash, Venmo, Etsy...
+  notes: String,
   shippingAddress: {
     name: String,
     line1: String,

@@ -22,7 +22,7 @@
             <li class="<%= i < at ? 'done' : i === at ? 'now' : '' %>"<%= i === at ? ' aria-current=step' : '' %>><span><%= label %></span><small><%= i <= at ? day(order[field]) : '' %></small></li>
           <% }) %>
         </ol>
-        <p class="otrack-msg"><%= NOW[status] || '' %>
+        <p class="otrack-msg"><a href="/invoice/<%= order._id %>" style="float:right;font-size:13px">Receipt →</a><%= NOW[status] || '' %>
           <% if (track) { %> <a href="<%= track.url %>" target="_blank" rel="noopener">Track it with <%= track.carrier %> →</a><% } %></p>
         <% order.items.forEach(item => { %><span class="muted" style="font-size:14px"><%= item.quantity %> × <%= item.name %></span><% }) %>
       </div>

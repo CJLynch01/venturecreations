@@ -9,7 +9,7 @@
 %>
 <article class="ad-order ad-st-<%= o.status %>">
   <div class="ad-order-top">
-    <div><b><%= addr.name || 'Customer' %></b><span class="muted"><%= when %><%= addr.city ? ' · ' + addr.city + (addr.state ? ', ' + addr.state : '') : '' %></span></div>
+    <div><b><%= addr.name || 'Customer' %></b><span class="muted"><% if (backTo !== 'invoice') { %><a href="/invoice/<%= o._id %>"><%= o.number ? 'VC-' + o.number : 'Invoice' %></a> · <% } %><%= when %><%= addr.city ? ' · ' + addr.city + (addr.state ? ', ' + addr.state : '') : '' %></span></div>
     <span class="ad-pill ad-pill-<%= o.status %>"><%= { paid: 'To print', printed: 'To ship', shipped: 'Shipped' }[o.status] || o.status %></span>
   </div>
   <ul class="ad-lines">

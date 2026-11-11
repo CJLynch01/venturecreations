@@ -22,6 +22,21 @@ export function orderFromSession(session) {
     stripeSessionId: session.id,
     items: (session.line_items?.data || []).map(item => ({ name: item.description, quantity: item.quantity, price: item.amount_total / 100 })),
     total: session.amount_total / 100,
+    email: session.customer_details?.email || session.customer_email || undefined,
+    subtotal: (session.amount_subtotal ?? session.amount_total) / 100,
+    discount: (session.total_details?.amount_discount || 0) / 100,
+    shipping: (session.total_details?.amount_shipping ?? session.shipping_cost?.amount_total ?? 0) / 100,
+    tax: (session.total_details?.amount_tax || 0) / 100,
     shippingAddress: shippingOf(session),
   };
 }
+
+// Next order number: VC-1001, VC-1002... (one counter, safe when two orders arrive together)
+export async function nextOrderNumber() {
+  const { default: Setting } = await import("../models/Setting.js");
+  const s = await Setting.findOneAndUpdate({ key: "orders.lastNumber" }, { $inc: { value: 1 }, $set: { updatedAt: new Date() } },
+    { upsert: true, new: true, setDefaultsOnInsert: true });
+  if (s.value < 1001) { s.value += 1000; await Setting.updateOne({ _id: s._id }, { value: s.value }); }
+  return s.value;
+}
+export const orderLabel = o => (o.number ? `VC-${o.number}` : `#${String(o._id).slice(-6).toUpperCase()}`);

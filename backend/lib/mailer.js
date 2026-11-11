@@ -16,8 +16,11 @@ const transport = mailEnabled
   ? nodemailer.createTransport({ host, port, secure: port === 465, auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS } })
   : null;
 
-export async function sendMail({ to, subject, text, html }) {
+export async function sendMail({ to, bcc, subject, text, html }) {
   if (!transport) throw new Error("Email isn't set up (SMTP_USER / SMTP_PASS missing)");
   const from = process.env.MAIL_FROM || `Venture Creations <${process.env.SMTP_USER}>`;
-  await transport.sendMail({ from, to, subject, text, html });
+  await transport.sendMail({ from, to, bcc, replyTo: process.env.SMTP_USER, subject, text, html });
 }
+
+// The shop's own address (gets a copy of every order email)
+export const shopAddress = () => process.env.SMTP_USER || "";

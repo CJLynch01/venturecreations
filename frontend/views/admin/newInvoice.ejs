@@ -1,0 +1,95 @@
+<%- include('../partials/v2/head') %>
+<%
+  const today = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Denver' });
+  const METHODS = ['Cash', 'Venmo', 'Card in person', 'Check', 'Etsy', 'Zelle', 'PayPal', 'Other'];
+%>
+<section class="page gut ad"><div class="in pf">
+  <div class="ad-head">
+    <div><a href="/admin/orders" style="font-size:14px">← Orders</a><h1>New <em>invoice</em></h1>
+      <p class="muted" style="margin:6px 0 0">For orders that didn't come through the website: Etsy, in person, Venmo, group orders. It gets the next order number (<b>VC-<%= nextNumber %></b>) and shows up in Orders.</p></div>
+  </div>
+  <% if (error) { %><p class="pf-error" role="alert"><%= error %></p><% } %>
+
+  <form action="/admin/invoices" method="POST" class="pf-form" id="invForm">
+    <section class="ad-card form">
+      <h2>Customer</h2>
+      <div class="field"><label for="iv-name">Name</label><input type="text" id="iv-name" name="name" maxlength="80" required value="<%= v.name || '' %>"></div>
+      <div class="field"><label for="iv-email">Email (to send the invoice; optional)</label><input type="email" id="iv-email" name="email" maxlength="120" value="<%= v.email || '' %>"></div>
+      <div class="field"><label for="iv-l1">Address (optional for pickup)</label><input type="text" id="iv-l1" name="line1" maxlength="120" placeholder="Street" value="<%= v.line1 || '' %>"></div>
+      <div class="iv-row3">
+        <div class="field"><label for="iv-city">City</label><input type="text" id="iv-city" name="city" maxlength="60" value="<%= v.city || '' %>"></div>
+        <div class="field"><label for="iv-state">State</label><input type="text" id="iv-state" name="state" maxlength="20" value="<%= v.state || '' %>"></div>
+        <div class="field"><label for="iv-zip">ZIP</label><input type="text" id="iv-zip" name="postal_code" maxlength="12" value="<%= v.postal_code || '' %>"></div>
+      </div>
+    </section>
+
+    <section class="ad-card form">
+      <div class="ad-card-head"><h2>Shirts</h2><span class="muted">Pick a shirt or type anything</span></div>
+      <datalist id="iv-products"><% products.forEach(p => { %><option value="<%= p.name %>" data-price="<%= p.price %>"></option><% }) %></datalist>
+      <div id="ivLines" class="iv-lines">
+        <% (v.lines && v.lines.length ? v.lines : [{}]).forEach(l => { %>
+        <div class="iv-line">
+          <div class="field"><label>Shirt</label><input type="text" name="item" list="iv-products" maxlength="120" required value="<%= l.item || '' %>" placeholder="Dadcula"></div>
+          <div class="field"><label>Details</label><input type="text" name="details" maxlength="160" value="<%= l.details || '' %>" placeholder="L · Black · custom text"></div>
+          <div class="field"><label>Qty</label><input type="number" name="qty" min="1" max="999" step="1" required value="<%= l.qty || 1 %>"></div>
+          <div class="field"><label>Each ($)</label><input type="number" name="each" min="0" step="0.01" required value="<%= l.each || '' %>"></div>
+          <button type="button" class="iv-x" aria-label="Remove this shirt">×</button>
+        </div>
+        <% }) %>
+      </div>
+      <button type="button" class="btn ghost" id="ivAdd">+ Add another shirt</button>
+    </section>
+
+    <section class="ad-card form">
+      <h2>Totals</h2>
+      <div class="iv-row3">
+        <div class="field"><label for="iv-disc">Discount ($)</label><input type="number" id="iv-disc" name="discount" min="0" step="0.01" value="<%= v.discount || '' %>" placeholder="0.00"></div>
+        <div class="field"><label for="iv-ship">Shipping ($)</label><input type="number" id="iv-ship" name="shipping" min="0" step="0.01" value="<%= v.shipping || '' %>" placeholder="0.00"></div>
+        <div class="field"><label for="iv-tax">Tax ($)</label><input type="number" id="iv-tax" name="tax" min="0" step="0.01" value="<%= v.tax || '' %>" placeholder="0.00"></div>
+      </div>
+      <div class="iv-total"><span>Subtotal <b class="tabnum" id="ivSub">$0.00</b></span><span>Total <b class="tabnum" id="ivTot">$0.00</b></span></div>
+    </section>
+
+    <section class="ad-card form">
+      <h2>Payment &amp; status</h2>
+      <div class="iv-row3">
+        <div class="field"><label for="iv-paid">Payment</label>
+          <select id="iv-paid" name="payment"><option value="">Not paid yet</option><% METHODS.forEach(m => { %><option <%= v.payment === m ? 'selected' : '' %>><%= m %></option><% }) %></select></div>
+        <div class="field"><label for="iv-status">Order status</label>
+          <select id="iv-status" name="status"><option value="paid">To print</option><option value="printed" <%= v.status === 'printed' ? 'selected' : '' %>>To ship</option><option value="shipped" <%= v.status === 'shipped' ? 'selected' : '' %>>Done / delivered</option></select></div>
+        <div class="field"><label for="iv-date">Order date</label><input type="date" id="iv-date" name="date" value="<%= v.date || today %>" max="<%= today %>"></div>
+      </div>
+      <div class="field"><label for="iv-notes">Note on the invoice (optional)</label><textarea id="iv-notes" name="notes" rows="2" maxlength="500" placeholder="Pickup at church on Sunday"><%= v.notes || '' %></textarea></div>
+      <label class="iv-check"><input type="checkbox" name="send" value="1" <%= v.send ? 'checked' : '' %>> Email the invoice to the customer now</label>
+    </section>
+
+    <div class="pf-bar"><button class="btn" type="submit">Create invoice</button><a class="btn ghost" href="/admin/orders">Cancel</a></div>
+  </form>
+</div></section>
+<script>
+(() => {
+  const box = document.getElementById('ivLines'), form = document.getElementById('invForm');
+  const prices = Object.fromEntries([...document.querySelectorAll('#iv-products option')].map(o => [o.value, o.dataset.price]));
+  const num = el => parseFloat(el?.value) || 0;
+  const money = n => '$' + n.toFixed(2);
+  function total() {
+    const sub = [...box.querySelectorAll('.iv-line')].reduce((a, r) => a + num(r.querySelector('[name=qty]')) * num(r.querySelector('[name=each]')), 0);
+    document.getElementById('ivSub').textContent = money(sub);
+    document.getElementById('ivTot').textContent = money(Math.max(0, sub - num(form.discount) + num(form.shipping) + num(form.tax)));
+  }
+  box.addEventListener('input', e => {
+    // Picking a shirt from the list fills in its price
+    if (e.target.name === 'item' && prices[e.target.value]) { const p = e.target.closest('.iv-line').querySelector('[name=each]'); if (!p.value) p.value = prices[e.target.value]; }
+    total();
+  });
+  box.addEventListener('click', e => { if (e.target.closest('.iv-x') && box.children.length > 1) { e.target.closest('.iv-line').remove(); total(); } });
+  document.getElementById('ivAdd').addEventListener('click', () => {
+    const row = box.firstElementChild.cloneNode(true);
+    row.querySelectorAll('input').forEach(i => { i.value = i.name === 'qty' ? 1 : ''; });
+    box.append(row); row.querySelector('input').focus(); total();
+  });
+  form.addEventListener('input', e => { if (['discount', 'shipping', 'tax'].includes(e.target.name)) total(); });
+  total();
+})();
+</script>
+<%- include('../partials/v2/foot') %>
