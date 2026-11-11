@@ -1,12 +1,14 @@
 // Site analytics kept in our own database: page views, shirts viewed, where visitors come from,
 // add-to-cart and checkout. Admins and bots aren't counted. Read by the admin Analytics page.
+// Page views come from a tiny beacon the page sends once a real browser has shown it for a moment
+// (crawlers that pretend to be phones never run it); cart and checkout are counted on the server.
 import crypto from "crypto";
 import Visit from "../models/Visit.js";
 import Order from "../models/Order.js";
 
 const TZ = "America/Denver";
-const BOT = /bot|crawl|spider|slurp|preview|facebookexternalhit|headless|lighthouse|pingdom|uptime|curl|wget|python|axios|node-fetch/i;
-const SKIP = /^\/(admin|api|auth|webhook|cart\/count|sitemap\.xml|robots\.txt|favicon)|\.\w{2,5}$/;
+const BOT = /bot|crawl|spider|slurp|preview|facebookexternalhit|headless|lighthouse|pingdom|uptime|curl|wget|python|axios|node-fetch|google|bing|yandex|baidu|semrush|ahrefs|petal|bytespider|meta-external|whatsapp|telegram|discord|slack|skype|linkedin|scanner|monitor/i;
+const SKIP = /^\/(admin|api|auth|webhook|cart|checkout|customer|success)|\.\w{2,5}$/;
 
 export const dayOf = d => new Date(d).toLocaleDateString("en-CA", { timeZone: TZ });
 
@@ -15,12 +17,13 @@ const SOURCES = [
   [/pinterest\.|pin\.it/, "Pinterest"], [/facebook\.|fb\.|messenger/, "Facebook"], [/instagram\./, "Instagram"],
   [/etsy\./, "Etsy"], [/tiktok\./, "TikTok"], [/mail\.|outlook|gmail/, "Email"],
 ];
-function source(req) {
-  const utm = String(req.query.utm_source || "").toLowerCase();
+// Where the visitor came from: ?utm_source=... if the link had one, else the page that linked here
+function source(req, referrer, utm) {
+  utm = String(utm || "").toLowerCase();
   if (utm) return SOURCES.find(([re]) => re.test(utm + "."))?.[1] || utm.slice(0, 30);
   let host = "";
-  try { host = new URL(req.get("referer") || "").hostname.replace(/^www\./, ""); } catch { return "Direct"; }
-  if (!host || host === req.hostname.replace(/^www\./, "")) return "";   // a click inside the site
+  try { host = new URL(referrer || "").hostname.replace(/^www\./, ""); } catch { return "Direct"; }
+  if (!host || host === req.hostname.replace(/^www\./, "") || /(^|\.)venturecreations\.net$/.test(host)) return "";   // a click inside the site
   return SOURCES.find(([re]) => re.test(host))?.[1] || host.slice(0, 60);
 }
 const device = ua => /ipad|tablet|kindle|silk/i.test(ua) ? "Tablet" : /mobi|iphone|android/i.test(ua) ? "Phone" : "Computer";
@@ -30,28 +33,35 @@ function visitorId(req, day) {
   return crypto.createHash("sha256").update(`${secret}|${day}|${req.ip}|${req.get("user-agent") || ""}`).digest("base64url").slice(0, 16);
 }
 
-// Express middleware: records shopper page views and cart/checkout steps after the response is sent
-export function trackVisits(req, res, next) {
+const skipVisitor = req => {
   const ua = req.get("user-agent") || "";
-  const isAdmin = req.user?.role === "Admin";
-  if (isAdmin || !ua || BOT.test(ua) || process.env.ANALYTICS_OFF === "1") return next();
+  return req.user?.role === "Admin" || !ua || BOT.test(ua) || process.env.ANALYTICS_OFF === "1";
+};
+const save = (req, fields) => {
+  const at = new Date(), day = dayOf(at);
+  Visit.create({ at, day, device: device(req.get("user-agent") || ""), visitor: visitorId(req, day), ...fields })
+    .catch(err => console.error("Analytics save failed:", err.message));
+};
 
-  let kind = null;
-  if (req.method === "GET" && !SKIP.test(req.path) && !req.xhr && (req.get("accept") || "").includes("text/html")) kind = "page";
-  else if (req.method === "POST" && /^\/cart\/(add|custom|group)$/.test(req.path)) kind = "cart";
-  else if (req.method === "POST" && req.path === "/checkout/create-checkout-session") kind = "checkout";
-  if (!kind) return next();
-
-  // Read these now; the session and query are still here before the route runs
-  const ref = kind === "page" ? source(req) : "";
-  const q = req.path === "/search" ? String(req.query.q || "").trim().toLowerCase().slice(0, 60) : "";
-  res.on("finish", () => {
-    if (res.statusCode !== 200) return;
-    const at = new Date(), day = dayOf(at);
-    Visit.create({ at, day, kind, path: req.path.slice(0, 120), ref, device: device(ua), visitor: visitorId(req, day), q: q || undefined })
-      .catch(err => console.error("Analytics save failed:", err.message));
-  });
+// Express middleware: counts add-to-cart and checkout steps once they succeed
+export function trackVisits(req, res, next) {
+  if (req.method !== "POST" || skipVisitor(req)) return next();
+  const kind = /^\/cart\/(add|custom|group)$/.test(req.path) ? "cart" : req.path === "/checkout/create-checkout-session" ? "checkout" : null;
+  if (kind) res.on("finish", () => { if (res.statusCode === 200) save(req, { kind, path: req.path }); });
   next();
+}
+
+// POST /v from the page beacon: { p: path + search, r: document.referrer }
+export function recordView(req, res) {
+  res.status(204).end();
+  const b = req.body && typeof req.body === "object" ? req.body : {};
+  if (skipVisitor(req) || b.w) return;
+  let url;
+  try { url = new URL(String(b.p || ""), "https://x"); } catch { return; }
+  const path = url.pathname.slice(0, 120);
+  if (!path.startsWith("/") || SKIP.test(path)) return;
+  const q = path === "/search" ? String(url.searchParams.get("q") || "").trim().toLowerCase().slice(0, 60) : "";
+  save(req, { kind: "page", path, ref: source(req, String(b.r || ""), url.searchParams.get("utm_source")), q: q || undefined });
 }
 
 const pct = (a, b) => (b ? Math.round((a / b) * 1000) / 10 : 0);

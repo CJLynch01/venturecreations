@@ -36,5 +36,21 @@
 </aside>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 <script>window.VC = { freeShippingOver: <%= shop.FREE_SHIPPING_OVER %> };</script>
+<% if (!(user && user.role === 'Admin') && !/^\/admin/.test(path)) { %>
+<script>
+// Visit counter for the shop's own Analytics page: sent once the page has been on screen for 2 seconds
+(() => {
+  let sent = false;
+  const send = () => {
+    if (sent || document.visibilityState !== 'visible') return;
+    sent = true;
+    const body = JSON.stringify({ p: location.pathname + location.search, r: document.referrer, w: navigator.webdriver === true });
+    navigator.sendBeacon ? navigator.sendBeacon('/v', new Blob([body], { type: 'application/json' })) : fetch('/v', { method: 'POST', body, headers: { 'Content-Type': 'application/json' }, keepalive: true });
+  };
+  const wait = () => setTimeout(send, 2000);
+  document.visibilityState === 'visible' ? wait() : document.addEventListener('visibilitychange', wait, { once: true });
+})();
+</script>
+<% } %>
 </body>
 </html>
