@@ -2,6 +2,7 @@ import express from "express";
 import stripe from "../config/stripe.js";
 import Order from "../models/Order.js";
 import User from "../models/User.js";
+import { orderFromSession } from "../lib/orders.js";
 
 const router = express.Router();
 
@@ -30,34 +31,12 @@ router.post("/", express.raw({ type: "application/json" }), async (req, res) => 
         expand: ["line_items"],
       });
 
-      const items = fullSession.line_items.data.map((item) => ({
-        name: item.description,
-        quantity: item.quantity,
-        price: item.amount_total / 100,
-      }));
-
-      const shipping = session.shipping_details?.address;
-
-      // Find user by email and clear their cart
-      const user = await User.findOne({ email: session.customer_details?.email });
-
-      const order = new Order({
-        userId: user?._id,
-        stripeSessionId: session.id,
-        items,
-        total: session.amount_total / 100,
-        shippingAddress: {
-          name: session.shipping_details?.name,
-          line1: shipping?.line1,
-          line2: shipping?.line2,
-          city: shipping?.city,
-          state: shipping?.state,
-          postal_code: shipping?.postal_code,
-          country: shipping?.country,
-        },
-      });
-
+      // Read everything from the session we just fetched (it uses the site's pinned Stripe version),
+      // and link the order to whoever was signed in when checkout started
+      const order = new Order(orderFromSession(fullSession));
+      if (!order.shippingAddress?.line1) console.error(`Order ${session.id} has no shipping address; check it in Stripe`);
       await order.save();
+      const user = order.userId ? await User.findById(order.userId) : null;
 
       if (user) {
         user.cart = [];

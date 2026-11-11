@@ -50,6 +50,8 @@ router.post('/create-checkout-session', async (req, res) => {
       ...(shippingOptions.length ? { shipping_options: shippingOptions } : {}),
       automatic_tax: { enabled: true },
       ...(req.user?.email ? { customer_email: req.user.email } : {}),
+      // Who placed it, so the paid order lands in the right account (not matched by the email typed at Stripe)
+      ...(req.user?._id ? { client_reference_id: String(req.user._id) } : {}),
       success_url: `${base}/success`,
       cancel_url: `${base}/cart`,
     });

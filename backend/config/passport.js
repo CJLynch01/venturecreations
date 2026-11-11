@@ -24,6 +24,8 @@ if (googleEnabled) passport.use(
 
   }, async (accessToken, refreshToken, profile, done) => {
     try {
+      // Only trust an email Google has verified (it decides admin access and which account to use)
+      if (profile.emails?.[0]?.verified === false) return done(null, false);
       let user = await User.findOne({ googleId: profile.id });
 
       // Someone who first signed in with an email link: same account, now linked to Google too
