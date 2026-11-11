@@ -9,6 +9,7 @@ import Setting from "../models/Setting.js";
 import { dashboardData, splitItem, ORDER_STEPS } from "../lib/dashboard.js";
 import { photoUpload, savePhotos, uploadsEnabled } from "../lib/uploads.js";
 import { analyticsData } from "../lib/analytics.js";
+import Visit from "../models/Visit.js";
 import { withSlugs, productPath } from "../lib/seo.js";
 import { CARRIERS, cleanTracking, guessCarrier } from "../lib/tracking.js";
 
@@ -76,10 +77,21 @@ router.get("/analytics", ensureAdmin, async (req, res) => {
   try {
     const days = [7, 30, 90].includes(Number(req.query.days)) ? Number(req.query.days) : 30;
     const names = new Map(withSlugs(await Product.find({}, { name: 1, createdAt: 1 }).lean()).map(p => [productPath(p), p.name]));
-    res.render("admin/analytics", { title: "Analytics", a: await analyticsData(days, names) });
+    res.render("admin/analytics", { title: "Analytics", a: await analyticsData(days, names), reset: req.query.reset === "1" });
   } catch (err) {
     console.error("Analytics error:", err);
     res.status(500).send("Couldn't load analytics.");
+  }
+});
+
+// Clear the visit counts and start over (orders and shirts aren't touched)
+router.post("/analytics/reset", ensureAdmin, async (req, res) => {
+  try {
+    if (req.body.confirm === "yes") await Visit.deleteMany({});
+    res.redirect("/admin/analytics?reset=1");
+  } catch (err) {
+    console.error("Analytics reset error:", err);
+    res.status(500).send("Couldn't clear analytics.");
   }
 });
 

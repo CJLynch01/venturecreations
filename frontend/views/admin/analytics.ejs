@@ -31,6 +31,7 @@
     </nav>
   </div>
 
+  <% if (reset) { %><p class="pf-ok" role="status" style="margin-bottom:18px">Cleared. Counting starts fresh from now.</p><% } %>
   <div class="ad-tiles">
     <div class="ad-tile"><span>Visitors</span><b class="tabnum"><%= num(t.visitors) %></b><small><%= change(t.visitors, t.prevVisitors) %></small></div>
     <div class="ad-tile"><span>Pages viewed</span><b class="tabnum"><%= num(t.views) %></b><small><%= change(t.views, t.prevViews) %></small></div>
@@ -124,6 +125,9 @@
         <% } else { %><ol class="ad-rank"><% a.searches.forEach(s => { %><li><span><%= s.label %></span><b class="tabnum"><%= s.n %></b></li><% }) %></ol><% } %>
       </section>
 
+      <details class="pf-remove" style="margin-top:0"><summary>Start fresh</summary>
+        <form action="/admin/analytics/reset" method="POST"><p class="muted" style="font-size:13px">Clears every visit counted so far and starts over. Orders, sales and shirts aren't touched.</p>
+          <button class="btn ghost" type="submit" name="confirm" value="yes">Yes, clear the counts</button></form></details>
       <p class="muted" style="font-size:13px">Counted by the site itself: no cookies, no outside trackers, and IP addresses aren't saved. Your own visits while signed in as admin aren't counted.</p>
     </aside>
   </div>
