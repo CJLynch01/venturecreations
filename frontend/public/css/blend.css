@@ -648,3 +648,5 @@ footer.site .copy{grid-column:1/-1;border-top:1px solid var(--line);padding-top:
 .an-list b,.an-list small{text-align:right}
 .an-compact li{grid-template-columns:minmax(0,1fr) minmax(60px,1fr) 44px}
 @media (max-width:560px){.an-step{grid-template-columns:120px 1fr 44px}.an-list li{grid-template-columns:minmax(0,1.4fr) 50px 36px 36px}}
+.gbtn{background:var(--card);border-color:var(--line);color:var(--ink);text-transform:none;letter-spacing:.02em;font-size:15px;padding:14px 20px}
+.gbtn:hover{border-color:var(--ink)}
